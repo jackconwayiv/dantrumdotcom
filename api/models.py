@@ -18,7 +18,9 @@ class Album(CreatedUpdated):
     link_url = models.CharField(max_length=200)
     thumbnail_url = models.CharField(max_length=200)
     album_date = models.DateTimeField(default=datetime.now())
-    # album_date = models.DateField(default=date.today)
+    owner = models.ForeignKey(
+        "auth.User", related_name="albums", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.title
