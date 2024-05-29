@@ -1,13 +1,12 @@
 import datetime
 
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from api.models import Album
+from api.models import Album, User
 
 
 class AlbumSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source="owner.username")
+    owner = serializers.ReadOnlyField(source="owner.email")
 
     class Meta:
         model = Album
@@ -27,4 +26,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "albums"]
+        fields = ["id", "email", "date_of_birth", "albums"]

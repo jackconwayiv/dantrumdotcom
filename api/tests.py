@@ -1,16 +1,17 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from .models import Album
+from .models import Album, User
 from .serializers import AlbumSerializer
 
 
 class AlbumModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user = User.objects.create_user(
+            email="testuser@test.com", password="testpass", date_of_birth="1990-01-01"
+        )
 
     def test_album_creation(self):
         album = Album.objects.create(title="Test Album", owner=self.user)
@@ -20,21 +21,25 @@ class AlbumModelTest(TestCase):
 
 class AlbumSerializerTest(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user = User.objects.create_user(
+            email="testuser@test.com", password="testpass", date_of_birth="1990-01-01"
+        )
         self.album = Album.objects.create(title="Test Album", owner=self.user)
 
     def test_album_serializer(self):
         serializer = AlbumSerializer(self.album)
         data = serializer.data
         self.assertEqual(data["title"], "Test Album")
-        self.assertEqual(data["owner"], self.user.username)  # Check for username
+        self.assertEqual(data["owner"], self.user.email)  # Check for email
 
 
 class AlbumViewSetTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user = User.objects.create_user(
+            email="testuser@test.com", password="testpass", date_of_birth="1990-01-01"
+        )
         self.client = APIClient()
-        self.client.login(username="testuser", password="testpass")
+        self.client.login(email="testuser@test.com", password="testpass")
 
     def test_list_albums(self):
         Album.objects.create(
@@ -97,17 +102,19 @@ class AlbumViewSetTests(APITestCase):
 
 class AlbumPermissionTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
-        self.other_user = User.objects.create_user(
-            username="otheruser", password="testpass"
+        self.user = User.objects.create_user(
+            email="testuser@test.com", password="testpass", date_of_birth="1990-01-01"
+        )
+        self.user = User.objects.create_user(
+            email="seconduser@test.com", password="testpass", date_of_birth="1990-02-02"
         )
         self.album = Album.objects.create(title="Test Album", owner=self.user)
         self.client = APIClient()
-        self.client.login(username="testuser", password="testpass")
+        self.client.login(email="testuser@test.com", password="testpass")
 
     def test_permission_denied_for_other_user(self):
         self.client.logout()
-        self.client.login(username="otheruser", password="testpass")
+        self.client.login(email="otheruser@test.com", password="testpass")
         url = reverse("album-detail", args=[self.album.id])
         response = self.client.put(url, {"title": "Updated Album"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
