@@ -1,10 +1,15 @@
+import datetime
+
 from django.contrib.auth.models import User
+from django.utils import timezone
 from rest_framework import serializers
 
 from api.models import Album
 
 
 class AlbumSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source="owner.username")
+
     class Meta:
         model = Album
         fields = [
@@ -16,7 +21,6 @@ class AlbumSerializer(serializers.ModelSerializer):
             "album_date",
             "owner",
         ]
-        owner = serializers.ReadOnlyField(source="owner.username")
 
 
 class UserSerializer(serializers.ModelSerializer):

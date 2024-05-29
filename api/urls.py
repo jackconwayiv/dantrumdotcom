@@ -1,17 +1,30 @@
 from django.urls import include, path
-from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
-urlpatterns = [
-    path("", views.index, name="index"),
-    path("albums/", views.AlbumList.as_view(), name="album-list"),
-    path("albums/<int:pk>/", views.AlbumDetail.as_view(), name="album-detail"),
-    path("users/", views.UserList.as_view(), name="user-list"),
-    path("users/<int:pk>/", views.UserDetail.as_view(), name="user-detail"),
-]
+# Create a router and register our ViewSets with it.
+router = DefaultRouter()
+router.register(r"albums", views.AlbumViewSet, basename="album")
+router.register(r"users", views.UserViewSet, basename="user")
 
-urlpatterns = format_suffix_patterns(urlpatterns)
-urlpatterns += [
+# album_list = AlbumViewSet.as_view({"get": "list", "post": "create"})
+# album_detail = AlbumViewSet.as_view(
+#     {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}
+# )
+# user_list = UserViewSet.as_view({"get": "list"})
+# user_detail = UserViewSet.as_view({"get": "retrieve"})
+
+# urlpatterns = [
+#     path("", index, name="index"),
+#     path("albums/", album_list, name="album-list"),
+#     path("albums/<int:pk>/", album_detail, name="album-detail"),
+#     path("users/", user_list, name="user-list"),
+#     path("users/<int:pk>/", user_detail, name="user-detail"),
+# ]
+
+# The API URLs are now determined automatically by the router.
+urlpatterns = [
+    path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls")),
 ]

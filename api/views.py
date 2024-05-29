@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from rest_framework import generics, permissions
-from rest_framework.decorators import api_view
+from django.utils import timezone
+from rest_framework import generics, permissions, renderers, viewsets
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -20,34 +21,57 @@ def index(request, format=None):
     )
 
 
-class AlbumList(generics.ListCreateAPIView):
+class AlbumViewSet(viewsets.ModelViewSet):
     """
-    List all albums, or create a new album.
+    This ViewSet automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
     """
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class AlbumDetail(generics.RetrieveUpdateDestroyAPIView):
+# class AlbumList(generics.ListCreateAPIView):
+#     """
+#     List all albums, or create a new album.
+#     """
+
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+#     queryset = Album.objects.all()
+#     serializer_class = AlbumSerializer
+
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
+
+
+# class AlbumDetail(generics.RetrieveUpdateDestroyAPIView):
+#     """
+#     Retrieve, update or delete an Album instance.
+#     """
+
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+#     queryset = Album.objects.all()
+#     serializer_class = AlbumSerializer
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Retrieve, update or delete an Album instance.
+    This viewset automatically provides `list` and `retrieve` actions.
     """
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    queryset = Album.objects.all()
-    serializer_class = AlbumSerializer
-
-
-class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserList(generics.ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+
+
+# class UserDetail(generics.RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer

@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from django.db import models
 
@@ -17,7 +17,7 @@ class Album(CreatedUpdated):
     description = models.CharField(max_length=200)
     link_url = models.CharField(max_length=200)
     thumbnail_url = models.CharField(max_length=200)
-    album_date = models.DateTimeField(default=datetime.now())
+    album_date = models.DateField(default=datetime.date.today, editable=True)
     owner = models.ForeignKey(
         "auth.User", related_name="albums", on_delete=models.CASCADE
     )
