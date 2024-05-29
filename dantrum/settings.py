@@ -89,7 +89,7 @@ DATABASES = {
     }
 }
 
-# before docker:
+# Before Docker:
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',

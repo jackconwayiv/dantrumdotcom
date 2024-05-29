@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.utils import timezone
-from rest_framework import generics, permissions, renderers, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework import permissions, viewsets
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -27,35 +25,14 @@ class AlbumViewSet(viewsets.ModelViewSet):
     `update` and `destroy` actions.
     """
 
-    queryset = Album.objects.all()
+    queryset = Album.objects.all().order_by(
+        "-album_date"
+    )  # Order by album_date descending
     serializer_class = AlbumSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-# class AlbumList(generics.ListCreateAPIView):
-#     """
-#     List all albums, or create a new album.
-#     """
-
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#     queryset = Album.objects.all()
-#     serializer_class = AlbumSerializer
-
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-
-
-# class AlbumDetail(generics.RetrieveUpdateDestroyAPIView):
-#     """
-#     Retrieve, update or delete an Album instance.
-#     """
-
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#     queryset = Album.objects.all()
-#     serializer_class = AlbumSerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -65,13 +42,3 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-
-# class UserList(generics.ListAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-
-
-# class UserDetail(generics.RetrieveAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
