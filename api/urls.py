@@ -5,10 +5,10 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("albums/", views.AlbumList.as_view()),
-    path("albums/<int:pk>/", views.AlbumDetail.as_view()),
-    path("users/", views.UserList.as_view()),
-    path("users/<int:pk>/", views.UserDetail.as_view()),
+    path("albums/", views.AlbumList.as_view(), name="album-list"),
+    path("albums/<int:pk>/", views.AlbumDetail.as_view(), name="album-detail"),
+    path("users/", views.UserList.as_view(), name="user-list"),
+    path("users/<int:pk>/", views.UserDetail.as_view(), name="user-detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

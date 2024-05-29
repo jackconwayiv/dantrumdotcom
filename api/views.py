@@ -1,14 +1,23 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework import generics, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from .models import Album
 from .permissions import IsOwnerOrReadOnly
 from .serializers import AlbumSerializer, UserSerializer
 
 
-def index(request):
-    return HttpResponse("Hello world. You're at the api index.")
+@api_view(["GET"])
+def index(request, format=None):
+    return Response(
+        {
+            "users": reverse("user-list", request=request, format=format),
+            "albums": reverse("album-list", request=request, format=format),
+        }
+    )
 
 
 class AlbumList(generics.ListCreateAPIView):
