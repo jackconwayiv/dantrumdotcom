@@ -5,7 +5,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 
-from .models import Album, User
+from .models import Album, Quote, User
 
 
 class UserCreationForm(forms.ModelForm):
@@ -80,6 +80,11 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ["email"]
     ordering = ["email"]
     filter_horizontal = []
+
+
+@admin.register(Quote)
+class QuoteAdmin(admin.ModelAdmin):
+    list_display = ("text", "date",  "owner")
 
 
 # Now register the new UserAdmin...

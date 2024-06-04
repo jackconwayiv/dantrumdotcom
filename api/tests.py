@@ -47,7 +47,7 @@ class AlbumViewSetTests(APITestCase):
             description="Desc 1",
             link_url="http://test1.com",
             thumbnail_url="http://test1.com/thumbnail.jpg",
-            album_date="2024-05-29",
+            date="2024-05-29",
             owner=self.user,
         )
         Album.objects.create(
@@ -55,7 +55,7 @@ class AlbumViewSetTests(APITestCase):
             description="Desc 2",
             link_url="http://test2.com",
             thumbnail_url="http://test2.com/thumbnail.jpg",
-            album_date="2024-05-28",
+            date="2024-05-28",
             owner=self.user,
         )
         url = reverse("album-list")
@@ -73,7 +73,7 @@ class AlbumViewSetTests(APITestCase):
             "description": "New Description",
             "link_url": "http://new.com",
             "thumbnail_url": "http://new.com/thumbnail.jpg",
-            "album_date": "2024-05-29",
+            "date": "2024-05-29",
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -94,7 +94,7 @@ class AlbumViewSetTests(APITestCase):
             "description": "New Description",
             "link_url": "http://new.com",
             "thumbnail_url": "http://new.com/thumbnail.jpg",
-            "album_date": "2024-05-29",
+            "date": "2024-05-29",
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

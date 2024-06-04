@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 
-from api.models import Album, User
+from api.models import Album, Quote, User
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class AlbumSerializer(serializers.ModelSerializer):
             "description",
             "link_url",
             "thumbnail_url",
-            "album_date",
+            "date",
             "owner",
         ]
 
@@ -27,3 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "date_of_birth", "albums"]
+
+
+class QuoteSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source="owner.email")
+
+    class Meta:
+        model = Quote
+        fields = ["id", "text", "date", "owner"]

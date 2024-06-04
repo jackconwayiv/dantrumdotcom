@@ -1,8 +1,15 @@
 import datetime
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, AbstractUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    AbstractUser,
+    BaseUserManager,
+    User,
+)
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils import timezone
 
 
 class CreatedUpdated(models.Model):
@@ -47,6 +54,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    nickname = models.CharField(max_length=200, blank=True)
     email = models.EmailField(
         verbose_name="email address",
         max_length=255,
@@ -64,15 +72,6 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
-    # def has_perm(self, perm, obj=None):
-    #     "Does the user have a specific permission?"
-    #     # Simplest possible answer: Yes, always
-    #     return True
-
-    # def has_module_perms(self, app_label):
-    #     "Does the user have permissions to view the app `app_label`?"
-    #     # Simplest possible answer: Yes, always
-    #     return True
 
     @property
     def is_staff(self):
@@ -85,12 +84,23 @@ class Album(CreatedUpdated):
 
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
-    link_url = models.CharField(max_length=200)
-    thumbnail_url = models.CharField(max_length=200)
-    album_date = models.DateField(default=datetime.date.today, editable=True)
+    link_url = models.CharField(max_length=4000)
+    thumbnail_url = models.CharField(max_length=4000)
+    date = models.DateField(default=datetime.date.today, editable=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name="albums", on_delete=models.CASCADE
     )
 
     def __str__(self):
         return self.title
+
+
+class Quote(models.Model):
+    text = models.TextField()
+    date = models.DateField(default=datetime.date.today, editable=True)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="owned_quotes"
+    )
+
+    def __str__(self):
+        return f"{self.text}"
