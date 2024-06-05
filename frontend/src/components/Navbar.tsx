@@ -13,73 +13,81 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <Flex width="100vw" justifyContent="space-between" alignItems="center">
+    <Flex justifyContent="space-between" alignItems="center">
       <Heading
         size="lg"
         cursor="pointer"
         onClick={() => navigate("/")}
-        margin="10px"
+        paddingX="10px"
       >
         DANTRUM.COM
       </Heading>
-      <Flex width="40vw" justifyContent="space-evenly" margin="20px">
+      <Flex justifyContent="end" marginY="10px">
         <Tooltip label="Home" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaHome
               cursor="pointer"
               size="30px"
+              color="brown"
               onClick={() => navigate("/")}
             />
-          </span>
+          </Flex>
         </Tooltip>
         <Tooltip label="Calendar" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaCalendarAlt
               cursor="pointer"
               size="30px"
+              color="red"
               onClick={() => navigate("/calendar")}
             />
-          </span>
+          </Flex>
         </Tooltip>
 
         <Tooltip label="Photos" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaCamera
               cursor="pointer"
               size="30px"
+              color="orange"
               onClick={() => navigate("/albums")}
             />
-          </span>
+          </Flex>
         </Tooltip>
         <Tooltip label="Quotes" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaFeatherAlt
               cursor="pointer"
               size="30px"
+              color="green"
               onClick={() => navigate("/quotes")}
             />
-          </span>
+          </Flex>
         </Tooltip>
         <Tooltip label="Resources" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaMapSigns
               cursor="pointer"
               size="30px"
+              color="blue"
               onClick={() => navigate("/resources")}
             />
-          </span>
+          </Flex>
         </Tooltip>
         <Tooltip label="Friends" fontSize="md">
-          <span>
+          <Flex paddingX={"10px"}>
             <FaAddressBook
               cursor="pointer"
               size="30px"
+              color="purple"
               onClick={() => navigate("/users")}
             />
-          </span>
+          </Flex>
         </Tooltip>
         <Tooltip label="Profile" fontSize="md">
-          <Avatar size="sm" />
+          <Flex paddingX={"10px"}>
+            <Avatar size="sm" />
+          </Flex>
         </Tooltip>
       </Flex>
     </Flex>
