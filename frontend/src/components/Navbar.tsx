@@ -18,13 +18,13 @@ function Navbar() {
         size="lg"
         cursor="pointer"
         onClick={() => navigate("/")}
-        paddingX="10px"
+        paddingX={4}
       >
         DANTRUM.COM
       </Heading>
       <Flex justifyContent="end" marginY="10px">
         <Tooltip label="Home" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaHome
               cursor="pointer"
               size="30px"
@@ -34,7 +34,7 @@ function Navbar() {
           </Flex>
         </Tooltip>
         <Tooltip label="Calendar" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaCalendarAlt
               cursor="pointer"
               size="30px"
@@ -45,7 +45,7 @@ function Navbar() {
         </Tooltip>
 
         <Tooltip label="Photos" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaCamera
               cursor="pointer"
               size="30px"
@@ -55,7 +55,7 @@ function Navbar() {
           </Flex>
         </Tooltip>
         <Tooltip label="Quotes" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaFeatherAlt
               cursor="pointer"
               size="30px"
@@ -65,7 +65,7 @@ function Navbar() {
           </Flex>
         </Tooltip>
         <Tooltip label="Resources" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaMapSigns
               cursor="pointer"
               size="30px"
@@ -75,7 +75,7 @@ function Navbar() {
           </Flex>
         </Tooltip>
         <Tooltip label="Friends" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <FaAddressBook
               cursor="pointer"
               size="30px"
@@ -85,7 +85,7 @@ function Navbar() {
           </Flex>
         </Tooltip>
         <Tooltip label="Profile" fontSize="md">
-          <Flex paddingX={"10px"}>
+          <Flex paddingX={4}>
             <Avatar size="sm" />
           </Flex>
         </Tooltip>

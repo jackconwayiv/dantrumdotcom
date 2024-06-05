@@ -1,3 +1,5 @@
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import redirect
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -6,6 +8,11 @@ from rest_framework.reverse import reverse
 from .models import Album, Quote, User
 from .permissions import IsOwnerOrReadOnly
 from .serializers import AlbumSerializer, QuoteSerializer, UserSerializer
+
+
+def logout(request):
+    auth_logout(request)
+    return redirect("/")
 
 
 @api_view(["GET"])
@@ -25,9 +32,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     `update` and `destroy` actions.
     """
 
-    queryset = Album.objects.all().order_by(
-        "-date"
-    )  # Order by date descending
+    queryset = Album.objects.all().order_by("-date")  # Order by date descending
     serializer_class = AlbumSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 

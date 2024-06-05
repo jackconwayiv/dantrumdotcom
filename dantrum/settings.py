@@ -13,6 +13,32 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import environ
+
+# Initialize the environment variables
+env = environ.Env(DJANGO_ENV=(str, "development"), DEBUG=(bool, False))
+
+
+# Read the .env file
+environ.Env.read_env(".env")
+
+# Load environment variables
+DJANGO_ENV = env("DJANGO_ENV", default="development")
+DEBUG = DJANGO_ENV == "development"
+
+# Set ALLOWED_HOSTS based on environment variable
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost").split(",")
+
+# CORS configuration
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
+
+# Auth0 settings
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = env("AUTH0_DOMAIN", default="fake_domain")
+SOCIAL_AUTH_AUTH0_KEY = env("AUTH0_CLIENT_ID", default="fake_id")
+SOCIAL_AUTH_AUTH0_SECRET = env("AUTH0_CLIENT_SECRET", default="fake_secret")
+SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile", "email"]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,9 +64,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "social_django",
+    'corsheaders',
 ]
 
 AUTH_USER_MODEL = "api.User"
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.auth0.Auth0OAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -55,7 +88,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
+
+LOGIN_URL = "/login/auth0"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 ROOT_URLCONF = "dantrum.urls"
 
@@ -133,7 +172,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
+
+BACKEND_DIR = BASE_DIR
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+# Directory where Django will look for static files (e.g., React build files)
+STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
+
+# Directory where Django will collect all static files
+STATIC_ROOT = BACKEND_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -17,3 +17,7 @@ Adjustments to commands from above tutorial:
 To start Docker container:
 
 - `docker-compose up`
+
+To enter virtual environment:
+
+- `source venv/bin/activate`
