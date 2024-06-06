@@ -1,9 +1,9 @@
 import { Flex, Heading } from "@chakra-ui/react";
 
-export default function Root() {
+export default function Resources() {
   return (
     <Flex direction="column">
-      <Heading>YO! IT'S DANTRUM.COM</Heading>
+      <Heading>RESOURCES</Heading>
     </Flex>
   );
 }

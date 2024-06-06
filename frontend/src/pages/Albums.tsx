@@ -43,11 +43,21 @@ const Albums = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Flex direction="column">
+        <Heading>PHOTOS</Heading>
+        <Text>Loading...</Text>
+      </Flex>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <Flex direction="column">
+        <Heading>PHOTOS</Heading>
+        <Text>Error: {error}</Text>
+      </Flex>
+    );
   }
   return (
     <Flex direction="column" alignItems="center" p={4} width="100%">
