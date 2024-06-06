@@ -2,18 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path
 
+from . import views
+
 urlpatterns = [
-    path("api/", include("api.urls")),
-    path("auth/", include("social_django.urls")),
+    path("", views.index, name="index"),
+    path("login/", views.login, name="login"),
     path("admin/", admin.site.urls),
-    # Including social_django.urls without any prefix
-    # path("", include("social_django.urls")),
-    # Redirecting the root URL to the React application
-    # path(
-    #     "",
-    #     RedirectView.as_view(pattern_name="react", permanent=True),
-    #     name="index",
-    # ),
-    # Logout URL
-    # path("logout/", login_required(views.logout), name="logout"),
+    path("api/", include("api.urls")),
+    path("", include("social_django.urls", namespace="social")),
+    path("callback", views.callback, name="callback"),
 ]

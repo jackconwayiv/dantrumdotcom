@@ -21,63 +21,41 @@ class CreatedUpdated(models.Model):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, password=None):
-        """
-        Creates and saves a User with the given email, date of
-        birth and password.
-        """
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("Users must have an email address")
-
-        user = self.model(
-            email=self.normalize_email(email),
-            date_of_birth=date_of_birth,
-        )
-
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        extra_fields.setdefault(
+            "is_active", False
+        )  # Set is_active to False for regular users
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, date_of_birth, password=None):
-        """
-        Creates and saves a superuser with the given email, date of
-        birth and password.
-        """
-        user = self.create_user(
-            email,
-            password=password,
-            date_of_birth=date_of_birth,
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault(
+            "is_active", True
+        )  # Set is_active to True for superusers
+        return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
-    nickname = models.CharField(max_length=200, blank=True)
-    email = models.EmailField(
-        verbose_name="email address",
-        max_length=255,
-        unique=True,
-    )
-    date_of_birth = models.DateField()
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+class User(AbstractUser):
+    username = models.CharField(
+        max_length=200, null=True, blank=True
+    )  # Make username nullable
+    date_of_birth = models.DateField(null=True, blank=True)
+    email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["date_of_birth"]
-
     def __str__(self):
         return self.email
-
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
 
 
 class Album(CreatedUpdated):

@@ -1,4 +1,5 @@
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import api_view
@@ -34,7 +35,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     queryset = Album.objects.all().order_by("-date")  # Order by date descending
     serializer_class = AlbumSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -48,7 +49,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
     queryset = Quote.objects.all().order_by("-date")  # Order by date descending
     serializer_class = QuoteSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -61,3 +62,4 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 import environ
+from dotenv import find_dotenv, load_dotenv
 
 # Initialize the environment variables
 env = environ.Env(DJANGO_ENV=(str, "development"), DEBUG=(bool, False))
@@ -32,15 +33,10 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost").split(",")
 # CORS configuration
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
 
-# Auth0 settings
-SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
-SOCIAL_AUTH_AUTH0_DOMAIN = env("AUTH0_DOMAIN", default="fake_domain")
-SOCIAL_AUTH_AUTH0_KEY = env("AUTH0_CLIENT_ID", default="fake_id")
-SOCIAL_AUTH_AUTH0_SECRET = env("AUTH0_CLIENT_SECRET", default="fake_secret")
-SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile", "email"]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATE_DIR = os.path.join(BASE_DIR, "dantrum", "templates")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -65,19 +61,19 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "social_django",
-    'corsheaders',
+    "corsheaders",
 ]
-
-AUTH_USER_MODEL = "api.User"
-
-AUTHENTICATION_BACKENDS = (
-    "social_core.backends.auth0.Auth0OAuth2",
-    "django.contrib.auth.backends.ModelBackend",
-)
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 1000,  # worry about pagination later
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
 MIDDLEWARE = [
@@ -92,16 +88,13 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-LOGIN_URL = "/login/auth0"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
 
 ROOT_URLCONF = "dantrum.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATE_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -109,6 +102,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -188,3 +183,60 @@ STATIC_ROOT = BACKEND_DIR / "static"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# Load environment definition file
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
+
+AUTH_USER_MODEL = "api.User"
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.google.GoogleOAuth2",
+    "social_core.backends.auth0.Auth0OAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+# Load Auth0 application settings into memory
+AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
+AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
+
+# Auth0 settings
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = env("AUTH0_DOMAIN", default="fake_domain")
+SOCIAL_AUTH_AUTH0_KEY = env("AUTH0_CLIENT_ID", default="fake_id")
+SOCIAL_AUTH_AUTH0_SECRET = env("AUTH0_CLIENT_SECRET", default="fake_secret")
+SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile", "email"]
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/api"
+SOCIAL_AUTH_AUTH0_CALLBACK_URL = "/auth/complete/auth0"
+
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.user.create_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
+
+SOCIAL_AUTH_URL_NAMESPACE = "social"
+
+LOGIN_URL = "/auth/login/auth0"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+# SOCIAL_AUTH_PIPELINE = (
+#     "social_core.pipeline.social_auth.social_details",
+#     "social_core.pipeline.social_auth.social_uid",
+#     "social_core.pipeline.social_auth.auth_allowed",
+#     "social_core.pipeline.social_auth.social_user",
+#     "social_core.pipeline.user.get_username",
+#     "api.pipeline.create_user",  # Use the custom create_user function
+#     "social_core.pipeline.social_auth.associate_user",
+#     "social_core.pipeline.social_auth.load_extra_data",
+#     "social_core.pipeline.user.user_details",
+# )

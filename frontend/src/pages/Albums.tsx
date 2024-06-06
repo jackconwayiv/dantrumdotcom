@@ -50,9 +50,9 @@ const Albums = () => {
     return <div>Error: {error}</div>;
   }
   return (
-    <Flex direction="column" p={4} width="100%">
+    <Flex direction="column" alignItems="center" p={4} width="100%">
       <Heading mb={4}>Albums</Heading>
-      <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={6}>
+      <Grid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" gap={6}>
         {albums &&
           albums.length > 0 &&
           albums.map((album) => (
@@ -66,16 +66,16 @@ const Albums = () => {
             >
               <Image
                 minW="150px"
-                maxW={{ base: "100%", sm: "200px" }}
+                maxW={{ base: "100%", sm: "150px" }}
                 height="100px"
                 objectFit="cover"
                 src={album.thumbnail_url}
                 alt={album.title}
               />
               <Flex direction="column" p={2}>
-                <Heading size="sm">{album.title}</Heading>
-                <Text>{album.description}</Text>
-                <Text>{album.date}</Text>
+                <Text fontSize="12">{album.title.toUpperCase()}</Text>
+                <Text fontSize="10">{album.description}</Text>
+                <Text fontSize="10">{album.date}</Text>
               </Flex>
             </Card>
           ))}

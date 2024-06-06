@@ -4,3 +4,7 @@ psycopg2>=2.8
 social-auth-app-django
 django-environ
 django-cors-headers
+authlib ~= 1.0
+python-dotenv ~= 0.19
+requests ~= 2.27
+faker
