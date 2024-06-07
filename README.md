@@ -21,3 +21,7 @@ To start Docker container:
 To enter virtual environment:
 
 - `source venv/bin/activate`
+
+## Social Auth through this package:
+
+- `https://github.com/python-social-auth/social-app-django`

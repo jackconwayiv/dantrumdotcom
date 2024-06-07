@@ -16,27 +16,21 @@ interface Album {
 const Albums = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown | null>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/albums/");
+        const response = await axios.get(`/api/albums`);
+        console.log(response.data.results);
         setAlbums(response.data.results);
         setLoading(false);
-      } catch (err: unknown) {
-        let errorMessage;
-        if (axios.isAxiosError(err)) {
-          errorMessage =
-            err?.response?.statusText || "An unknown error occurred";
-        } else {
-          errorMessage = "An unknown error occurred";
-        }
-        console.error("There was an error fetching the albums: ", err);
-        setError(errorMessage);
-        setLoading(false);
+      } catch (error) {
+        console.error(`Couldn't retrieve albums: ${error}`);
+        setError(error);
+        return false;
       }
     };
     fetchAlbums();
@@ -45,7 +39,7 @@ const Albums = () => {
   if (loading) {
     return (
       <Flex direction="column">
-        <Heading>PHOTOS</Heading>
+        <Heading mb={4}>PHOTOS</Heading>
         <Text>Loading...</Text>
       </Flex>
     );
@@ -54,14 +48,14 @@ const Albums = () => {
   if (error) {
     return (
       <Flex direction="column">
-        <Heading>PHOTOS</Heading>
-        <Text>Error: {error}</Text>
+        <Heading mb={4}>PHOTOS</Heading>
+        <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
     );
   }
   return (
-    <Flex direction="column" alignItems="center" p={4} width="100%">
-      <Heading mb={4}>Albums</Heading>
+    <Flex direction="column" width="100%">
+      <Heading mb={4}>PHOTOS</Heading>
       <Grid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" gap={6}>
         {albums &&
           albums.length > 0 &&

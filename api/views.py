@@ -10,21 +10,20 @@ from .models import Album, Quote, User
 from .permissions import IsOwnerOrReadOnly
 from .serializers import AlbumSerializer, QuoteSerializer, UserSerializer
 
+# def logout(request):
+#     auth_logout(request)
+#     return redirect("/")
 
-def logout(request):
-    auth_logout(request)
-    return redirect("/")
 
-
-@api_view(["GET"])
-def index(request, format=None):
-    return Response(
-        {
-            "users": reverse("user-list", request=request, format=format),
-            "albums": reverse("album-list", request=request, format=format),
-            "quotes": reverse("quote-list", request=request, format=format),
-        }
-    )
+# @api_view(["GET"])
+# def index(request, format=None):
+#     return Response(
+#         {
+#             "users": reverse("user-list", request=request, format=format),
+#             "albums": reverse("album-list", request=request, format=format),
+#             "quotes": reverse("quote-list", request=request, format=format),
+#         }
+#     )
 
 
 class AlbumViewSet(viewsets.ModelViewSet):
@@ -35,7 +34,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     queryset = Album.objects.all().order_by("-date")  # Order by date descending
     serializer_class = AlbumSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -62,4 +61,4 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]

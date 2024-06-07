@@ -11,7 +11,7 @@ router.register(r"quotes", views.QuoteViewSet, basename="quote")
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path("", views.index, name="index"),
+    # path("", views.index, name="index"),
     path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls")),
 ]
