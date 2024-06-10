@@ -16,7 +16,6 @@ const Albums = () => {
     const fetchAlbums = async () => {
       try {
         const response = await axios.get(`/api/albums`);
-        console.log(response.data.results);
         setAlbums(response.data.results);
         setLoading(false);
       } catch (error) {

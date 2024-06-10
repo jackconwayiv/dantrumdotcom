@@ -32,9 +32,9 @@ function Navbar({ user }: NavbarProps) {
               ANTRUM.COM
             </Heading>
           </Flex>
-          <Flex justifyContent="end" marginY="10px">
+          <Flex justifyContent="end">
             <Tooltip label="Photos" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <FaCamera
                   cursor="pointer"
                   size="30px"
@@ -44,7 +44,7 @@ function Navbar({ user }: NavbarProps) {
               </Flex>
             </Tooltip>
             <Tooltip label="Calendar" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <FaCalendarAlt
                   cursor="pointer"
                   size="30px"
@@ -54,7 +54,7 @@ function Navbar({ user }: NavbarProps) {
               </Flex>
             </Tooltip>
             <Tooltip label="Quotes" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <FaFeatherAlt
                   cursor="pointer"
                   size="30px"
@@ -64,7 +64,7 @@ function Navbar({ user }: NavbarProps) {
               </Flex>
             </Tooltip>
             <Tooltip label="Resources" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <FaMapSigns
                   cursor="pointer"
                   size="30px"
@@ -74,7 +74,7 @@ function Navbar({ user }: NavbarProps) {
               </Flex>
             </Tooltip>
             <Tooltip label="Friends" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <FaAddressBook
                   cursor="pointer"
                   size="30px"
@@ -84,11 +84,11 @@ function Navbar({ user }: NavbarProps) {
               </Flex>
             </Tooltip>
             <Tooltip label="Profile" fontSize="md">
-              <Flex paddingX={4}>
+              <Flex paddingX={2}>
                 <Avatar
                   name={user.username}
                   referrerPolicy="no-referrer"
-                  src={user.social_auth[0].picture}
+                  src={user.social_auth[0] && user.social_auth[0].picture}
                   size="sm"
                   onClick={() => navigate("/profile")}
                 />
