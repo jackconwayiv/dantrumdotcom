@@ -5,6 +5,7 @@ import { fetchUserProfile } from "./api/user";
 import Navbar from "./components/Navbar";
 import Albums from "./pages/Albums";
 import Calendar from "./pages/Calendar";
+import Friend from "./pages/Friend";
 import Profile from "./pages/Profile";
 import Quotes from "./pages/Quotes";
 import Resources from "./pages/Resources";
@@ -45,8 +46,9 @@ function App() {
             <Route path="/quotes" element={<Quotes />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/users/:id" element={<Friend />} />
             <Route path="/profile" element={<Profile user={user} />} />
-            <Route path="/*" element={<Root />} />
+            <Route path="/" element={<Root />} />
           </Routes>
         </Flex>
       </BrowserRouter>

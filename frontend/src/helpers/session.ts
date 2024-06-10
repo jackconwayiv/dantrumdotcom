@@ -4,7 +4,7 @@ export function createCSRF() {
     .substring(0, 64);
 }
 
-export async function handleFailedRequest(error) {
+export async function handleFailedRequest(error: any) {
   // Any status codes that falls outside the range of 2xx cause this function to trigger
   const { config } = error;
   if (config && config.noRetry) {

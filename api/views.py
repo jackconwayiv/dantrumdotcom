@@ -8,7 +8,12 @@ from rest_framework.reverse import reverse
 
 from .models import Album, Quote, User
 from .permissions import IsOwnerOrReadOnly
-from .serializers import AlbumSerializer, QuoteSerializer, UserSerializer
+from .serializers import (
+    AlbumSerializer,
+    AuthenticatedUserSerializer,
+    QuoteSerializer,
+    UserSerializer,
+)
 
 # def logout(request):
 #     auth_logout(request)
@@ -59,9 +64,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     This viewset automatically provides `list` and `retrieve` actions.
     """
 
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.action == "get_authenticated_user":
+            return User.objects.filter(pk=self.request.user.pk)
+        return User.objects.filter(is_active=True)
+
+    def get_serializer_class(self):
+        if self.action == "get_authenticated_user":
+            return AuthenticatedUserSerializer
+        return UserSerializer
 
     @action(detail=False, methods=["get"], url_path="me")
     def get_authenticated_user(self, request):

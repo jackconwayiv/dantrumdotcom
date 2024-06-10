@@ -52,6 +52,24 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "social_auth",
+            "date_of_birth",
+        ]
+
+
+class AuthenticatedUserSerializer(serializers.ModelSerializer):
+    # albums = serializers.PrimaryKeyRelatedField(many=True, queryset=Album.objects.all())
+    # quotes = serializers.PrimaryKeyRelatedField(many=True, queryset=Quote.objects.all())
+    social_auth = UserSocialAuthSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = [
             "first_name",
             "last_name",
             "username",
@@ -60,5 +78,4 @@ class UserSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "last_login",
             "date_joined",
-            "is_active",
         ]

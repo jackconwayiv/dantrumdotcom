@@ -87,6 +87,7 @@ function Navbar({ user }: NavbarProps) {
               <Flex paddingX={2}>
                 <Avatar
                   name={user.username}
+                  cursor="pointer"
                   referrerPolicy="no-referrer"
                   src={user.social_auth[0] && user.social_auth[0].picture}
                   size="sm"

@@ -1,4 +1,4 @@
-import { Card, Flex, Grid, Heading, Image, Text } from "@chakra-ui/react";
+import { Card, Flex, Heading, Image, Text, Wrap } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -47,13 +47,15 @@ const Albums = () => {
   return (
     <Flex direction="column" width="100%">
       <Heading mb={4}>PHOTOS</Heading>
-      <Grid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" gap={6}>
+      <Wrap>
         {albums &&
           albums.length > 0 &&
           albums.map((album) => (
             <Card
               key={album.id}
               direction={{ base: "column", sm: "row" }}
+              width="375px"
+              height="125px"
               overflow="hidden"
               variant="outline"
               cursor="pointer"
@@ -74,7 +76,7 @@ const Albums = () => {
               </Flex>
             </Card>
           ))}
-      </Grid>
+      </Wrap>
     </Flex>
   );
 };
