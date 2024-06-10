@@ -73,11 +73,11 @@ class Album(CreatedUpdated):
         return self.title
 
 
-class Quote(models.Model):
+class Quote(CreatedUpdated):
     text = models.TextField()
     date = models.DateField(default=datetime.date.today, editable=True)
     owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="owned_quotes"
+        settings.AUTH_USER_MODEL, related_name="quotes", on_delete=models.CASCADE
     )
 
     def __str__(self):

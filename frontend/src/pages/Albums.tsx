@@ -3,18 +3,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Album {
-  id: number;
-  title: string;
-  description: string;
-  link_url: string;
-  thumbnail_url: string;
-  date: string;
-  owner: number;
-}
+import { AlbumType } from "../helpers/types";
 
 const Albums = () => {
-  const [albums, setAlbums] = useState<Album[]>([]);
+  const [albums, setAlbums] = useState<AlbumType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 

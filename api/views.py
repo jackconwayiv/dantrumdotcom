@@ -2,7 +2,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -61,4 +61,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["get"], url_path="me")
+    def get_authenticated_user(self, request):
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
