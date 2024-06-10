@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -71,6 +72,25 @@ def react(request):
         return redirect("http://localhost:5173")
     else:
         return render(request, "index.html")
+
+
+@login_required
+def logout(request):
+    print("Logging out user:", request.user)
+    django_logout(request)
+    print("User logged out. Session:", request.session)
+    domain = settings.SOCIAL_AUTH_AUTH0_DOMAIN
+    client_id = settings.SOCIAL_AUTH_AUTH0_KEY
+    return_to = request.build_absolute_uri("/")
+    return redirect(
+        f"https://{domain}/v2/logout?client_id={client_id}&returnTo={return_to}"
+    )
+
+
+# def logout(request):
+#     """Logs out user"""
+#     auth_logout(request)
+#     return render_to_response('home.html', {}, RequestContext(request))
 
 
 # def logout(request):

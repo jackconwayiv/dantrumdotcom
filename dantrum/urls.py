@@ -6,6 +6,7 @@ from django.views.generic import RedirectView, TemplateView
 from . import views
 
 urlpatterns = [
+    path("logout/", login_required(views.logout), name="logout"),
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
     path("check/", views.is_logged_in),

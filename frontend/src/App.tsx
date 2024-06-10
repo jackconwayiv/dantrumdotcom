@@ -45,7 +45,7 @@ function App() {
             <Route path="/quotes" element={<Quotes />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile user={user} />} />
             <Route path="/*" element={<Root />} />
           </Routes>
         </Flex>

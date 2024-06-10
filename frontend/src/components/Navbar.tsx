@@ -88,7 +88,7 @@ function Navbar({ user }: NavbarProps) {
                 <Avatar
                   name={user.username}
                   referrerPolicy="no-referrer"
-                  src={user.social_auth.picture}
+                  src={user.social_auth[0].picture}
                   size="sm"
                   onClick={() => navigate("/profile")}
                 />
