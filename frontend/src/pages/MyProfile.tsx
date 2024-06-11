@@ -1,5 +1,5 @@
-import { Button, Flex, Heading } from "@chakra-ui/react";
-import { useState } from "react";
+import { Button, Flex, Heading, Input } from "@chakra-ui/react";
+import { useFormik } from "formik";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
 
@@ -9,11 +9,16 @@ interface ProfileProps {
 }
 
 export default function MyProfile({ user, setUser }: ProfileProps) {
-  const [formData, setFormData] = useState({
-    first_name: user.first_name,
-    last_name: user.last_name,
-    username: user.username,
-    date_of_birth: user.date_of_birth,
+  const formik = useFormik({
+    initialValues: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      username: user.username,
+      date_of_birth: user.date_of_birth,
+    },
+    onSubmit: (values) => {
+      handleSubmit(values);
+    },
   });
 
   const handleLogoutClick = () => {
@@ -24,18 +29,10 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
     }
   };
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = async (values: User) => {
+    // e.preventDefault();
     try {
-      const newUser = await updateUser(formData);
+      const newUser = await updateUser(values);
       setUser({
         ...user,
         ...newUser,
@@ -47,59 +44,67 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
 
   if (user)
     return (
-      <Flex direction="column">
+      <Flex direction="column" width="100%">
         <Heading mb={4}>PROFILE</Heading>
-        <Heading size="md">{user.username || "none"}</Heading>
+        {user.username && <Heading size="md">{user.username}</Heading>}
         <Heading size="md">
           {user.first_name} {user.last_name}
         </Heading>
-        <Heading size="md">Birthday: {user.date_of_birth || "none"}</Heading>
+        <Heading size="md">
+          Birthday: {user.date_of_birth || "no name provided"}
+        </Heading>
         <Heading size="md">{user.email}</Heading>
         <Heading size="md">Member since {user.date_joined}</Heading>
         <Heading size="md">Last logged in {user.last_login}</Heading>
-        <Button onClick={handleLogoutClick} mb="1rem">
-          Logout
-        </Button>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
           <div>
-            <label>First Name:</label>
-            <input
+            <label htmlFor="first_name">First Name:</label>
+            <Input
+              mt={2}
               type="text"
               name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
+              value={formik.values.first_name}
+              onChange={formik.handleChange}
             />
           </div>
           <div>
-            <label>Last Name:</label>
-            <input
+            <label htmlFor="last_name">Last Name:</label>
+            <Input
+              mt={2}
               type="text"
               name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
+              value={formik.values.last_name}
+              onChange={formik.handleChange}
             />
           </div>
           <div>
-            <label>Username:</label>
-            <input
+            <label htmlFor="username">Nickname (or leave blank):</label>
+            <Input
+              mt={2}
               type="text"
               name="username"
-              value={formData.username}
-              onChange={handleChange}
+              value={formik.values.username}
+              onChange={formik.handleChange}
             />
           </div>
           <div>
-            <label>Date of Birth:</label>
-            <input
+            <label htmlFor="date_of_birth">Date of Birth:</label>
+            <Input
+              mt={2}
               type="date"
               name="date_of_birth"
-              value={formData.date_of_birth}
-              onChange={handleChange}
+              value={formik.values.date_of_birth}
+              onChange={formik.handleChange}
             />
           </div>
-          <button type="submit">Update Profile</button>
+          <Button mt={2} type="submit">
+            Update Profile
+          </Button>
         </form>
+        <Button mt={2} onClick={handleLogoutClick}>
+          Logout
+        </Button>
       </Flex>
     );
 }
