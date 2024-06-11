@@ -4,11 +4,11 @@ export type DjangoPaginatedResponse<T> = {
   previous: string;
   results: T[];
 };
-interface SocialAuthType {
+interface SocialAuth {
   picture: "string";
 }
 
-export interface AlbumType {
+export interface Album {
   id: number;
   title: string;
   description: string;
@@ -18,7 +18,7 @@ export interface AlbumType {
   owner: number;
 }
 
-export interface QuoteType {
+export interface Quote {
   id: number;
   text: string;
   date: string;
@@ -27,26 +27,26 @@ export interface QuoteType {
   owner: number;
 }
 
-export interface FriendType {
+export interface Friend {
   id: number;
   first_name: string;
   last_name: string;
   username: string;
   email: string;
-  social_auth: SocialAuthType[];
+  social_auth: SocialAuth[];
   date_of_birth: string;
 }
 
-export interface UserType {
+export interface User {
   first_name: string;
   last_name: string;
   username: string;
-  email: string;
-  social_auth: SocialAuthType[];
+  email?: string;
+  social_auth?: SocialAuth[];
   date_of_birth: string;
-  last_login: string;
-  date_joined: string;
+  last_login?: string;
+  date_joined?: string;
   // is_active: boolean;
-  // albums: AlbumType[];
-  // quotes: QuoteType[];
+  // albums: Album[];
+  // quotes: Quote[];
 }

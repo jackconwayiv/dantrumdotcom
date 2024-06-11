@@ -1,19 +1,20 @@
 import { Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { fetchUserProfile } from "./api/user";
+import { fetchUserProfile } from "./api/users";
 import Navbar from "./components/Navbar";
-import Albums from "./pages/Albums";
-import Calendar from "./pages/Calendar";
-import Friend from "./pages/Friend";
-import Profile from "./pages/Profile";
-import Quotes from "./pages/Quotes";
-import Resources from "./pages/Resources";
+import { User } from "./helpers/types";
+import AlbumsView from "./pages/AlbumsView";
+import CalendarView from "./pages/CalendarView";
+import FriendProfile from "./pages/FriendProfile";
+import FriendsDirectory from "./pages/FriendsDirectory";
+import MyProfile from "./pages/MyProfile";
+import QuotesView from "./pages/QuotesView";
+import ResourcesView from "./pages/ResourcesView";
 import Root from "./pages/Root";
-import Users from "./pages/Users";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 
@@ -41,13 +42,16 @@ function App() {
         <Navbar user={user} />
         <Flex margin="10px">
           <Routes>
-            <Route path="/albums" element={<Albums />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/quotes" element={<Quotes />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/users/:id" element={<Friend />} />
-            <Route path="/profile" element={<Profile user={user} />} />
+            <Route path="/albums" element={<AlbumsView />} />
+            <Route path="/calendar" element={<CalendarView />} />
+            <Route path="/quotes" element={<QuotesView />} />
+            <Route path="/resources" element={<ResourcesView />} />
+            <Route path="/friends" element={<FriendsDirectory />} />
+            <Route path="/friends/:id" element={<FriendProfile />} />
+            <Route
+              path="/profile"
+              element={<MyProfile user={user} setUser={setUser} />}
+            />
             <Route path="/" element={<Root />} />
           </Routes>
         </Flex>

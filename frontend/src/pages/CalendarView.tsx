@@ -1,6 +1,6 @@
 import { Flex, Heading } from "@chakra-ui/react";
 
-export default function Calendar() {
+export default function CalendarView() {
   return (
     <Flex direction="column">
       <Heading>CALENDAR</Heading>

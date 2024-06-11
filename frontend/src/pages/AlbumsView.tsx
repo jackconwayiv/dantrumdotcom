@@ -3,10 +3,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { AlbumType } from "../helpers/types";
+import { Album } from "../helpers/types";
 
-const Albums = () => {
-  const [albums, setAlbums] = useState<AlbumType[]>([]);
+const AlbumsView = () => {
+  const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 
@@ -81,4 +81,4 @@ const Albums = () => {
   );
 };
 
-export default Albums;
+export default AlbumsView;

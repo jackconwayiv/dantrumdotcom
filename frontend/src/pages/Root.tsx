@@ -21,7 +21,7 @@ export default function Root() {
           <Button m={1} onClick={() => navigate("/resources")}>
             Resources
           </Button>
-          <Button m={1} onClick={() => navigate("/users")}>
+          <Button m={1} onClick={() => navigate("/friends")}>
             Friends
           </Button>
           <Button m={1} onClick={() => navigate("/profile")}>

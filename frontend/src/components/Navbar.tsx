@@ -8,10 +8,10 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { UserType } from "../helpers/types";
+import { User } from "../helpers/types";
 
 interface NavbarProps {
-  user: UserType;
+  user: User;
 }
 
 function Navbar({ user }: NavbarProps) {
@@ -79,7 +79,7 @@ function Navbar({ user }: NavbarProps) {
                   cursor="pointer"
                   size="30px"
                   color="purple"
-                  onClick={() => navigate("/users")}
+                  onClick={() => navigate("/friends")}
                 />
               </Flex>
             </Tooltip>
@@ -89,7 +89,11 @@ function Navbar({ user }: NavbarProps) {
                   name={user.username}
                   cursor="pointer"
                   referrerPolicy="no-referrer"
-                  src={user.social_auth[0] && user.social_auth[0].picture}
+                  src={
+                    user.social_auth &&
+                    user.social_auth[0] &&
+                    user.social_auth[0].picture
+                  }
                   size="sm"
                   onClick={() => navigate("/profile")}
                 />

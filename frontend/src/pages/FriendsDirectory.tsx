@@ -1,11 +1,11 @@
 import { Avatar, Card, Flex, Heading, Text, Wrap } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchFriends } from "../api/user";
-import { FriendType } from "../helpers/types";
+import { fetchFriends } from "../api/users";
+import { Friend } from "../helpers/types";
 
-export default function Users() {
-  const [friends, setFriends] = useState<FriendType[]>([]);
+export default function FriendsDirectory() {
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 
@@ -38,12 +38,13 @@ export default function Users() {
           <Wrap>
             {friends.map((friend, i) => (
               <Card
-                padding={5}
+                padding={3}
                 cursor="pointer"
-                height="150px"
+                height="175px"
                 width="300px"
                 key={i}
-                onClick={() => navigate(`/users/${friend.id}`)}
+                alignItems="center"
+                onClick={() => navigate(`/friends/${friend.id}`)}
               >
                 {friend.social_auth.length > 0 && (
                   <Avatar
@@ -52,9 +53,8 @@ export default function Users() {
                     src={friend.social_auth[0].picture}
                   />
                 )}
-                {friend.username ? (
-                  <Text>{friend.username}</Text>
-                ) : (
+                {friend.username && <Text>{friend.username}</Text>}
+                {friend.username && (
                   <Text>
                     {friend.first_name} {friend.last_name}
                   </Text>

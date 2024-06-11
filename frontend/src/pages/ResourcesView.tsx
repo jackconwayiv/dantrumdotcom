@@ -1,9 +1,9 @@
 import { Flex, Heading } from "@chakra-ui/react";
 
-export default function Quotes() {
+export default function ResourcesView() {
   return (
     <Flex direction="column">
-      <Heading>QUOTES</Heading>
+      <Heading>RESOURCES</Heading>
     </Flex>
   );
 }
