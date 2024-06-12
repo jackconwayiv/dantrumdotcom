@@ -1,4 +1,4 @@
-import { Avatar, Card, Flex, Heading, Text, Wrap } from "@chakra-ui/react";
+import { Avatar, Flex, Heading, Text, Wrap } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchFriends } from "../api/users";
@@ -29,14 +29,54 @@ export default function FriendsDirectory() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {JSON.stringify(error)}</div>;
 
+  const renderFriendCard = (friend: Friend, i: number) => {
+    return (
+      <Flex
+        key={i}
+        m={1}
+        height="60px"
+        width="100%"
+        cursor="pointer"
+        onClick={() => navigate(`/friends/${friend.id}`)}
+        alignItems="center"
+      >
+        <Flex p={2} width="65px">
+          {friend.social_auth.length > 0 && (
+            <Avatar
+              name={friend.username}
+              referrerPolicy="no-referrer"
+              src={friend.social_auth[0].picture}
+              size="md"
+            />
+          )}
+        </Flex>
+        <Flex direction="column" p={2}>
+          {friend.username && <Text>{friend.username}</Text>}
+          {friend.username && (
+            <Text>
+              {friend.first_name} {friend.last_name}
+            </Text>
+          )}
+          {!friend.username && !friend.first_name && !friend.last_name && (
+            <Text>{friend.email}</Text>
+          )}
+        </Flex>
+      </Flex>
+    );
+  };
+
   if (friends)
     return (
-      <Flex direction="column">
-        <Heading>FRIENDS</Heading>
+      <Flex direction="column" width="100%">
+        <Heading size="md">
+          {friends.length > 0 && friends.length} Friends
+        </Heading>
 
-        {friends.length > 0 && (
-          <Wrap>
-            {friends.map((friend, i) => (
+        <Wrap>
+          {friends.length > 0 &&
+            friends.map((friend, i) => renderFriendCard(friend, i))}
+        </Wrap>
+        {/* {friends.map((friend, i) => (
               <Card
                 padding={3}
                 cursor="pointer"
@@ -62,9 +102,7 @@ export default function FriendsDirectory() {
                 {friend.email && <Text>{friend.email}</Text>}
                 {friend.date_of_birth && <Text>{friend.date_of_birth}</Text>}
               </Card>
-            ))}{" "}
-          </Wrap>
-        )}
+            ))}{" "}  */}
       </Flex>
     );
 }

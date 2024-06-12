@@ -1,5 +1,16 @@
-import { Button, Flex, Heading, Input } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Input,
+  Tooltip,
+  useToast,
+} from "@chakra-ui/react";
+import { isAxiosError } from "axios";
 import { useFormik } from "formik";
+import { FaBirthdayCake } from "react-icons/fa";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
 
@@ -9,6 +20,7 @@ interface ProfileProps {
 }
 
 export default function MyProfile({ user, setUser }: ProfileProps) {
+  const toast = useToast();
   const formik = useFormik({
     initialValues: {
       first_name: user.first_name,
@@ -30,32 +42,71 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
   };
 
   const handleSubmit = async (values: User) => {
-    // e.preventDefault();
     try {
       const newUser = await updateUser(values);
       setUser({
         ...user,
         ...newUser,
       });
-    } catch (error) {
+      toast({
+        title: "Profile updated.",
+        description: "Now look at you!",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } catch (error: unknown) {
+      let errorMessage = "Check console log for details.";
+
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       console.error("Error updating user:", error);
+      toast({
+        title: "Error updating your profile:",
+        description: errorMessage,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
     }
   };
 
   if (user)
     return (
       <Flex direction="column" width="100%">
-        <Heading mb={4}>PROFILE</Heading>
-        {user.username && <Heading size="md">{user.username}</Heading>}
-        <Heading size="md">
-          {user.first_name} {user.last_name}
-        </Heading>
-        <Heading size="md">
-          Birthday: {user.date_of_birth || "no name provided"}
-        </Heading>
+        {user.social_auth && user.social_auth[0] && (
+          <Avatar
+            name={user.username}
+            referrerPolicy="no-referrer"
+            src={user.social_auth[0].picture}
+            margin={5}
+            size="xl"
+          />
+        )}
+        {user.first_name || user.last_name ? (
+          <Heading size="lg">
+            {user.first_name} {user.username && `"${user.username}" `}
+            {user.last_name}
+          </Heading>
+        ) : (
+          <Heading size="lg">no name on record</Heading>
+        )}
+        <Flex alignItems="center">
+          <Tooltip label="Birthday" fontSize="md">
+            <Box mr={3}>
+              <FaBirthdayCake />
+            </Box>
+          </Tooltip>
+          <Heading size="md">
+            {user.date_of_birth || "no birthday provided"}
+          </Heading>
+        </Flex>
         <Heading size="md">{user.email}</Heading>
-        <Heading size="md">Member since {user.date_joined}</Heading>
-        <Heading size="md">Last logged in {user.last_login}</Heading>
+        {/* <Heading size="md">Member since {user.date_joined}</Heading>
+        <Heading size="md">Last logged in {user.last_login}</Heading> */}
 
         <form onSubmit={formik.handleSubmit}>
           <div>
