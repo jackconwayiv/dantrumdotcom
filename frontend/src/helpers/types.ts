@@ -15,16 +15,16 @@ export interface Album {
   link_url: string;
   thumbnail_url: string;
   date: string;
-  owner?: number;
+  owner?: string;
 }
 
 export interface Quote {
-  id: number;
+  id?: number;
   text: string;
   date: string;
-  date_created: string;
-  date_updated: string;
-  owner: number;
+  date_created?: string;
+  date_updated?: string;
+  owner?: string;
 }
 
 export interface Friend {

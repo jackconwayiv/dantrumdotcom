@@ -1,16 +1,6 @@
 import axios from "axios";
 import { Album } from "../helpers/types";
 
-export const createAlbum = async (albumDetails: Album) => {
-  try {
-    const response = await axios.post("/api/albums/", albumDetails);
-
-    return response.data;
-  } catch (error) {
-    console.error("Error creating album:", error);
-  }
-};
-
 export const saveAlbum = async (albumDetails: Album) => {
   try {
     let response;

@@ -25,7 +25,7 @@ import {
 import axios, { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
-import { FaRegTrashAlt, FaWrench } from "react-icons/fa";
+import { FaWrench } from "react-icons/fa";
 import { deleteAlbum, saveAlbum } from "../api/albums";
 import { Album, User } from "../helpers/types";
 import { isOwner } from "../helpers/utils";
@@ -49,6 +49,21 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
     onClose: onAlertClose,
   } = useDisclosure();
   const cancelRef = useRef(null);
+
+  useEffect(() => {
+    const fetchAlbums = async () => {
+      try {
+        const response = await axios.get(`/api/albums`);
+        setAlbums(response.data.results);
+        setLoading(false);
+      } catch (error) {
+        console.error(`Couldn't retrieve albums: ${error}`);
+        setError(error);
+        return false;
+      }
+    };
+    fetchAlbums();
+  }, []);
 
   const validate = (values: Album) => {
     const errors = {} as any;
@@ -145,16 +160,6 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
     }
   };
 
-  const handleEdit = (album: Album) => {
-    setCurrentAlbum(album);
-    onOpen();
-  };
-
-  const handleAdd = () => {
-    setCurrentAlbum(null);
-    onOpen();
-  };
-
   const handleDelete = async () => {
     //this sets currentAlbum earlier due to Alert Dialog popup
     try {
@@ -192,21 +197,6 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
     );
   };
 
-  useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const response = await axios.get(`/api/albums`);
-        setAlbums(response.data.results);
-        setLoading(false);
-      } catch (error) {
-        console.error(`Couldn't retrieve albums: ${error}`);
-        setError(error);
-        return false;
-      }
-    };
-    fetchAlbums();
-  }, []);
-
   if (loading) {
     return (
       <Flex direction="column">
@@ -233,7 +223,7 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
         m={4}
         onClick={() => {
           setCurrentAlbum(null);
-          handleAdd();
+          onOpen();
         }}
       >
         Add Album
@@ -272,7 +262,8 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
                     <FaWrench
                       cursor="pointer"
                       onClick={() => {
-                        handleEdit(album);
+                        setCurrentAlbum(album);
+                        onOpen();
                       }}
                     />
                   ) : (
@@ -284,17 +275,6 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
                 </Flex>
                 <Flex justifyContent="space-between" width="100%">
                   <Text fontSize="10">{album.date}</Text>
-                  {isOwner(user, album) ? (
-                    <FaRegTrashAlt
-                      cursor="pointer"
-                      onClick={() => {
-                        setCurrentAlbum(album);
-                        onAlertOpen();
-                      }}
-                    />
-                  ) : (
-                    <></>
-                  )}
                 </Flex>
               </Flex>
             </Card>
@@ -378,7 +358,7 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
               <Flex marginY={6} justifyContent="space-evenly">
                 <Button
                   onClick={() => {
-                    formik.resetForm();
+                    !currentAlbum && formik.resetForm();
                     onClose();
                   }}
                 >
@@ -387,6 +367,17 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
                 <Button colorScheme="green" type="submit">
                   {currentAlbum ? "Save Changes" : "Create Album"}
                 </Button>
+                {currentAlbum && (
+                  <Button
+                    colorScheme="red"
+                    onClick={() => {
+                      onClose();
+                      onAlertOpen();
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )}
               </Flex>
             </form>
           </ModalBody>
