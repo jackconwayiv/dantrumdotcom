@@ -42,7 +42,7 @@ function App() {
         <Navbar user={user} />
         <Flex margin="10px">
           <Routes>
-            <Route path="/albums" element={<AlbumsView />} />
+            <Route path="/albums" element={<AlbumsView user={user} />} />
             <Route path="/calendar" element={<CalendarView />} />
             <Route path="/quotes" element={<QuotesView />} />
             <Route path="/resources" element={<ResourcesView />} />

@@ -15,31 +15,15 @@ from .serializers import (
     UserSerializer,
 )
 
-# def logout(request):
-#     auth_logout(request)
-#     return redirect("/")
-
-
-# @api_view(["GET"])
-# def index(request, format=None):
-#     return Response(
-#         {
-#             "users": reverse("user-list", request=request, format=format),
-#             "albums": reverse("album-list", request=request, format=format),
-#             "quotes": reverse("quote-list", request=request, format=format),
-#         }
-#     )
-
-
 class AlbumViewSet(viewsets.ModelViewSet):
     """
     This ViewSet automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
 
-    queryset = Album.objects.all().order_by("-date")  # Order by date descending
+    queryset = Album.objects.all().order_by("-date")
     serializer_class = AlbumSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -51,7 +35,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
     `update` and `destroy` actions.
     """
 
-    queryset = Quote.objects.all().order_by("-date")  # Order by date descending
+    queryset = Quote.objects.all().order_by("-date")
     serializer_class = QuoteSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -64,7 +48,7 @@ class UserViewSet(viewsets.ModelViewSet):
     This viewset provides `retrieve`, `update`, `partial_update`, `list`, and `me` actions.
     """
 
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         if self.action == "me":

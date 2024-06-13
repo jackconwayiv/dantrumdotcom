@@ -20,20 +20,45 @@ function Navbar({ user }: NavbarProps) {
   if (user)
     return (
       <Flex bgColor="white" direction="column" justifyContent="space-between">
-        <Flex direction="row" alignItems="center" justifyContent="baseline">
-          <Image
-            height="40px"
-            src="favicon.ico"
-            cursor="pointer"
-            onClick={() => navigate("/")}
-            m={1}
-            mr={0}
-          />
-          <Heading size="lg" cursor="pointer" onClick={() => navigate("/")}>
-            ANTRUM.COM
-          </Heading>
+        <Flex
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Flex direction="row" alignItems="center" justifyContent="baseline">
+            <Image
+              height="40px"
+              src="favicon.ico"
+              cursor="pointer"
+              onClick={() => navigate("/")}
+              ml={1}
+              mt={1}
+              mr={0}
+              mb={0}
+            />
+            <Heading size="lg" cursor="pointer" onClick={() => navigate("/")}>
+              ANTRUM.COM
+            </Heading>
+          </Flex>
+          <Tooltip label="Profile" fontSize="md">
+            <Flex mr={1}>
+              <Avatar
+                name={user.username}
+                cursor="pointer"
+                referrerPolicy="no-referrer"
+                src={
+                  user.social_auth &&
+                  user.social_auth[0] &&
+                  user.social_auth[0].picture
+                }
+                size="sm"
+                mr={1}
+                onClick={() => navigate("/profile")}
+              />
+            </Flex>
+          </Tooltip>
         </Flex>
-        <Flex justifyContent="space-between" p={3}>
+        <Flex justifyContent="space-between" paddingX={2} m={2}>
           <Tooltip label="Photos" fontSize="md">
             <Flex paddingX={2}>
               <FaCamera
@@ -81,23 +106,6 @@ function Navbar({ user }: NavbarProps) {
                 size="20px"
                 // color="purple"
                 onClick={() => navigate("/friends")}
-              />
-            </Flex>
-          </Tooltip>
-          <Tooltip label="Profile" fontSize="md">
-            <Flex paddingX={2}>
-              <Avatar
-                name={user.username}
-                cursor="pointer"
-                referrerPolicy="no-referrer"
-                src={
-                  user.social_auth &&
-                  user.social_auth[0] &&
-                  user.social_auth[0].picture
-                }
-                size="xs"
-                mr={1}
-                onClick={() => navigate("/profile")}
               />
             </Flex>
           </Tooltip>

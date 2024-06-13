@@ -9,13 +9,13 @@ interface SocialAuth {
 }
 
 export interface Album {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   link_url: string;
   thumbnail_url: string;
   date: string;
-  owner: number;
+  owner?: number;
 }
 
 export interface Quote {
