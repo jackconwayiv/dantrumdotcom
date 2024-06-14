@@ -61,9 +61,9 @@ class User(AbstractUser):
 class Album(CreatedUpdated):
 
     title = models.CharField(max_length=200)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True, null=True)
     link_url = models.CharField(max_length=4000)
-    thumbnail_url = models.CharField(max_length=4000)
+    thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
     date = models.DateField(default=datetime.date.today, editable=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name="albums", on_delete=models.CASCADE
@@ -82,3 +82,15 @@ class Quote(CreatedUpdated):
 
     def __str__(self):
         return f"{self.text}"
+
+class Resource(CreatedUpdated):
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True, null=True)
+    url = models.CharField(max_length=4000)
+    thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="resources", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title

@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from social_django.models import UserSocialAuth
 
-from api.models import Album, Quote, User
+from api.models import Album, Quote, Resource, User
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -29,6 +29,14 @@ class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = ["id", "text", "date", "owner"]
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source="owner.email")
+
+    class Meta:
+        model = Resource
+        fields = ["id", "title", "description", "url", "thumbnail_url", "owner"]
 
 
 class UserSocialAuthSerializer(serializers.ModelSerializer):

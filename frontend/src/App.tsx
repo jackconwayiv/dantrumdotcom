@@ -45,7 +45,7 @@ function App() {
             <Route path="/albums" element={<AlbumsView user={user} />} />
             <Route path="/calendar" element={<CalendarView />} />
             <Route path="/quotes" element={<QuotesView user={user} />} />
-            <Route path="/resources" element={<ResourcesView />} />
+            <Route path="/resources" element={<ResourcesView user={user} />} />
             <Route path="/friends" element={<FriendsDirectory />} />
             <Route path="/friends/:id" element={<FriendProfile />} />
             <Route

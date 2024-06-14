@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r"albums", views.AlbumViewSet, basename="album")
 router.register(r"users", views.UserViewSet, basename="user")
 router.register(r"quotes", views.QuoteViewSet, basename="quote")
+router.register(r"resources", views.ResourceViewSet, basename="resource")
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import axios, { isAxiosError } from "axios";
 import { useFormik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaWrench } from "react-icons/fa";
 import { deleteAlbum, saveAlbum } from "../api/albums";
 import { Album, User } from "../helpers/types";
@@ -34,7 +34,7 @@ interface AlbumsViewProps {
   user: User;
 }
 
-const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
+const AlbumsView = ({ user }: AlbumsViewProps) => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
@@ -70,11 +70,7 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
 
     if (!values.title) errors.title = "Required";
 
-    if (!values.description) errors.description = "Required";
-
     if (!values.link_url) errors.link_url = "Required";
-
-    if (!values.thumbnail_url) errors.thumbnail_url = "Required";
 
     if (!values.date) errors.date = "Required";
 
@@ -112,6 +108,57 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
       formik.resetForm();
     }
   }, [currentAlbum]);
+
+  const renderAlbum = (album: Album) => {
+    return (
+      <Card
+        direction={{ base: "column", sm: "row" }}
+        width="375px"
+        height="125px"
+        overflow="hidden"
+        key={album.id}
+      >
+        <a
+          href={album.link_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none" }}
+        >
+          <Image
+            minW="150px"
+            maxW={{ base: "100%", sm: "150px" }}
+            height="100px"
+            objectFit="cover"
+            cursor="pointer"
+            src={album.thumbnail_url}
+            alt={album.title}
+          />
+        </a>
+        <Flex direction="column" p={2}>
+          <Flex justifyContent="space-between" width="100%">
+            <Text fontSize="12">{album.title.toUpperCase()}</Text>{" "}
+            {isOwner(user, album) ? (
+              <FaWrench
+                cursor="pointer"
+                onClick={() => {
+                  setCurrentAlbum(album);
+                  onOpen();
+                }}
+              />
+            ) : (
+              <></>
+            )}
+          </Flex>
+          <Flex width="100%">
+            <Text fontSize="10">{album.description}</Text>
+          </Flex>
+          <Flex justifyContent="space-between" width="100%">
+            <Text fontSize="10">{album.date}</Text>
+          </Flex>
+        </Flex>
+      </Card>
+    );
+  };
 
   const handleSubmit = async (values: Album) => {
     try {
@@ -231,54 +278,7 @@ const AlbumsView: React.FC<AlbumsViewProps> = ({ user }) => {
       <Wrap>
         {albums &&
           albums.length > 0 &&
-          albums.map((album) => (
-            <Card
-              direction={{ base: "column", sm: "row" }}
-              width="375px"
-              height="125px"
-              overflow="hidden"
-              key={album.id}
-            >
-              <a
-                href={album.link_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none" }}
-              >
-                <Image
-                  minW="150px"
-                  maxW={{ base: "100%", sm: "150px" }}
-                  height="100px"
-                  objectFit="cover"
-                  cursor="pointer"
-                  src={album.thumbnail_url}
-                  alt={album.title}
-                />
-              </a>
-              <Flex direction="column" p={2}>
-                <Flex justifyContent="space-between" width="100%">
-                  <Text fontSize="12">{album.title.toUpperCase()}</Text>{" "}
-                  {isOwner(user, album) ? (
-                    <FaWrench
-                      cursor="pointer"
-                      onClick={() => {
-                        setCurrentAlbum(album);
-                        onOpen();
-                      }}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </Flex>
-                <Flex width="100%">
-                  <Text fontSize="10">{album.description}</Text>
-                </Flex>
-                <Flex justifyContent="space-between" width="100%">
-                  <Text fontSize="10">{album.date}</Text>
-                </Flex>
-              </Flex>
-            </Card>
-          ))}
+          albums.map((album) => renderAlbum(album))}
       </Wrap>
 
       <Modal isOpen={isOpen} onClose={onClose}>

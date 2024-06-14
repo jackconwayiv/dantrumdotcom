@@ -11,9 +11,9 @@ interface SocialAuth {
 export interface Album {
   id?: number;
   title: string;
-  description: string;
+  description?: string;
   link_url: string;
-  thumbnail_url: string;
+  thumbnail_url?: string;
   date: string;
   owner?: string;
 }
@@ -24,6 +24,15 @@ export interface Quote {
   date: string;
   date_created?: string;
   date_updated?: string;
+  owner?: string;
+}
+
+export interface Resource {
+  id?: number;
+  title: string;
+  description?: string;
+  url: string;
+  thumbnail_url?: string;
   owner?: string;
 }
 

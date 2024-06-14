@@ -6,14 +6,16 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from .models import Album, Quote, User
+from .models import Album, Quote, Resource, User
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     AlbumSerializer,
     AuthenticatedUserSerializer,
     QuoteSerializer,
+    ResourceSerializer,
     UserSerializer,
 )
+
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -37,6 +39,20 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
     queryset = Quote.objects.all().order_by("-date")
     serializer_class = QuoteSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ResourceViewSet(viewsets.ModelViewSet):
+    """
+    This ViewSet automatically provides `list`, `create`, `retrieve`,
+    `update`, and `destroy` actions.
+    """
+
+    queryset = Resource.objects.all().order_by("-created_at")
+    serializer_class = ResourceSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
