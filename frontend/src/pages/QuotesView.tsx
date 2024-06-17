@@ -212,7 +212,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
 
   if (loading) {
     return (
-      <Flex direction="column">
+      <Flex direction="column" width="100%">
         <Heading>QUOTES</Heading>
         <Text>Loading...</Text>
       </Flex>
@@ -221,7 +221,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
 
   if (error) {
     return (
-      <Flex direction="column">
+      <Flex direction="column" width="100%">
         <Heading>QUOTES</Heading>
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
@@ -229,7 +229,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
   }
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" width="100%">
       <Heading>QUOTES</Heading>
       <Button
         width="120px"

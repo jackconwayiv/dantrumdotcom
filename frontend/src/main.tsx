@@ -31,7 +31,6 @@ root.render(
           height="100%"
           maxWidth="850px"
           bgColor="white"
-          p={2}
         >
           <App />
         </Flex>

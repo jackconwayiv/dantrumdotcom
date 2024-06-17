@@ -85,6 +85,7 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
   };
 
   if (user)
+    //otherwise, handle error
     return (
       <Flex direction="column" width="100%">
         <Flex alignItems="center" justifyContent="space-between">

@@ -39,8 +39,15 @@ function App() {
   if (user)
     return (
       <BrowserRouter>
-        <Navbar user={user} />
-        <Flex margin="10px" direction="column" height="100%">
+        <Flex
+          direction="column"
+          width="100%"
+          maxW="850px"
+          minHeight="100vh"
+          m={2}
+          p={2}
+        >
+          <Navbar user={user} />
           <Routes>
             <Route path="/albums" element={<AlbumsView user={user} />} />
             <Route path="/calendar" element={<CalendarView />} />

@@ -243,7 +243,7 @@ export default function ResourcesView({ user }: ResourcesViewProps) {
 
   if (loading) {
     return (
-      <Flex direction="column">
+      <Flex direction="column" width="100%">
         <Heading>RESOURCES</Heading>
         <Text>Loading...</Text>
       </Flex>
@@ -252,7 +252,7 @@ export default function ResourcesView({ user }: ResourcesViewProps) {
 
   if (error) {
     return (
-      <Flex direction="column">
+      <Flex direction="column" width="100%">
         <Heading>RESOURCES</Heading>
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
@@ -260,7 +260,7 @@ export default function ResourcesView({ user }: ResourcesViewProps) {
   }
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" width="100%">
       <Heading>RESOURCES</Heading>
       <Button
         width="120px"

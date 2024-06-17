@@ -23,6 +23,7 @@ import {
 import axios, { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
+import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { deleteAlbum, saveAlbum } from "../api/albums";
 import AlbumCard from "../components/AlbumCard";
 import { Album, User } from "../helpers/types";
@@ -202,12 +203,18 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     );
   };
 
+  const renderHeading = () => {
+    return (
+      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
+        FOTO ALBUMS
+      </Heading>
+    );
+  };
+
   if (loading) {
     return (
-      <Flex direction="column">
-        <Heading fontFamily={"Comic Sans MS"} mb={4}>
-          PHOTOS
-        </Heading>
+      <Flex direction="column" width="100%">
+        {renderHeading()}
         <Text>Loading...</Text>
       </Flex>
     );
@@ -215,10 +222,8 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   if (error) {
     return (
-      <Flex direction="column">
-        <Heading fontFamily={"Comic Sans MS"} mb={4}>
-          PHOTOS
-        </Heading>
+      <Flex direction="column" width="100%">
+        {renderHeading()}
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
     );
@@ -226,30 +231,31 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   return (
     <Flex direction="column" width="100%">
-      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
-        FOTO ALBUMS
-      </Heading>
-      <Button
-        width="120px"
-        m={4}
-        onClick={() => {
-          setCurrentAlbum(null);
-          onOpen();
-        }}
-      >
-        + New Album
-      </Button>
+      {renderHeading()}
+      <Flex>
+        <Button
+          leftIcon={<FaPlus />}
+          borderRadius="25px"
+          colorScheme="green"
+          variant="outline"
+          onClick={() => {
+            setCurrentAlbum(null);
+            onOpen();
+          }}
+        >
+          New Album
+        </Button>
+      </Flex>
       <Flex direction="column">
         {albums &&
           albums.length > 0 &&
           albums.map((album) => renderAlbum(album))}
       </Flex>
-
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            {currentAlbum ? "Edit Album" : "Create Album"}
+            {currentAlbum ? "Edit Foto Album:" : "New Foto Album:"}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -320,6 +326,9 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
               </Flex>
               <Flex marginY={6} justifyContent="space-evenly">
                 <Button
+                  borderRadius="25px"
+                  colorScheme="gray"
+                  variant="outline"
                   onClick={() => {
                     !currentAlbum && formik.resetForm();
                     onClose();
@@ -327,12 +336,14 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
                 >
                   Cancel
                 </Button>
-                <Button colorScheme="green" type="submit">
+                <Button colorScheme="green" borderRadius="25px" type="submit">
                   {currentAlbum ? "Save Changes" : "Create Album"}
                 </Button>
                 {currentAlbum && (
                   <Button
                     colorScheme="red"
+                    borderRadius="25px"
+                    leftIcon={<FaRegTrashAlt />}
                     onClick={() => {
                       onClose();
                       onAlertOpen();
@@ -346,7 +357,6 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           </ModalBody>
         </ModalContent>
       </Modal>
-
       <AlertDialog
         isOpen={isAlertOpen}
         leastDestructiveRef={cancelRef}

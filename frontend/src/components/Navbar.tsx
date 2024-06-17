@@ -1,4 +1,12 @@
-import { Avatar, Box, Flex, Heading, Image, Tooltip } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Flex,
+  Heading,
+  Image,
+  Spacer,
+  Tooltip,
+} from "@chakra-ui/react";
 import {
   FaAddressBook,
   FaCalendarAlt,
@@ -21,10 +29,15 @@ function Navbar({ user }: NavbarProps) {
 
   if (user)
     return (
-      <Flex bgColor="white" direction="column" justifyContent="space-between">
+      <Flex
+        direction="column"
+        justifyContent="center"
+        maxWidth="800px"
+        alignItems="space-between"
+      >
         <Flex
           direction="row"
-          alignItems="center"
+          alignItems="baseline"
           justifyContent="space-between"
         >
           <Flex direction="row" alignItems="center" justifyContent="baseline">
@@ -34,44 +47,37 @@ function Navbar({ user }: NavbarProps) {
               cursor="pointer"
               onClick={() => navigate("/")}
               alt="D"
-              ml={1}
-              mt={1}
-              mr={0}
-              mb={0}
             />
-            <Heading
-              fontFamily={"Comic Sans MS"}
-              size="lg"
-              cursor="pointer"
-              onClick={() => navigate("/")}
-            >
+            <Heading size="xl" cursor="pointer" onClick={() => navigate("/")}>
               ANTRUM.COM
             </Heading>
           </Flex>
+          <Spacer />
           <Tooltip label="Profile" fontSize="md">
-            <Flex mr={1}>
+            <Flex>
               <Avatar
                 name={user.username}
+                size="md"
                 cursor="pointer"
                 referrerPolicy="no-referrer"
+                border="1px silver solid"
                 src={
                   user.social_auth &&
                   user.social_auth[0] &&
                   user.social_auth[0].picture
                 }
-                size="sm"
-                mr={1}
                 onClick={() => navigate("/profile")}
               />
             </Flex>
           </Tooltip>
         </Flex>
-        <Flex justifyContent="space-between" paddingX={2} m={2}>
+        <Spacer m={4} />
+        <Flex justifyContent="space-between">
           <Tooltip label="Photos" fontSize="md">
-            <Flex paddingX={2}>
+            <Flex>
               <Box
                 as={FaCamera}
-                size="24px"
+                size="30px"
                 color={currentPath === "/albums" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
@@ -80,10 +86,10 @@ function Navbar({ user }: NavbarProps) {
             </Flex>
           </Tooltip>
           <Tooltip label="Calendar" fontSize="md">
-            <Flex paddingX={2}>
+            <Flex>
               <Box
                 as={FaCalendarAlt}
-                size="24px"
+                size="30px"
                 color={currentPath === "/calendar" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
@@ -92,10 +98,10 @@ function Navbar({ user }: NavbarProps) {
             </Flex>
           </Tooltip>
           <Tooltip label="Quotes" fontSize="md">
-            <Flex paddingX={2}>
+            <Flex>
               <Box
                 as={FaFeatherAlt}
-                size="24px"
+                size="30px"
                 color={currentPath === "/quotes" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
@@ -104,10 +110,10 @@ function Navbar({ user }: NavbarProps) {
             </Flex>
           </Tooltip>
           <Tooltip label="Resources" fontSize="md">
-            <Flex paddingX={2}>
+            <Flex>
               <Box
                 as={FaMapSigns}
-                size="24px"
+                size="30px"
                 color={currentPath === "/resources" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
@@ -116,10 +122,10 @@ function Navbar({ user }: NavbarProps) {
             </Flex>
           </Tooltip>
           <Tooltip label="Friends" fontSize="md">
-            <Flex paddingX={2}>
+            <Flex>
               <Box
                 as={FaAddressBook}
-                size="24px"
+                size="30px"
                 color={currentPath === "/friends" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
@@ -128,6 +134,7 @@ function Navbar({ user }: NavbarProps) {
             </Flex>
           </Tooltip>
         </Flex>
+        <Spacer m={4} />
       </Flex>
     );
 }

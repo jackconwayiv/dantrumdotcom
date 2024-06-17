@@ -65,10 +65,10 @@ export default function FriendsDirectory() {
     );
   };
 
-  if (friends)
+  if (friends) //else handle error
     return (
       <Flex direction="column" width="100%">
-        <Heading size="md">
+        <Heading size="md" fontFamily="Comic Sans MS">
           {friends.length > 0 && friends.length} Friends
         </Heading>
 

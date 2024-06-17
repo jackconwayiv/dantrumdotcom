@@ -1,4 +1,13 @@
-import { Box, Card, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  Flex,
+  Heading,
+  Image,
+  Spacer,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
 import { Album, User } from "../helpers/types";
 import { isOwner } from "../helpers/utils";
@@ -19,16 +28,16 @@ const AlbumCard = ({
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
-      overflow="hidden"
-      margin={3}
       padding={2}
+      margin={4}
       key={album.id}
+      width="95%"
     >
       <a
         href={album.link_url}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ textDecoration: "none" }}
+        style={{ textDecoration: "none", cursor: "alias" }}
       >
         <Flex direction={{ base: "column", sm: "row" }}>
           <Box
@@ -42,21 +51,27 @@ const AlbumCard = ({
               height="100%"
               maxHeight={{ base: "200px", sm: "200px" }}
               objectFit="cover"
-              cursor="pointer"
               border="1px silver solid"
               src={album.thumbnail_url}
               alt={album.title}
             />
           </Box>
           <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
-            <Flex direction="column" p={4}>
+            <Flex direction="column">
               <Flex justifyContent="space-between">
-                <Text mb={4} fontFamily={"Comic Sans MS"} fontWeight="bold">
+                <Heading
+                  fontFamily={"Comic Sans MS"}
+                  fontWeight="bold"
+                  size="md"
+                  p={1}
+                >
                   {album.date} {album.title.toUpperCase()}
-                </Text>
+                </Heading>
               </Flex>
-              <Flex width="100%">
-                <Text fontFamily={"Comic Sans MS"}>{album.description}</Text>
+              <Flex>
+                <Text p={1} fontFamily={"Comic Sans MS"}>
+                  {album.description}
+                </Text>
               </Flex>
             </Flex>
           </Box>
@@ -65,14 +80,18 @@ const AlbumCard = ({
       <Spacer />
       <Flex justifyContent="end">
         {isOwner(user, album) ? (
-          <FaGear
-            cursor="pointer"
-            size="25px"
-            onClick={() => {
-              setCurrentAlbum(album);
-              onOpen();
-            }}
-          />
+          <Tooltip label={`Edit ${album.title}`} placement="top" fontSize="md">
+            <Box>
+              <FaGear
+                cursor="context-menu"
+                size="25px"
+                onClick={() => {
+                  setCurrentAlbum(album);
+                  onOpen();
+                }}
+              />
+            </Box>
+          </Tooltip>
         ) : (
           <></>
         )}
