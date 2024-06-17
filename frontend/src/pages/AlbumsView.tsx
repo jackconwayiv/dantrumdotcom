@@ -6,10 +6,8 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  Card,
   Flex,
   Heading,
-  Image,
   Input,
   Modal,
   ModalBody,
@@ -18,17 +16,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  Wrap,
+  Textarea,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import axios, { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
-import { FaWrench } from "react-icons/fa";
 import { deleteAlbum, saveAlbum } from "../api/albums";
+import AlbumCard from "../components/AlbumCard";
 import { Album, User } from "../helpers/types";
-import { isOwner } from "../helpers/utils";
 
 interface AlbumsViewProps {
   user: User;
@@ -111,52 +108,13 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   const renderAlbum = (album: Album) => {
     return (
-      <Card
-        direction={{ base: "column", sm: "row" }}
-        width="375px"
-        height="125px"
-        overflow="hidden"
+      <AlbumCard
         key={album.id}
-      >
-        <a
-          href={album.link_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ textDecoration: "none" }}
-        >
-          <Image
-            minW="150px"
-            maxW={{ base: "100%", sm: "150px" }}
-            height="100px"
-            objectFit="cover"
-            cursor="pointer"
-            src={album.thumbnail_url}
-            alt={album.title}
-          />
-        </a>
-        <Flex direction="column" p={2}>
-          <Flex justifyContent="space-between" width="100%">
-            <Text fontSize="12">{album.title.toUpperCase()}</Text>{" "}
-            {isOwner(user, album) ? (
-              <FaWrench
-                cursor="pointer"
-                onClick={() => {
-                  setCurrentAlbum(album);
-                  onOpen();
-                }}
-              />
-            ) : (
-              <></>
-            )}
-          </Flex>
-          <Flex width="100%">
-            <Text fontSize="10">{album.description}</Text>
-          </Flex>
-          <Flex justifyContent="space-between" width="100%">
-            <Text fontSize="10">{album.date}</Text>
-          </Flex>
-        </Flex>
-      </Card>
+        user={user}
+        album={album}
+        onOpen={onOpen}
+        setCurrentAlbum={setCurrentAlbum}
+      />
     );
   };
 
@@ -247,7 +205,9 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   if (loading) {
     return (
       <Flex direction="column">
-        <Heading mb={4}>PHOTOS</Heading>
+        <Heading fontFamily={"Comic Sans MS"} mb={4}>
+          PHOTOS
+        </Heading>
         <Text>Loading...</Text>
       </Flex>
     );
@@ -256,7 +216,9 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   if (error) {
     return (
       <Flex direction="column">
-        <Heading mb={4}>PHOTOS</Heading>
+        <Heading fontFamily={"Comic Sans MS"} mb={4}>
+          PHOTOS
+        </Heading>
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
     );
@@ -264,7 +226,9 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   return (
     <Flex direction="column" width="100%">
-      <Heading mb={4}>PHOTOS</Heading>
+      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
+        FOTO ALBUMS
+      </Heading>
       <Button
         width="120px"
         m={4}
@@ -273,13 +237,13 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           onOpen();
         }}
       >
-        Add Album
+        + New Album
       </Button>
-      <Wrap>
+      <Flex direction="column">
         {albums &&
           albums.length > 0 &&
           albums.map((album) => renderAlbum(album))}
-      </Wrap>
+      </Flex>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -305,8 +269,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
               </Flex>
               <Flex direction="column" m={3}>
                 <label htmlFor="description">Description:</label>
-                <Input
-                  type="text"
+                <Textarea
                   name="description"
                   value={formik.values.description}
                   onChange={formik.handleChange}

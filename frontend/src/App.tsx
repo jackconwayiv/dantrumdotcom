@@ -40,7 +40,7 @@ function App() {
     return (
       <BrowserRouter>
         <Navbar user={user} />
-        <Flex margin="10px">
+        <Flex margin="10px" direction="column" height="100%">
           <Routes>
             <Route path="/albums" element={<AlbumsView user={user} />} />
             <Route path="/calendar" element={<CalendarView />} />

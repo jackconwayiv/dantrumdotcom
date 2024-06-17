@@ -1,9 +1,10 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, Flex } from "@chakra-ui/react";
 
 import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import "./Scroll.css";
 import { handleFailedRequest } from "./helpers/session";
 
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
@@ -18,7 +19,23 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ChakraProvider>
-      <App />
+      <Flex
+        direction="row"
+        justifyContent="center"
+        bgColor="silver"
+        height="100%"
+      >
+        <Flex
+          direction="column"
+          width="100%"
+          height="100%"
+          maxWidth="850px"
+          bgColor="white"
+          p={2}
+        >
+          <App />
+        </Flex>
+      </Flex>
     </ChakraProvider>
   </React.StrictMode>
 );

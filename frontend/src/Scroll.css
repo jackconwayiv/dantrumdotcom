@@ -1,0 +1,20 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+html {
+  overflow-y: scroll; /* Always show scrollbar */
+}
+
+/* Alternatively, hide the scrollbar completely */
+/*
+body::-webkit-scrollbar {
+  display: none;
+}
+body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  /* scrollbar-width: none;  Firefox */
+/* }  */

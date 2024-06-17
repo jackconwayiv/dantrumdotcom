@@ -61,7 +61,7 @@ class User(AbstractUser):
 class Album(CreatedUpdated):
 
     title = models.CharField(max_length=200)
-    description = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     link_url = models.CharField(max_length=4000)
     thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
     date = models.DateField(default=datetime.date.today, editable=True)
@@ -82,6 +82,7 @@ class Quote(CreatedUpdated):
 
     def __str__(self):
         return f"{self.text}"
+
 
 class Resource(CreatedUpdated):
     title = models.CharField(max_length=200)

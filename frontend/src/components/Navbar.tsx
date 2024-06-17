@@ -1,4 +1,4 @@
-import { Avatar, Flex, Heading, Image, Tooltip } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Heading, Image, Tooltip } from "@chakra-ui/react";
 import {
   FaAddressBook,
   FaCalendarAlt,
@@ -6,7 +6,7 @@ import {
   FaFeatherAlt,
   FaMapSigns,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { User } from "../helpers/types";
 
@@ -16,6 +16,8 @@ interface NavbarProps {
 
 function Navbar({ user }: NavbarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   if (user)
     return (
@@ -31,12 +33,18 @@ function Navbar({ user }: NavbarProps) {
               src="favicon.ico"
               cursor="pointer"
               onClick={() => navigate("/")}
+              alt="D"
               ml={1}
               mt={1}
               mr={0}
               mb={0}
             />
-            <Heading size="lg" cursor="pointer" onClick={() => navigate("/")}>
+            <Heading
+              fontFamily={"Comic Sans MS"}
+              size="lg"
+              cursor="pointer"
+              onClick={() => navigate("/")}
+            >
               ANTRUM.COM
             </Heading>
           </Flex>
@@ -61,50 +69,60 @@ function Navbar({ user }: NavbarProps) {
         <Flex justifyContent="space-between" paddingX={2} m={2}>
           <Tooltip label="Photos" fontSize="md">
             <Flex paddingX={2}>
-              <FaCamera
+              <Box
+                as={FaCamera}
+                size="24px"
+                color={currentPath === "/albums" ? "green.500" : "black"}
+                _hover={{ color: "green.300" }}
                 cursor="pointer"
-                size="20px"
-                // color="red"
                 onClick={() => navigate("/albums")}
               />
             </Flex>
           </Tooltip>
           <Tooltip label="Calendar" fontSize="md">
             <Flex paddingX={2}>
-              <FaCalendarAlt
+              <Box
+                as={FaCalendarAlt}
+                size="24px"
+                color={currentPath === "/calendar" ? "green.500" : "black"}
+                _hover={{ color: "green.300" }}
                 cursor="pointer"
-                size="20px"
-                // color="orange"
                 onClick={() => navigate("/calendar")}
               />
             </Flex>
           </Tooltip>
           <Tooltip label="Quotes" fontSize="md">
             <Flex paddingX={2}>
-              <FaFeatherAlt
+              <Box
+                as={FaFeatherAlt}
+                size="24px"
+                color={currentPath === "/quotes" ? "green.500" : "black"}
+                _hover={{ color: "green.300" }}
                 cursor="pointer"
-                size="20px"
-                // color="green"
                 onClick={() => navigate("/quotes")}
               />
             </Flex>
           </Tooltip>
           <Tooltip label="Resources" fontSize="md">
             <Flex paddingX={2}>
-              <FaMapSigns
+              <Box
+                as={FaMapSigns}
+                size="24px"
+                color={currentPath === "/resources" ? "green.500" : "black"}
+                _hover={{ color: "green.300" }}
                 cursor="pointer"
-                size="20px"
-                // color="blue"
                 onClick={() => navigate("/resources")}
               />
             </Flex>
           </Tooltip>
           <Tooltip label="Friends" fontSize="md">
             <Flex paddingX={2}>
-              <FaAddressBook
+              <Box
+                as={FaAddressBook}
+                size="24px"
+                color={currentPath === "/friends" ? "green.500" : "black"}
+                _hover={{ color: "green.300" }}
                 cursor="pointer"
-                size="20px"
-                // color="purple"
                 onClick={() => navigate("/friends")}
               />
             </Flex>
