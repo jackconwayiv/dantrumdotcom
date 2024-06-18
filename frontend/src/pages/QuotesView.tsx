@@ -242,8 +242,6 @@ export default function QuotesView({ user }: QuotesViewProps) {
         Add Quote
       </Button>
       <Wrap>{quotes && quotes.map((quote) => renderQuote(quote))}</Wrap>
-      {currentQuote && JSON.stringify(currentQuote)}
-
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

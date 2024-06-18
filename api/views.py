@@ -5,6 +5,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from django.db.models.functions import ExtractYear
 
 from .models import Album, Quote, Resource, User
 from .permissions import IsOwnerOrReadOnly
@@ -27,9 +28,29 @@ class AlbumViewSet(viewsets.ModelViewSet):
     serializer_class = AlbumSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
+    def get_queryset(self):
+        return Album.objects.all().order_by("-date")
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    @action(detail=False, methods=['get'], url_path='year/(?P<year>\d{4})')
+    def year(self, request, year=None):
+        albums = Album.objects.filter(date__year=year).order_by("-date")
+        serializer = self.get_serializer(albums, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='mine')
+    def mine(self, request):
+        user = self.request.user
+        albums = Album.objects.filter(owner=user).order_by("-date")
+        serializer = self.get_serializer(albums, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET'])
+def album_years(request):
+    years = Album.objects.annotate(year=ExtractYear('date')).values_list('year', flat=True).distinct()
+    return Response(sorted(years, reverse=True))
 
 class QuoteViewSet(viewsets.ModelViewSet):
     """

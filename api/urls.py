@@ -14,5 +14,6 @@ router.register(r"resources", views.ResourceViewSet, basename="resource")
 urlpatterns = [
     # path("", views.index, name="index"),
     path("", include(router.urls)),
+    path("years/", views.album_years, name="album-years"),
     path("api-auth/", include("rest_framework.urls")),
 ]

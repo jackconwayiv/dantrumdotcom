@@ -15,8 +15,8 @@ import { isOwner } from "../helpers/utils";
 interface AlbumCardProps {
   user: User;
   album: Album;
-  onOpen: any;
-  setCurrentAlbum: any;
+  onOpen: () => void;
+  setCurrentAlbum: React.Dispatch<React.SetStateAction<Album | null>>;
 }
 
 const AlbumCard = ({

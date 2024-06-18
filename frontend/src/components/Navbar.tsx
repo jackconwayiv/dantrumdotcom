@@ -48,7 +48,12 @@ function Navbar({ user }: NavbarProps) {
               onClick={() => navigate("/")}
               alt="D"
             />
-            <Heading size="xl" cursor="pointer" onClick={() => navigate("/")}>
+            <Heading
+              fontFamily="Tahoma"
+              size="xl"
+              cursor="pointer"
+              onClick={() => navigate("/")}
+            >
               ANTRUM.COM
             </Heading>
           </Flex>
