@@ -11,7 +11,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Text,
   Tooltip,
   useDisclosure,
   useToast,
@@ -19,6 +18,7 @@ import {
 import { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { FaBirthdayCake, FaSignOutAlt } from "react-icons/fa";
+import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
 
@@ -88,7 +88,7 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
     //otherwise, handle error
     return (
       <Flex direction="column" width="100%">
-        <Flex alignItems="center" justifyContent="space-between">
+        <Flex alignItems="center" justifyContent="space-between" m={4}>
           {user.social_auth && user.social_auth[0] && (
             <Avatar
               name={user.username}
@@ -98,29 +98,14 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
               size="xl"
             />
           )}
-
-          <Flex
-            cursor="pointer"
-            m={5}
-            onClick={handleLogoutClick}
-            direction="row"
-          >
-            <Text mr={1} fontSize="12">
-              Logout
-            </Text>{" "}
-            <FaSignOutAlt />
-          </Flex>
         </Flex>
         <Flex m={5} direction="column">
-          {user.first_name || user.last_name ? (
-            <Heading size="lg">
-              {user.first_name} {user.username && `"${user.username}" `}
-              {user.last_name}
-            </Heading>
-          ) : (
-            <Heading size="lg">no name on record</Heading>
-          )}
-          <Flex alignItems="center">
+          <Heading size="lg" m={4}>
+            {user.first_name && `${user.first_name} `}
+            {user.username && ` "${user.username}" `}
+            {user.last_name && ` ${user.last_name}`}
+          </Heading>
+          <Flex alignItems="center" m={4}>
             <Tooltip label="Birthday" fontSize="md">
               <Box mr={3}>
                 <FaBirthdayCake />
@@ -130,19 +115,39 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
               {user.date_of_birth || "no birthday provided"}
             </Heading>
           </Flex>
-          <Heading size="md">{user.email}</Heading>
-          {/* <Heading size="md">Member since {user.date_joined}</Heading>
-        <Heading size="md">Last logged in {user.last_login}</Heading> */}
+          <Heading size="md" m={4}>
+            {user.email}
+          </Heading>
         </Flex>
-
-        <Button width="120px" m={4} onClick={onOpen}>
-          Edit Profile
-        </Button>
+        <Flex direction="column" m={4}>
+          <Button
+            width="120px"
+            borderRadius="25px"
+            variant="outline"
+            colorScheme="green"
+            m={4}
+            leftIcon={<FaGear />}
+            onClick={onOpen}
+          >
+            Edit Profile
+          </Button>
+          <Button
+            width="120px"
+            variant="outline"
+            m={4}
+            colorScheme="red"
+            borderRadius="25px"
+            leftIcon={<FaSignOutAlt />}
+            onClick={handleLogoutClick}
+          >
+            Logout
+          </Button>
+        </Flex>
 
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Edit Profile</ModalHeader>
+            <ModalHeader fontFamily="Comic Sans MS">Edit Profile</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <form onSubmit={formik.handleSubmit}>
@@ -165,7 +170,7 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
                   />
                 </Flex>
                 <Flex direction="column" m={3}>
-                  <label htmlFor="username">Nickname (or leave blank):</label>
+                  <label htmlFor="username">Nickname (optional):</label>
                   <Input
                     type="text"
                     name="username"
@@ -182,14 +187,19 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
                     onChange={formik.handleChange}
                   />
                 </Flex>
-                <Button
-                  colorScheme="green"
-                  marginY={6}
-                  type="submit"
-                  onClick={onClose}
-                >
-                  Submit Changes
-                </Button>
+                <Flex justifyContent="space-evenly" marginY={6}>
+                  <Button borderRadius="25px" onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    colorScheme="green"
+                    borderRadius="25px"
+                    type="submit"
+                    onClick={onClose}
+                  >
+                    Save
+                  </Button>
+                </Flex>
               </form>
             </ModalBody>
           </ModalContent>

@@ -7,13 +7,7 @@ import {
   Spacer,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  FaAddressBook,
-  FaCalendarAlt,
-  FaCamera,
-  FaFeatherAlt,
-  FaMapSigns,
-} from "react-icons/fa";
+import { FaCamera, FaMapSigns } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { User } from "../helpers/types";
@@ -37,7 +31,7 @@ function Navbar({ user }: NavbarProps) {
       >
         <Flex
           direction="row"
-          alignItems="baseline"
+          alignItems="center"
           justifyContent="space-between"
         >
           <Flex direction="row" alignItems="center" justifyContent="baseline">
@@ -57,27 +51,6 @@ function Navbar({ user }: NavbarProps) {
               ANTRUM.COM
             </Heading>
           </Flex>
-          <Spacer />
-          <Tooltip label="Profile" fontSize="md">
-            <Flex>
-              <Avatar
-                name={user.username}
-                size="md"
-                cursor="pointer"
-                referrerPolicy="no-referrer"
-                border="1px silver solid"
-                src={
-                  user.social_auth &&
-                  user.social_auth[0] &&
-                  user.social_auth[0].picture
-                }
-                onClick={() => navigate("/profile")}
-              />
-            </Flex>
-          </Tooltip>
-        </Flex>
-        <Spacer m={4} />
-        <Flex justifyContent="space-between">
           <Tooltip label="Photos" fontSize="md">
             <Flex>
               <Box
@@ -90,7 +63,7 @@ function Navbar({ user }: NavbarProps) {
               />
             </Flex>
           </Tooltip>
-          <Tooltip label="Calendar" fontSize="md">
+          {/* <Tooltip label="Calendar" fontSize="md">
             <Flex>
               <Box
                 as={FaCalendarAlt}
@@ -101,8 +74,8 @@ function Navbar({ user }: NavbarProps) {
                 onClick={() => navigate("/calendar")}
               />
             </Flex>
-          </Tooltip>
-          <Tooltip label="Quotes" fontSize="md">
+          </Tooltip> */}
+          {/* <Tooltip label="Quotes" fontSize="md">
             <Flex>
               <Box
                 as={FaFeatherAlt}
@@ -113,7 +86,7 @@ function Navbar({ user }: NavbarProps) {
                 onClick={() => navigate("/quotes")}
               />
             </Flex>
-          </Tooltip>
+          </Tooltip> */}
           <Tooltip label="Resources" fontSize="md">
             <Flex>
               <Box
@@ -126,7 +99,7 @@ function Navbar({ user }: NavbarProps) {
               />
             </Flex>
           </Tooltip>
-          <Tooltip label="Friends" fontSize="md">
+          {/* <Tooltip label="Friends" fontSize="md">
             <Flex>
               <Box
                 as={FaAddressBook}
@@ -137,7 +110,42 @@ function Navbar({ user }: NavbarProps) {
                 onClick={() => navigate("/friends")}
               />
             </Flex>
-          </Tooltip>
+          </Tooltip> */}
+          <Flex alignItems="baseline" justifyContent="baseline">
+            {/* <Box m={0} p={0}>
+              <Menu>
+                <MenuButton
+                  as={Flex}
+                  alignItems="baseline"
+                  justifyContent="baseline"
+                > */}
+            <Avatar
+              name={user.username}
+              cursor="pointer"
+              referrerPolicy="no-referrer"
+              border="1px silver solid"
+              alignSelf="baseline"
+              justifySelf="baseline"
+              onClick={() => navigate("/profile")}
+              src={
+                user.social_auth &&
+                user.social_auth[0] &&
+                user.social_auth[0].picture
+              }
+            />
+            {/* </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    icon={<FaGear />}
+                    onClick={() => navigate("/profile")}
+                  >
+                    Edit Profile
+                  </MenuItem>
+                  <MenuItem icon={<FaSignOutAlt />}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
+            </Box> */}
+          </Flex>
         </Flex>
         <Spacer m={4} />
       </Flex>

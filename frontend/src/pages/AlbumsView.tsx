@@ -57,9 +57,11 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     const errors = {} as any;
 
     if (!values.title) errors.title = "Required";
-
-    if (!values.link_url) errors.link_url = "Required";
-
+    if (!values.link_url) {
+      errors.link_url = "Required";
+    } else if (!/^(ftp|http|https):\/\/[^ "]+$/.test(values.link_url)) {
+      errors.link_url = "Invalid URL";
+    }
     if (!values.date) errors.date = "Required";
 
     return errors;
@@ -216,6 +218,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
         isOpen={isOpen}
         onClose={onClose}
         formik={formik}
+        validate={validate}
       />
     </Flex>
   );

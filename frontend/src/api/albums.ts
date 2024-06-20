@@ -28,3 +28,21 @@ export const deleteAlbum = async (albumId: number) => {
     throw error;
   }
 };
+
+interface AlbumData {
+  title: string;
+  link_url: string;
+  thumbnail_url: string;
+}
+
+export async function fetchAlbumDataFromBackend(
+  url: string
+): Promise<AlbumData | null> {
+  try {
+    const response = await axios.post("/api/fetch-album-data/", { url });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching album data:", error);
+    return null;
+  }
+}

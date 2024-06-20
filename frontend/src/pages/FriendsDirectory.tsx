@@ -52,11 +52,12 @@ export default function FriendsDirectory() {
         </Flex>
         <Flex direction="column" p={2}>
           {friend.username && <Text>{friend.username}</Text>}
-          {friend.username && (
-            <Text>
-              {friend.first_name} {friend.last_name}
-            </Text>
-          )}
+          {friend.first_name ||
+            (friend.last_name && (
+              <Text>
+                {friend.first_name} {friend.last_name}
+              </Text>
+            ))}
           {!friend.username && !friend.first_name && !friend.last_name && (
             <Text>{friend.email}</Text>
           )}
@@ -65,7 +66,8 @@ export default function FriendsDirectory() {
     );
   };
 
-  if (friends) //else handle error
+  if (friends)
+    //else handle error
     return (
       <Flex direction="column" width="100%">
         <Heading size="md" fontFamily="Comic Sans MS">

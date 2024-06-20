@@ -7,6 +7,7 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
+  Image,
   Input,
   Modal,
   ModalBody,
@@ -14,15 +15,16 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Text,
   Textarea,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { isAxiosError } from "axios";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { deleteAlbum } from "../api/albums";
+import { deleteAlbum, fetchAlbumDataFromBackend } from "../api/albums";
 import { Album } from "../helpers/types";
 
 interface AlbumModalsProps {
@@ -33,6 +35,7 @@ interface AlbumModalsProps {
   setCurrentAlbum: React.Dispatch<React.SetStateAction<Album | null>>;
   setAlbums: React.Dispatch<React.SetStateAction<Album[]>>;
   formik: any;
+  validate: (values: Album) => any;
 }
 
 export const AlbumModals = ({
@@ -43,7 +46,10 @@ export const AlbumModals = ({
   setCurrentAlbum,
   setAlbums,
   formik,
+  validate,
 }: AlbumModalsProps) => {
+  const [loading, setLoading] = useState(false);
+
   const toast = useToast();
   const {
     isOpen: isAlertOpen,
@@ -89,29 +95,59 @@ export const AlbumModals = ({
     }
   };
 
+  const handleUrlBlur = async (
+    e: React.FocusEvent<HTMLInputElement, Element>
+  ) => {
+    const url = e.target.value;
+    const errors = validate({ ...formik.values, link_url: url });
+
+    if (!errors.link_url && url.includes("goo.gl")) {
+      setLoading(true);
+      const albumData = await fetchAlbumDataFromBackend(url);
+      setLoading(false);
+      if (albumData) {
+        formik.setValues({
+          ...formik.values,
+          title: albumData.title,
+          link_url: albumData.link_url,
+          thumbnail_url: albumData.thumbnail_url,
+        });
+      }
+    }
+  };
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
-            {currentAlbum ? "Edit Foto Album:" : "New Foto Album:"}
+          <ModalHeader fontFamily={"Comic Sans MS"}>
+            {currentAlbum ? "Edit Foto Album" : "Add Foto Album"}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <form onSubmit={formik.handleSubmit}>
               <Flex direction="column" m={3}>
-                <label htmlFor="title">Title:</label>
+                <label htmlFor="link_url">Album URL link:</label>
                 <Input
-                  type="text"
-                  name="title"
-                  value={formik.values.title}
+                  type="url"
+                  name="link_url"
+                  value={formik.values.link_url}
                   onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
+                  onBlur={(e) => {
+                    formik.handleBlur(e);
+                    handleUrlBlur(e);
+                  }}
                 />
-                {formik.touched.title && formik.errors.title
-                  ? renderAlert(formik.errors.title)
+                {formik.touched.link_url && formik.errors.link_url
+                  ? renderAlert(formik.errors.link_url)
                   : null}
+                {loading && (
+                  <Flex align="center">
+                    <Spinner size="sm" />
+                    <Text ml={2}>Fetching details...</Text>
+                  </Flex>
+                )}
               </Flex>
               <Flex direction="column" m={3}>
                 <label htmlFor="description">Description:</label>
@@ -123,32 +159,6 @@ export const AlbumModals = ({
                 />
                 {formik.touched.description && formik.errors.description
                   ? renderAlert(formik.errors.description)
-                  : null}
-              </Flex>
-              <Flex direction="column" m={3}>
-                <label htmlFor="link_url">Album URL link:</label>
-                <Input
-                  type="url"
-                  name="link_url"
-                  value={formik.values.link_url}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.link_url && formik.errors.link_url
-                  ? renderAlert(formik.errors.link_url)
-                  : null}
-              </Flex>
-              <Flex direction="column" m={3}>
-                <label htmlFor="thumbnail_url">Thumbnail URL:</label>
-                <Input
-                  type="url"
-                  name="thumbnail_url"
-                  value={formik.values.thumbnail_url}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.thumbnail_url && formik.errors.thumbnail_url
-                  ? renderAlert(formik.errors.thumbnail_url)
                   : null}
               </Flex>
               <Flex direction="column" m={3}>
@@ -164,6 +174,36 @@ export const AlbumModals = ({
                   ? renderAlert(formik.errors.date)
                   : null}
               </Flex>
+              <Flex direction="column" m={3}>
+                <label htmlFor="title">Title:</label>
+                <Input
+                  type="text"
+                  name="title"
+                  value={formik.values.title}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.title && formik.errors.title
+                  ? renderAlert(formik.errors.title)
+                  : null}
+              </Flex>
+              <Flex direction="column" m={3}>
+                <label htmlFor="thumbnail_url">Thumbnail URL:</label>
+                <Input
+                  type="url"
+                  name="thumbnail_url"
+                  value={formik.values.thumbnail_url}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.thumbnail_url && formik.errors.thumbnail_url
+                  ? renderAlert(formik.errors.thumbnail_url)
+                  : null}
+                {formik.values.thumbnail_url && (
+                  <Image src={formik.values.thumbnail_url} />
+                )}
+              </Flex>
+
               <Flex marginY={6} justifyContent="space-evenly">
                 <Button
                   borderRadius="25px"

@@ -7,5 +7,6 @@ django-cors-headers
 authlib ~= 1.0
 python-dotenv ~= 0.19
 requests ~= 2.27
+beautifulsoup4==4.9.3
 faker
 debugpy
