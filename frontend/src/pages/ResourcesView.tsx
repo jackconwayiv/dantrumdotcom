@@ -3,7 +3,6 @@ import {
   Flex,
   Heading,
   Text,
-  Wrap,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -159,13 +158,12 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   return (
     <Flex direction="column" width="100%">
       {renderHeading()}
-      <Flex>
+      <Flex justifyContent="space-evenly">
         <Button
           leftIcon={<FaPlus />}
           borderRadius="25px"
           colorScheme="green"
           variant="outline"
-          m={4}
           onClick={() => {
             setCurrentResource(null);
             onOpen();
@@ -174,7 +172,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
           New Resource
         </Button>
       </Flex>
-      <Wrap>
+      <Flex direction="column">
         {resources &&
           resources.length > 0 &&
           resources.map((resource) => (
@@ -186,7 +184,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
               setCurrentResource={setCurrentResource}
             />
           ))}
-      </Wrap>
+      </Flex>
       <ResourceModals
         resources={resources}
         setResources={setResources}

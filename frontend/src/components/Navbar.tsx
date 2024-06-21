@@ -6,6 +6,7 @@ import {
   Image,
   Spacer,
   Tooltip,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { FaCamera, FaMapSigns } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -20,7 +21,7 @@ function Navbar({ user }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-
+  const isMobile = useBreakpointValue({ base: true, md: false });
   if (user)
     return (
       <Flex
@@ -42,14 +43,16 @@ function Navbar({ user }: NavbarProps) {
               onClick={() => navigate("/")}
               alt="D"
             />
-            <Heading
-              fontFamily="Tahoma"
-              size="xl"
-              cursor="pointer"
-              onClick={() => navigate("/")}
-            >
-              ANTRUM.COM
-            </Heading>
+            {!isMobile && (
+              <Heading
+                fontFamily="Tahoma"
+                size="xl"
+                cursor="pointer"
+                onClick={() => navigate("/")}
+              >
+                ANTRUM.COM
+              </Heading>
+            )}
           </Flex>
           <Tooltip label="Photos" fontSize="md">
             <Flex>

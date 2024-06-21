@@ -1,18 +1,20 @@
-import { Flex, Heading, Image } from "@chakra-ui/react";
-import { FaCamera, FaMapSigns } from "react-icons/fa";
+import { Flex, Heading } from "@chakra-ui/react";
+import { FaCamera, FaMapSigns, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import ImageCarousel from "../components/ImageCarousel";
 
 export default function Root() {
   const navigate = useNavigate();
   return (
     <Flex direction="column">
       <Flex direction="column" alignItems="center">
-        <Image
+        {/* <Image
           src="splash_art.jpg"
           objectFit="cover"
           width="50%"
           border="1px black solid"
-        />
+        /> */}
+        <ImageCarousel />
         <Heading fontFamily="Comic Sans MS" my={6}>
           YO! IT'S DANTRUM.COM
         </Heading>
@@ -76,7 +78,7 @@ export default function Root() {
             Friends
           </Heading>
         </Flex> */}
-        {/* <Flex
+        <Flex
           alignItems="center"
           width="90%"
           m={2}
@@ -89,7 +91,7 @@ export default function Root() {
           <Heading m={3} size="md">
             Profile
           </Heading>
-        </Flex> */}
+        </Flex>
       </Flex>
     </Flex>
   );
