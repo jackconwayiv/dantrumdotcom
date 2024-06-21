@@ -86,7 +86,7 @@ class Quote(CreatedUpdated):
 
 class Resource(CreatedUpdated):
     title = models.CharField(max_length=200)
-    description = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=4000)
     thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
     owner = models.ForeignKey(

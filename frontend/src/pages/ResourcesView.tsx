@@ -130,10 +130,18 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     }
   };
 
+  const renderHeading = () => {
+    return (
+      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
+        LINKS & RESOURCES
+      </Heading>
+    );
+  };
+
   if (loading) {
     return (
       <Flex direction="column" width="100%">
-        <Heading>RESOURCES</Heading>
+        {renderHeading()}
         <Text>Loading...</Text>
       </Flex>
     );
@@ -142,7 +150,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   if (error) {
     return (
       <Flex direction="column" width="100%">
-        <Heading>RESOURCES</Heading>
+        {renderHeading()}
         <Text>Error: {error}</Text>
       </Flex>
     );
@@ -150,7 +158,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
 
   return (
     <Flex direction="column" width="100%">
-      <Heading>RESOURCES</Heading>
+      {renderHeading()}
       <Flex>
         <Button
           leftIcon={<FaPlus />}

@@ -35,7 +35,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    @action(detail=False, methods=["get"], url_path="year/(?P<year>\d{4})")
+    @action(detail=False, methods=["get"], url_path=r"year/(?P<year>\d{4})")
     def year(self, request, year=None):
         albums = Album.objects.filter(date__year=year).order_by("-date")
         serializer = self.get_serializer(albums, many=True)
@@ -61,35 +61,37 @@ def album_years(request):
 
 class FetchAlbumData(APIView):
     def post(self, request, *args, **kwargs):
-        url = request.data.get("url")
-        if not url:
-            return Response({"error": "URL is required"}, status=400)
+        serializer = URLSerializer(data=request.data)
+        if serializer.is_valid():
+            url = serializer.validated_data.get("url")
 
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, "html.parser")
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, "html.parser")
 
-        title = (
-            soup.find("meta", property="og:title")["content"]
-            if soup.find("meta", property="og:title")
-            else soup.find("title").text if soup.find("title") else "No title found"
-        )
-        thumbnail = (
-            soup.find("meta", property="og:image")["content"]
-            if soup.find("meta", property="og:image")
-            else "No image found"
-        )
-        album_url = (
-            soup.find("meta", property="og:url")["content"]
-            if soup.find("meta", property="og:url")
-            else "No URL found"
-        )
+            title = (
+                soup.find("meta", property="og:title")["content"]
+                if soup.find("meta", property="og:title")
+                else soup.find("title").text if soup.find("title") else "No title found"
+            )
+            thumbnail = (
+                soup.find("meta", property="og:image")["content"]
+                if soup.find("meta", property="og:image")
+                else "No image found"
+            )
+            album_url = (
+                soup.find("meta", property="og:url")["content"]
+                if soup.find("meta", property="og:url")
+                else "No URL found"
+            )
 
-        data = {
-            "title": title,
-            "thumbnail_url": thumbnail,
-            "link_url": album_url,
-        }
-        return Response(data)
+            data = {
+                "title": title,
+                "thumbnail_url": thumbnail,
+                "link_url": album_url,
+            }
+            return Response(data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuoteViewSet(viewsets.ModelViewSet):
@@ -137,9 +139,6 @@ class URLSummaryView(APIView):
                     if img.get("src"):
                         thumbnail = img["src"]
                         break
-
-                # paragraphs = soup.find_all("p")
-                # summary = paragraphs[0].get_text() if paragraphs else ""
 
                 paragraphs = soup.find_all("p")
                 summary = ""
