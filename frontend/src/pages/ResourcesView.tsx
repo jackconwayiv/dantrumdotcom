@@ -1,9 +1,7 @@
 import {
   Button,
-  Card,
   Flex,
   Heading,
-  Image,
   Text,
   Wrap,
   useDisclosure,
@@ -12,11 +10,11 @@ import {
 import axios, { isAxiosError } from "axios";
 import { FormikErrors, useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { FaWrench } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { saveResource } from "../api/resources";
+import ResourceCard from "../components/ResourceCard";
 import { ResourceModals } from "../components/ResourceModals";
 import { Resource, User } from "../helpers/types";
-import { isOwner } from "../helpers/utils";
 
 interface ResourcesViewProps {
   user: User;
@@ -84,56 +82,6 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     };
     fetchResources();
   }, []);
-
-  const renderResource = (resource: Resource) => {
-    return (
-      <Card
-        direction={{ base: "column", sm: "row" }}
-        width="375px"
-        height="125px"
-        overflow="hidden"
-        key={resource.id}
-      >
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ textDecoration: "none" }}
-        >
-          {resource.thumbnail_url && (
-            <Image
-              minW="150px"
-              maxW={{ base: "100%", sm: "150px" }}
-              height="100px"
-              objectFit="cover"
-              cursor="pointer"
-              src={resource.thumbnail_url}
-              alt={resource.title}
-            />
-          )}
-        </a>
-        <Flex direction="column" p={2}>
-          <Flex justifyContent="space-between" width="100%">
-            <Text fontSize="12">{resource.title.toUpperCase()}</Text>{" "}
-            {isOwner(user, resource) ? (
-              <FaWrench
-                cursor="pointer"
-                onClick={() => {
-                  setCurrentResource(resource);
-                  onOpen();
-                }}
-              />
-            ) : (
-              <></>
-            )}
-          </Flex>
-          <Flex width="100%">
-            <Text fontSize="10">{resource.description}</Text>
-          </Flex>
-        </Flex>
-      </Card>
-    );
-  };
 
   const handleSubmit = async (values: Resource) => {
     try {
@@ -203,20 +151,33 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   return (
     <Flex direction="column" width="100%">
       <Heading>RESOURCES</Heading>
-      <Button
-        width="120px"
-        m={4}
-        onClick={() => {
-          setCurrentResource(null);
-          onOpen();
-        }}
-      >
-        Add Resource
-      </Button>
+      <Flex>
+        <Button
+          leftIcon={<FaPlus />}
+          borderRadius="25px"
+          colorScheme="green"
+          variant="outline"
+          m={4}
+          onClick={() => {
+            setCurrentResource(null);
+            onOpen();
+          }}
+        >
+          New Resource
+        </Button>
+      </Flex>
       <Wrap>
         {resources &&
           resources.length > 0 &&
-          resources.map((resource) => renderResource(resource))}
+          resources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              user={user}
+              resource={resource}
+              onOpen={onOpen}
+              setCurrentResource={setCurrentResource}
+            />
+          ))}
       </Wrap>
       <ResourceModals
         resources={resources}

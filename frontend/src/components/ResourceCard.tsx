@@ -12,19 +12,19 @@ import { FaGear } from "react-icons/fa6";
 import { Resource, User } from "../helpers/types";
 import { isOwner } from "../helpers/utils";
 
-interface AlbumCardProps {
+interface ResourceCardProps {
   user: User;
   resource: Resource;
   onOpen: () => void;
   setCurrentResource: React.Dispatch<React.SetStateAction<Resource | null>>;
 }
 
-const AlbumCard = ({
+const ResourceCard = ({
   user,
   resource,
   onOpen,
   setCurrentResource,
-}: AlbumCardProps) => {
+}: ResourceCardProps) => {
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
@@ -73,6 +73,11 @@ const AlbumCard = ({
                   {resource.description}
                 </Text>
               </Flex>
+              <Flex>
+                <Text p={1} fontSize="10px" fontFamily={"Comic Sans MS"}>
+                  Shared by {resource.owner}
+                </Text>
+              </Flex>
             </Flex>
           </Box>
         </Flex>
@@ -104,4 +109,4 @@ const AlbumCard = ({
   );
 };
 
-export default AlbumCard;
+export default ResourceCard;

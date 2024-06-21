@@ -73,6 +73,11 @@ const AlbumCard = ({
                   {album.description}
                 </Text>
               </Flex>
+              <Flex>
+                <Text p={1} fontSize="10px" fontFamily={"Comic Sans MS"}>
+                  Shared by {album.owner}
+                </Text>
+              </Flex>
             </Flex>
           </Box>
         </Flex>
