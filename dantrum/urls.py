@@ -16,5 +16,8 @@ urlpatterns = [
         RedirectView.as_view(pattern_name="react", permanent=True),
         name="index",
     ),
+    path(
+        "unverified/", views.unverified, name="unverified"
+    ),
     re_path(r"^live/*", login_required(views.react), name="react"),
 ]

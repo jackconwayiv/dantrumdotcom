@@ -87,6 +87,10 @@ def logout(request):
     )
 
 
+def unverified(request):
+    return render(request, "unverified.html")
+
+
 # def logout(request):
 #     """Logs out user"""
 #     auth_logout(request)
