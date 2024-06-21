@@ -21,42 +21,42 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import { useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { deleteAlbum, fetchAlbumDataFromBackend } from "../api/albums";
-import { Album } from "../helpers/types";
+import { deleteResource } from "../api/resources";
+import { Resource } from "../helpers/types";
 
-interface AlbumModalsProps {
-  albums: Album[];
+interface ResourceModalsProps {
+  resources: Resource[];
   isOpen: boolean;
   onClose: () => void;
-  currentAlbum: Album | null;
-  setCurrentAlbum: React.Dispatch<React.SetStateAction<Album | null>>;
-  setAlbums: React.Dispatch<React.SetStateAction<Album[]>>;
+  currentResource: Resource | null;
+  setCurrentResource: React.Dispatch<React.SetStateAction<Resource | null>>;
+  setResources: React.Dispatch<React.SetStateAction<Resource[]>>;
   formik: any;
-  validate: (values: Album) => any;
+  validate: (values: Resource) => any;
 }
 
-export const AlbumModals = ({
-  albums,
+export const ResourceModals = ({
+  resources,
   isOpen,
   onClose,
-  currentAlbum,
-  setCurrentAlbum,
-  setAlbums,
+  currentResource,
+  setCurrentResource,
+  setResources,
   formik,
   validate,
-}: AlbumModalsProps) => {
-  const [loading, setLoading] = useState(false);
-
+}: ResourceModalsProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const toast = useToast();
   const {
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
     onClose: onAlertClose,
   } = useDisclosure();
-  const cancelRef = useRef(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   const renderAlert = (error: string) => {
     return (
@@ -66,13 +66,40 @@ export const AlbumModals = ({
     );
   };
 
+  const handleUrlBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    const errors = validate({ ...formik.values, url });
+
+    if (!errors.url) {
+      setLoading(true);
+      try {
+        const response = await axios.post("/api/summary/", { url });
+        setLoading(false);
+        if (response.data) {
+          formik.setValues({
+            ...formik.values,
+            title: response.data.title || "",
+            url: url || "",
+            description: response.data.summary || "",
+            thumbnail_url: response.data.thumbnail || "",
+          });
+          setError(null);
+        }
+      } catch (err) {
+        setLoading(false);
+        setError("Couldn't auto-fetch resource details");
+      }
+    }
+  };
+
   const handleDelete = async () => {
-    //this sets currentAlbum earlier due to Alert Dialog popup
     try {
-      await deleteAlbum(currentAlbum!.id || 0);
-      setAlbums(albums.filter((album) => album.id !== currentAlbum!.id));
+      await deleteResource(currentResource!.id || 0);
+      setResources(
+        resources.filter((resource) => resource.id !== currentResource!.id)
+      );
       toast({
-        title: "Album Deleted",
+        title: "Resource Deleted",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -84,35 +111,14 @@ export const AlbumModals = ({
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Error deleting album:", error);
+      console.error("Error deleting resource:", error);
       toast({
-        title: "Error deleting album:",
+        title: "Error deleting resource:",
         description: errorMessage,
         status: "error",
         duration: 9000,
         isClosable: true,
       });
-    }
-  };
-
-  const handleUrlBlur = async (
-    e: React.FocusEvent<HTMLInputElement, Element>
-  ) => {
-    const url = e.target.value;
-    const errors = validate({ ...formik.values, link_url: url });
-
-    if (!errors.link_url && url.includes("goo.gl")) {
-      setLoading(true);
-      const albumData = await fetchAlbumDataFromBackend(url);
-      setLoading(false);
-      if (albumData) {
-        formik.setValues({
-          ...formik.values,
-          title: albumData.title,
-          link_url: albumData.link_url,
-          thumbnail_url: albumData.thumbnail_url,
-        });
-      }
     }
   };
 
@@ -122,58 +128,32 @@ export const AlbumModals = ({
         <ModalOverlay />
         <ModalContent>
           <ModalHeader fontFamily={"Comic Sans MS"}>
-            {currentAlbum ? "Edit Foto Album" : "Add Foto Album"}
+            {currentResource
+              ? `Edit Resource: ${currentResource.title}`
+              : "Add New Resource"}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <form onSubmit={formik.handleSubmit}>
               <Flex direction="column" m={3}>
-                <label htmlFor="link_url">Album URL link:</label>
+                <label htmlFor="url">Resource URL:</label>
                 <Input
                   type="url"
-                  name="link_url"
-                  value={formik.values.link_url}
+                  name="url"
+                  value={formik.values.url}
                   onChange={formik.handleChange}
-                  onBlur={(e) => {
-                    formik.handleBlur(e);
-                    handleUrlBlur(e);
-                  }}
+                  onBlur={handleUrlBlur}
                 />
-                {formik.touched.link_url && formik.errors.link_url
-                  ? renderAlert(formik.errors.link_url)
-                  : null}
-                {loading && (
-                  <Flex align="center">
-                    <Spinner size="sm" />
-                    <Text ml={2}>Fetching details...</Text>
-                  </Flex>
-                )}
-              </Flex>
-              <Flex direction="column" m={3}>
-                <label htmlFor="description">Description:</label>
-                <Textarea
-                  name="description"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.description && formik.errors.description
-                  ? renderAlert(formik.errors.description)
+                {formik.touched.url && formik.errors.url
+                  ? renderAlert(formik.errors.url)
                   : null}
               </Flex>
-              <Flex direction="column" m={3}>
-                <label htmlFor="date">Album Date:</label>
-                <Input
-                  type="date"
-                  name="date"
-                  value={formik.values.date}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.date && formik.errors.date
-                  ? renderAlert(formik.errors.date)
-                  : null}
-              </Flex>
+              {loading && (
+                <Flex justifyContent="center" alignItems="center" mt={4}>
+                  <Spinner />
+                  <Text ml={2}>Fetching details...</Text>
+                </Flex>
+              )}
               <Flex direction="column" m={3}>
                 <label htmlFor="title">Title:</label>
                 <Input
@@ -187,6 +167,19 @@ export const AlbumModals = ({
                   ? renderAlert(formik.errors.title)
                   : null}
               </Flex>
+              <Flex direction="column" m={3}>
+                <label htmlFor="description">Description:</label>
+                <Textarea
+                  name="description"
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.description && formik.errors.description
+                  ? renderAlert(formik.errors.description)
+                  : null}
+              </Flex>
+
               <Flex direction="column" m={3}>
                 <label htmlFor="thumbnail_url">Thumbnail URL:</label>
                 <Input
@@ -203,20 +196,24 @@ export const AlbumModals = ({
                   <Image src={formik.values.thumbnail_url} />
                 )}
               </Flex>
-
+              {error && (
+                <Text color="red.500" mt={4}>
+                  {error}
+                </Text>
+              )}
               <Flex marginY={6} justifyContent="space-evenly">
                 <Button
                   borderRadius="25px"
                   colorScheme="gray"
                   variant="outline"
                   onClick={() => {
-                    !currentAlbum && formik.resetForm();
+                    !currentResource && formik.resetForm();
                     onClose();
                   }}
                 >
                   Cancel
                 </Button>
-                {currentAlbum && (
+                {currentResource && (
                   <Button
                     colorScheme="red"
                     borderRadius="25px"
@@ -229,7 +226,7 @@ export const AlbumModals = ({
                   </Button>
                 )}
                 <Button colorScheme="green" borderRadius="25px" type="submit">
-                  {currentAlbum ? "Save Changes" : "Create Album"}
+                  {currentResource ? "Save Changes" : "Create Resource"}
                 </Button>
               </Flex>
             </form>
@@ -249,15 +246,15 @@ export const AlbumModals = ({
               fontSize="lg"
               fontWeight="bold"
             >
-              Delete Album: {currentAlbum && currentAlbum.title}
+              Delete Resource: {currentResource && currentResource.title}
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              {currentAlbum && currentAlbum.thumbnail_url !== "" && (
-                <Image src={currentAlbum?.thumbnail_url} />
+              {currentResource && currentResource.thumbnail_url !== "" && (
+                <Image src={currentResource?.thumbnail_url} />
               )}
-              Are you sure you want to delete this album? You can't undo this
-              action.
+              Do you truly wish to deprive your friends of this precious
+              resource? You can't undo this action.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -267,7 +264,7 @@ export const AlbumModals = ({
                 colorScheme="gray"
                 variant="outline"
                 onClick={() => {
-                  setCurrentAlbum(null);
+                  setCurrentResource(null);
                   onAlertClose();
                 }}
               >
@@ -278,7 +275,7 @@ export const AlbumModals = ({
                 borderRadius="25px"
                 onClick={() => {
                   handleDelete();
-                  setCurrentAlbum(null);
+                  setCurrentResource(null);
                   onAlertClose();
                 }}
                 ml={3}

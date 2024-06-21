@@ -31,6 +31,9 @@ class QuoteSerializer(serializers.ModelSerializer):
         fields = ["id", "text", "date", "owner"]
 
 
+class URLSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
 class ResourceSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.email")
 

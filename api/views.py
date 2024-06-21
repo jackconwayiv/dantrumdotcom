@@ -14,6 +14,7 @@ from .serializers import (
     AuthenticatedUserSerializer,
     QuoteSerializer,
     ResourceSerializer,
+    URLSerializer,
     UserSerializer,
 )
 
@@ -117,6 +118,44 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class URLSummaryView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = URLSerializer(data=request.data)
+        if serializer.is_valid():
+            url = serializer.validated_data["url"]
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.content, "html.parser")
+
+                title = soup.title.string if soup.title else ""
+
+                thumbnail = ""
+                for img in soup.find_all("img"):
+                    if img.get("src"):
+                        thumbnail = img["src"]
+                        break
+
+                # paragraphs = soup.find_all("p")
+                # summary = paragraphs[0].get_text() if paragraphs else ""
+
+                paragraphs = soup.find_all("p")
+                summary = ""
+                if paragraphs:
+                    first_paragraph = paragraphs[0].get_text()
+                    sentences = first_paragraph.split(".")
+                    if sentences:
+                        summary = sentences[0] + "."
+
+                return Response(
+                    {"title": title, "thumbnail": thumbnail, "summary": summary},
+                    status=status.HTTP_200_OK,
+                )
+            except requests.exceptions.RequestException as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):

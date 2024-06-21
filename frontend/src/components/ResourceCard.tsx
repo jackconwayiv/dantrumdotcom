@@ -9,32 +9,32 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
-import { Album, User } from "../helpers/types";
+import { Resource, User } from "../helpers/types";
 import { isOwner } from "../helpers/utils";
 
 interface AlbumCardProps {
   user: User;
-  album: Album;
+  resource: Resource;
   onOpen: () => void;
-  setCurrentAlbum: React.Dispatch<React.SetStateAction<Album | null>>;
+  setCurrentResource: React.Dispatch<React.SetStateAction<Resource | null>>;
 }
 
 const AlbumCard = ({
   user,
-  album,
+  resource,
   onOpen,
-  setCurrentAlbum,
+  setCurrentResource,
 }: AlbumCardProps) => {
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
       padding={2}
       margin={4}
-      key={album.id}
+      key={resource.id}
       width="95%"
     >
       <a
-        href={album.link_url}
+        href={resource.url}
         target="_blank"
         rel="noopener noreferrer"
         style={{ textDecoration: "none", cursor: "alias" }}
@@ -52,8 +52,8 @@ const AlbumCard = ({
               maxHeight={{ base: "200px", sm: "200px" }}
               objectFit="cover"
               border="1px silver solid"
-              src={album.thumbnail_url}
-              alt={album.title}
+              src={resource.thumbnail_url}
+              alt={resource.title}
             />
           </Box>
           <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
@@ -65,12 +65,12 @@ const AlbumCard = ({
                   size="md"
                   p={1}
                 >
-                  {album.date} {album.title.toUpperCase()}
+                  {resource.title.toUpperCase()}
                 </Heading>
               </Flex>
               <Flex>
                 <Text p={1} fontFamily={"Comic Sans MS"}>
-                  {album.description}
+                  {resource.description}
                 </Text>
               </Flex>
             </Flex>
@@ -79,14 +79,18 @@ const AlbumCard = ({
       </a>
       <Spacer />
       <Flex justifyContent="end">
-        {isOwner(user, album) ? (
-          <Tooltip label={`Edit ${album.title}`} placement="top" fontSize="md">
+        {isOwner(user, resource) ? (
+          <Tooltip
+            label={`Edit ${resource.title}`}
+            placement="top"
+            fontSize="md"
+          >
             <Box>
               <FaGear
                 cursor="context-menu"
                 size="25px"
                 onClick={() => {
-                  setCurrentAlbum(album);
+                  setCurrentResource(resource);
                   onOpen();
                 }}
               />
