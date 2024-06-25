@@ -16,4 +16,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["react-icons"],
   },
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+  },
+  base: "/static/",
 });

@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "dantrum"
+version = "0.1.0"
+description = "social media site"
+authors = ["Jack Conway <jackconwayiv@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = ">=3.0,<4.0"
+djangorestframework = "*"
+psycopg2 = ">=2.8"
+social-auth-app-django = "*"
+django-environ = "*"
+django-cors-headers = "*"
+authlib = "~1.0"
+python-dotenv = "~0.19"
+requests = "~2.27"
+beautifulsoup4 = "==4.9.3"
+faker = "*"
+debugpy = "*"
+gunicorn = "^20.1.0"
+whitenoise = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

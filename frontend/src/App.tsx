@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { fetchUserProfile } from "./api/users";
 import Navbar from "./components/Navbar";
 import { User } from "./helpers/types";
@@ -49,17 +49,20 @@ function App() {
         >
           <Navbar user={user} />
           <Routes>
-            <Route path="/albums" element={<AlbumsView user={user} />} />
-            <Route path="/calendar" element={<CalendarView />} />
-            <Route path="/quotes" element={<QuotesView user={user} />} />
-            <Route path="/resources" element={<ResourcesView user={user} />} />
-            <Route path="/friends" element={<FriendsDirectory />} />
-            <Route path="/friends/:id" element={<FriendProfile />} />
+            <Route path="/home/" element={<Root />} />
+
+            <Route path="/albums/" element={<AlbumsView user={user} />} />
+            <Route path="/calendar/" element={<CalendarView />} />
+            <Route path="/quotes/" element={<QuotesView user={user} />} />
+            <Route path="/resources/" element={<ResourcesView user={user} />} />
+            <Route path="/friends/" element={<FriendsDirectory />} />
+            <Route path="/friends/:id/" element={<FriendProfile />} />
             <Route
-              path="/profile"
+              path="/profile/"
               element={<MyProfile user={user} setUser={setUser} />}
             />
-            <Route path="/" element={<Root />} />
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/*" element={<Root />} />
           </Routes>
         </Flex>
       </BrowserRouter>

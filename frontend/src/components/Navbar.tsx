@@ -40,7 +40,7 @@ function Navbar({ user }: NavbarProps) {
               height="40px"
               src="favicon.ico"
               cursor="pointer"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/home")}
               alt="D"
             />
             {!isMobile && (
@@ -48,7 +48,7 @@ function Navbar({ user }: NavbarProps) {
                 fontFamily="Tahoma"
                 size="xl"
                 cursor="pointer"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/home")}
               >
                 ANTRUM.COM
               </Heading>

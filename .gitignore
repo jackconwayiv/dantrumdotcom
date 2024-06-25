@@ -2,7 +2,11 @@ data/
 dev_utils/
 venv/
 
+static/
+staticfiles/
+
 .env
+__pycache__
 
 # MacOS files
 .DS_Store
