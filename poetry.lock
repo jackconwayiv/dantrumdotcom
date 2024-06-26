@@ -114,6 +114,18 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "dj-database-url"
+version = "1.3.0"
+description = "Use Database URLs in your Django Application."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Django = ">=3.2"
+typing-extensions = ">=3.10.0.0"
+
+[[package]]
 name = "django"
 version = "3.2.25"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
@@ -433,7 +445,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "ed04fefd44e317724bf0d0bd02e050b863dcd9015fad8747dfbf3be7bf776b71"
+content-hash = "50d9995f5be0f0528e4e328d337508a5e76332bdf6a8ad32b9c5f3be36f1ceee"
 
 [metadata.files]
 asgiref = [
@@ -576,6 +588,10 @@ debugpy = [
 defusedxml = [
     {file = "defusedxml-0.8.0rc2-py2.py3-none-any.whl", hash = "sha256:1c812964311154c3bf4aaf3bc1443b31ee13530b7f255eaaa062c0553c76103d"},
     {file = "defusedxml-0.8.0rc2.tar.gz", hash = "sha256:138c7d540a78775182206c7c97fe65b246a2f40b29471e1a2f1b0da76e7a3942"},
+]
+dj-database-url = [
+    {file = "dj-database-url-1.3.0.tar.gz", hash = "sha256:87be5f7c4c83d9b3d8ce94b834f96cea14b3986f3629aac097afdd9318d7b098"},
+    {file = "dj_database_url-1.3.0-py3-none-any.whl", hash = "sha256:80a115bd7675c9fe14a900b2f8b5c8b1822b5a279b333bf9b2804de681656c7c"},
 ]
 django = [
     {file = "Django-3.2.25-py3-none-any.whl", hash = "sha256:a52ea7fcf280b16f7b739cec38fa6d3f8953a5456986944c3ca97e79882b4e38"},

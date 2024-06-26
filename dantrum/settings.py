@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
+
+import dj_database_url
 import environ
 from dotenv import find_dotenv, load_dotenv
 
@@ -35,7 +38,10 @@ CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = env("SECRET_KEY", default="django-insecure-gvm%c7rma=aoo!316)h=b%^vvc@$cgsz%9+mlfa-_yz^$c1*^c")
+SECRET_KEY = env(
+    "SECRET_KEY",
+    default="django-insecure-gvm%c7rma=aoo!316)h=b%^vvc@$cgsz%9+mlfa-_yz^$c1*^c",
+)
 
 # Application definition
 INSTALLED_APPS = [
@@ -49,7 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "social_django",
     "corsheaders",
-    "dantrum"
+    "dantrum",
 ]
 
 REST_FRAMEWORK = {
@@ -104,17 +110,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "dantrum.wsgi.application"
 
-# Database configuration
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": "db",
-        "PORT": 5432,
-    }
+default_db_config = {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": os.environ.get("POSTGRES_NAME"),
+    "USER": os.environ.get("POSTGRES_USER"),
+    "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+    "HOST": "db",
+    "PORT": 5432,
 }
+
+database_url = os.environ.get("DATABASE_URL")
+
+if len(sys.argv) > 0 and sys.argv[1] != "collectstatic":
+    if database_url:
+        DATABASES = {"default": dj_database_url.parse(database_url)}
+    else:
+        raise Exception("DATABASE_URL environment variable not defined")
+else:
+    DATABASES = {"default": default_db_config}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -140,11 +153,10 @@ USE_L10N = True
 USE_TZ = True
 
 
-
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = BACKEND_DIR / "static"
 STATIC_URL = "/static/"  # already declared in the default settings
-STATICFILES_DIRS = [FRONTEND_DIR / 'dist']
+STATICFILES_DIRS = [FRONTEND_DIR / "dist"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_ROOT = FRONTEND_DIR / "dist"
 
