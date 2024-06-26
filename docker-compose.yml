@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:13-alpine
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -21,9 +21,6 @@ services:
       - .:/code
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
     ports:
       - "8000:8000"
       - "5678:5678"
