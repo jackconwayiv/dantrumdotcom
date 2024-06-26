@@ -20,6 +20,8 @@ faker = "*"
 debugpy = "*"
 gunicorn = "^20.1.0"
 whitenoise = "^6.0.0"
+charset-normalizer = ">=2.0.0,<3.0.0"
+chardet = ">=3.0.4,<5.0.0"
 
 [build-system]
 requires = ["poetry-core"]
