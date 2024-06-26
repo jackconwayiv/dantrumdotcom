@@ -127,7 +127,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           isClosable: true,
         });
       } else {
-        setAlbums([savedAlbum, ...albums]);
+        setAlbums([savedAlbum, ...(albums || [])]);
         toast({
           title: "New Album Created",
           status: "success",

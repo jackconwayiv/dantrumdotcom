@@ -70,7 +70,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await axios.get(`/api/resources`);
+        const response = await axios.get(`/api/resources/`);
         setResources(response.data.results);
         setLoading(false);
       } catch (error) {
@@ -98,7 +98,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
           isClosable: true,
         });
       } else {
-        setResources([savedResource, ...resources]);
+        setResources([savedResource, ...(resources || [])]);
         toast({
           title: "New Resource Created",
           status: "success",

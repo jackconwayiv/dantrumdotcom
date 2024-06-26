@@ -18,5 +18,4 @@ urlpatterns = [
         RedirectView.as_view(pattern_name="react", permanent=True),
         name="index",
     ),
-    re_path(r"^.*$", login_required(views.react), name="react-router"),
 ]
