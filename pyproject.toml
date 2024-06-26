@@ -3,7 +3,6 @@ name = "dantrum"
 version = "0.1.0"
 description = "social media site"
 authors = ["Jack Conway <jackconwayiv@gmail.com>"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
