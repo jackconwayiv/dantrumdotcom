@@ -21,6 +21,9 @@ services:
       - .:/code
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "8000:8000"
       - "5678:5678"

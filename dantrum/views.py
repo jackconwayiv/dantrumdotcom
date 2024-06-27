@@ -68,9 +68,9 @@ def is_logged_in(request):
 
 
 def react(request):
-    # if settings.DEBUG:
-    #     return redirect("http://localhost:5173")
-    # else:
+    if settings.DEBUG:
+        return redirect("http://localhost:5173")
+    else:
         return render(request, "index.html")
 
 

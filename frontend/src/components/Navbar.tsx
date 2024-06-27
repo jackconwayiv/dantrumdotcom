@@ -40,7 +40,7 @@ function Navbar({ user }: NavbarProps) {
               height="40px"
               src="favicon.ico"
               cursor="pointer"
-              onClick={() => navigate("/home")}
+              onClick={() => navigate("/app/")}
               alt="D"
             />
             {!isMobile && (
@@ -48,7 +48,7 @@ function Navbar({ user }: NavbarProps) {
                 fontFamily="Tahoma"
                 size="xl"
                 cursor="pointer"
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/app/")}
               >
                 ANTRUM.COM
               </Heading>
@@ -62,7 +62,7 @@ function Navbar({ user }: NavbarProps) {
                 color={currentPath === "/albums" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
-                onClick={() => navigate("/albums")}
+                onClick={() => navigate("/app/albums")}
               />
             </Flex>
           </Tooltip>
@@ -74,7 +74,7 @@ function Navbar({ user }: NavbarProps) {
                 color={currentPath === "/calendar" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
-                onClick={() => navigate("/calendar")}
+                onClick={() => navigate("/app/calendar")}
               />
             </Flex>
           </Tooltip> */}
@@ -86,7 +86,7 @@ function Navbar({ user }: NavbarProps) {
                 color={currentPath === "/quotes" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
-                onClick={() => navigate("/quotes")}
+                onClick={() => navigate("/app/quotes")}
               />
             </Flex>
           </Tooltip> */}
@@ -98,7 +98,7 @@ function Navbar({ user }: NavbarProps) {
                 color={currentPath === "/resources" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
-                onClick={() => navigate("/resources")}
+                onClick={() => navigate("/app/resources")}
               />
             </Flex>
           </Tooltip>
@@ -110,7 +110,7 @@ function Navbar({ user }: NavbarProps) {
                 color={currentPath === "/friends" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
-                onClick={() => navigate("/friends")}
+                onClick={() => navigate("/app/friends")}
               />
             </Flex>
           </Tooltip> */}
@@ -129,7 +129,7 @@ function Navbar({ user }: NavbarProps) {
               border="1px silver solid"
               alignSelf="baseline"
               justifySelf="baseline"
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/app/profile")}
               src={
                 user.social_auth &&
                 user.social_auth[0] &&
@@ -140,7 +140,7 @@ function Navbar({ user }: NavbarProps) {
                 <MenuList>
                   <MenuItem
                     icon={<FaGear />}
-                    onClick={() => navigate("/profile")}
+                    onClick={() => navigate("/app/profile")}
                   >
                     Edit Profile
                   </MenuItem>

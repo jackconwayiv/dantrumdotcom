@@ -49,20 +49,23 @@ function App() {
         >
           <Navbar user={user} />
           <Routes>
-            <Route path="/home/" element={<Root />} />
+            <Route path="/app/" element={<Root />} />
 
-            <Route path="/albums/" element={<AlbumsView user={user} />} />
-            <Route path="/calendar/" element={<CalendarView />} />
-            <Route path="/quotes/" element={<QuotesView user={user} />} />
-            <Route path="/resources/" element={<ResourcesView user={user} />} />
-            <Route path="/friends/" element={<FriendsDirectory />} />
-            <Route path="/friends/:id/" element={<FriendProfile />} />
+            <Route path="/app/albums/" element={<AlbumsView user={user} />} />
+            <Route path="/app/calendar/" element={<CalendarView />} />
+            <Route path="/app/quotes/" element={<QuotesView user={user} />} />
             <Route
-              path="/profile/"
+              path="/app/resources/"
+              element={<ResourcesView user={user} />}
+            />
+            <Route path="/app/friends/" element={<FriendsDirectory />} />
+            <Route path="/app/friends/:id/" element={<FriendProfile />} />
+            <Route
+              path="/app/profile/"
               element={<MyProfile user={user} setUser={setUser} />}
             />
-            <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/*" element={<Root />} />
+            <Route path="/" element={<Navigate to="/app" />} />
+            <Route path="/*" element={<Navigate to="/app" />} />
           </Routes>
         </Flex>
       </BrowserRouter>
