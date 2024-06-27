@@ -139,7 +139,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
 
   if (loading) {
     return (
-      <Flex direction="column" width="100%">
+      <Flex direction="column" width="100%" p={2}>
         {renderHeading()}
         <Text>Loading...</Text>
       </Flex>
@@ -148,7 +148,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
 
   if (error) {
     return (
-      <Flex direction="column" width="100%">
+      <Flex direction="column" width="100%" p={2}>
         {renderHeading()}
         <Text>Error: {error}</Text>
       </Flex>
@@ -156,7 +156,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   }
 
   return (
-    <Flex direction="column" width="100%">
+    <Flex direction="column" width="100%" p={2}>
       {renderHeading()}
       <Flex justifyContent="space-evenly">
         <Button
@@ -172,7 +172,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
           New Resource
         </Button>
       </Flex>
-      <Flex direction="column">
+      <Flex direction="column" alignItems="center">
         {resources &&
           resources.length > 0 &&
           resources.map((resource) => (

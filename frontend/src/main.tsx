@@ -24,6 +24,7 @@ root.render(
         justifyContent="center"
         bgColor="silver"
         height="100%"
+        width="100vw"
       >
         <Flex
           direction="column"
