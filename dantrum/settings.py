@@ -208,3 +208,5 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
 )
+
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
