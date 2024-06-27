@@ -7,6 +7,8 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from utils.slack_notifications import send_slack_message
+
 from .models import Album, Quote, Resource, User
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
@@ -33,7 +35,12 @@ class AlbumViewSet(viewsets.ModelViewSet):
         return Album.objects.all().order_by("-date")
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        instance = serializer.save(owner=self.request.user)
+        message = (
+            f"> A lovely new album of fotos entitled '{instance.title}' has been shared to dantrum.com by {instance.owner}."
+            # f"View it here: {album_url}"
+        )
+        send_slack_message(message)
 
     @action(detail=False, methods=["get"], url_path=r"year/(?P<year>\d{4})")
     def year(self, request, year=None):
@@ -119,7 +126,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        instance = serializer.save(owner=self.request.user)
+        message = (
+            f"> A fascinating new resource link entitled '{instance.title}' has been shared to dantrum.com by {instance.owner}."
+            # f"View it here: {album_url}"
+        )
+        send_slack_message(message)
 
 
 class URLSummaryView(APIView):

@@ -31,7 +31,7 @@ const ImageCarousel: React.FC = () => {
       position="relative"
       width="95%"
       maxWidth="500px"
-      maxHeight="375px" // Fixed height for all images
+      height="375px" // Fixed height for all images
       mx="auto"
       overflow="hidden"
       onMouseEnter={setShowDots.on}
