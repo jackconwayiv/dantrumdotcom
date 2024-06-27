@@ -168,7 +168,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   if (loading) {
     return (
-      <Flex direction="column" width="100%">
+      <Flex direction="column" width="100%" p={2}>
         {renderHeading()}
         <Text>Loading...</Text>
       </Flex>
@@ -177,7 +177,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   if (error) {
     return (
-      <Flex direction="column" width="100%">
+      <Flex direction="column" width="100%" p={2}>
         {renderHeading()}
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
@@ -185,7 +185,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   }
 
   return (
-    <Flex direction="column" width="100%">
+    <Flex direction="column" width="100%" p={2}>
       {renderHeading()}
       <Flex justifyContent="space-evenly">
         <YearSelector
@@ -205,7 +205,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           New Album
         </Button>
       </Flex>
-      <Flex direction="column">
+      <Flex direction="column" alignItems="center">
         {albums &&
           albums.length > 0 &&
           albums.map((album) => renderAlbum(album))}

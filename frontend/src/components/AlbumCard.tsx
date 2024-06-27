@@ -28,8 +28,8 @@ const AlbumCard = ({
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
-      padding={2}
-      margin={4}
+      padding={1}
+      margin={2}
       key={album.id}
       width="95%"
     >

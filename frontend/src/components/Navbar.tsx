@@ -29,6 +29,7 @@ function Navbar({ user }: NavbarProps) {
         justifyContent="center"
         maxWidth="800px"
         alignItems="space-between"
+        p={2}
       >
         <Flex
           direction="row"
@@ -38,9 +39,9 @@ function Navbar({ user }: NavbarProps) {
           <Flex direction="row" alignItems="center" justifyContent="baseline">
             <Image
               height="40px"
-              src="favicon.ico"
+              src="/favicon.ico"
               cursor="pointer"
-              onClick={() => navigate("/app/")}
+              onClick={() => navigate("/app")}
               alt="D"
             />
             {!isMobile && (
@@ -48,7 +49,7 @@ function Navbar({ user }: NavbarProps) {
                 fontFamily="Tahoma"
                 size="xl"
                 cursor="pointer"
-                onClick={() => navigate("/app/")}
+                onClick={() => navigate("/app")}
               >
                 ANTRUM.COM
               </Heading>
@@ -59,7 +60,7 @@ function Navbar({ user }: NavbarProps) {
               <Box
                 as={FaCamera}
                 size="30px"
-                color={currentPath === "/albums" ? "green.500" : "black"}
+                color={currentPath === "/app/albums" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
                 onClick={() => navigate("/app/albums")}
@@ -71,7 +72,7 @@ function Navbar({ user }: NavbarProps) {
               <Box
                 as={FaCalendarAlt}
                 size="30px"
-                color={currentPath === "/calendar" ? "green.500" : "black"}
+                color={currentPath === "/app/calendar" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
                 onClick={() => navigate("/app/calendar")}
@@ -83,7 +84,7 @@ function Navbar({ user }: NavbarProps) {
               <Box
                 as={FaFeatherAlt}
                 size="30px"
-                color={currentPath === "/quotes" ? "green.500" : "black"}
+                color={currentPath === "/app/quotes" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
                 onClick={() => navigate("/app/quotes")}
@@ -95,7 +96,7 @@ function Navbar({ user }: NavbarProps) {
               <Box
                 as={FaMapSigns}
                 size="30px"
-                color={currentPath === "/resources" ? "green.500" : "black"}
+                color={currentPath === "/app/resources" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
                 onClick={() => navigate("/app/resources")}
@@ -107,7 +108,7 @@ function Navbar({ user }: NavbarProps) {
               <Box
                 as={FaAddressBook}
                 size="30px"
-                color={currentPath === "/friends" ? "green.500" : "black"}
+                color={currentPath === "/app/friends" ? "green.500" : "black"}
                 _hover={{ color: "green.300" }}
                 cursor="pointer"
                 onClick={() => navigate("/app/friends")}

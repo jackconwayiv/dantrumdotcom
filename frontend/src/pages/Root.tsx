@@ -7,15 +7,16 @@ export default function Root() {
   const navigate = useNavigate();
   return (
     <Flex direction="column">
-      <Flex direction="column" alignItems="center">
+      <ImageCarousel />
+      <Flex direction="column" alignItems="center" p={2}>
         {/* <Image
           src="splash_art.jpg"
           objectFit="cover"
           width="50%"
           border="1px black solid"
         /> */}
-        <ImageCarousel />
-        <Heading fontFamily="Comic Sans MS" my={6}>
+
+        <Heading textAlign="center" fontFamily="Comic Sans MS" my={6}>
           YO! IT'S DANTRUM.COM
         </Heading>
 

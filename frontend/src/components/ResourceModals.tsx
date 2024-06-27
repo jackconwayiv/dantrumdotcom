@@ -78,10 +78,11 @@ export const ResourceModals = ({
         if (response.data) {
           formik.setValues({
             ...formik.values,
-            title: response.data.title || "",
-            url: url || "",
-            description: response.data.summary || "",
-            thumbnail_url: response.data.thumbnail || "",
+            title: formik.values.title || response.data.title || "",
+            description:
+              formik.values.description || response.data.summary || "",
+            thumbnail_url:
+              formik.values.thumbnail_url || response.data.thumbnail || "",
           });
           setError(null);
         }
@@ -208,6 +209,7 @@ export const ResourceModals = ({
                   variant="outline"
                   onClick={() => {
                     !currentResource && formik.resetForm();
+                    setError(null);
                     onClose();
                   }}
                 >
@@ -219,6 +221,7 @@ export const ResourceModals = ({
                     borderRadius="25px"
                     onClick={() => {
                       onClose();
+                      setError(null);
                       onAlertOpen();
                     }}
                   >

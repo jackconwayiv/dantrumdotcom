@@ -108,9 +108,9 @@ export const AlbumModals = ({
       if (albumData) {
         formik.setValues({
           ...formik.values,
-          title: albumData.title,
-          link_url: albumData.link_url,
-          thumbnail_url: albumData.thumbnail_url,
+          title: formik.values.title || albumData.title || "",
+          thumbnail_url:
+            formik.values.thumbnail_url || albumData.thumbnail_url || "",
         });
       }
     }

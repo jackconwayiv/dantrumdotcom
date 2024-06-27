@@ -1,10 +1,12 @@
 import { Box, Flex, Image, useBoolean } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
-const images = ["utah.jpg", "skyline.jpg", "safari.jpg", "cafe.jpg"];
+const images = ["/utah.jpg", "/skyline.jpg", "/safari.jpg", "/cafe.jpg"];
 
 const ImageCarousel: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(
+    Math.floor(Math.random() * images.length)
+  );
   const [showDots, setShowDots] = useBoolean(false);
   const totalImages = images.length;
 
@@ -27,9 +29,9 @@ const ImageCarousel: React.FC = () => {
   return (
     <Box
       position="relative"
-      width="100%"
+      width="95%"
       maxWidth="500px"
-      height="375px" // Fixed height for all images
+      maxHeight="375px" // Fixed height for all images
       mx="auto"
       overflow="hidden"
       onMouseEnter={setShowDots.on}

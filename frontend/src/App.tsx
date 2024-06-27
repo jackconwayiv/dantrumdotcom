@@ -39,14 +39,7 @@ function App() {
   if (user)
     return (
       <BrowserRouter>
-        <Flex
-          direction="column"
-          width="100%"
-          maxW="850px"
-          minHeight="100vh"
-          m={2}
-          p={2}
-        >
+        <Flex direction="column" width="100%" maxW="850px" minHeight="100vh">
           <Navbar user={user} />
           <Routes>
             <Route path="/app/" element={<Root />} />
