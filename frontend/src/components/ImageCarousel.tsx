@@ -30,8 +30,8 @@ const ImageCarousel: React.FC = () => {
     <Box
       position="relative"
       width="95%"
-      maxWidth="500px"
-      height="375px" // Fixed height for all images
+      maxWidth={{ base: "95%", sm: "400px", md: "500px" }}
+      height={{ base: "200px", sm: "300px", md: "375px" }}
       mx="auto"
       overflow="hidden"
       onMouseEnter={setShowDots.on}

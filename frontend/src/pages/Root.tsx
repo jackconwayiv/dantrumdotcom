@@ -27,14 +27,14 @@ export default function Root() {
           p={2}
           _hover={{ bgColor: "green.100" }}
           cursor="pointer"
-          onClick={() => navigate("/albums")}
+          onClick={() => navigate("/app/albums")}
         >
           <FaCamera size="30px" />
           <Heading m={3} size="md">
             Photos
           </Heading>
         </Flex>
-        {/* <Button m={1} onClick={() => navigate("/calendar")}>
+        {/* <Button m={1} onClick={() => navigate("/app/calendar")}>
           Calendar
         </Button> */}
         {/* <Flex
@@ -44,7 +44,7 @@ export default function Root() {
           p={2}
           _hover={{ bgColor: "green.100" }}
           cursor="pointer"
-          onClick={() => navigate("/quotes")}
+          onClick={() => navigate("/app/quotes")}
         >
           <FaFeatherAlt size="30px" />
           <Heading m={3} size="md">
@@ -58,7 +58,7 @@ export default function Root() {
           p={2}
           _hover={{ bgColor: "green.100" }}
           cursor="pointer"
-          onClick={() => navigate("/resources")}
+          onClick={() => navigate("/app/resources")}
         >
           <FaMapSigns size="30px" />
           <Heading m={3} size="md">
@@ -72,7 +72,7 @@ export default function Root() {
           p={2}
           _hover={{ bgColor: "green.100" }}
           cursor="pointer"
-          onClick={() => navigate("/friends")}
+          onClick={() => navigate("/app/friends")}
         >
           <FaAddressBook size="30px" />
           <Heading m={3} size="md">
@@ -86,7 +86,7 @@ export default function Root() {
           p={2}
           _hover={{ bgColor: "green.100" }}
           cursor="pointer"
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate("/app/profile")}
         >
           <FaUserCircle size="30px" />
           <Heading m={3} size="md">
