@@ -30,6 +30,7 @@ export const deleteAlbum = async (albumId: number) => {
 };
 
 interface AlbumData {
+  date: string;
   title: string;
   link_url: string;
   thumbnail_url: string;

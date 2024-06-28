@@ -106,9 +106,11 @@ export const AlbumModals = ({
       const albumData = await fetchAlbumDataFromBackend(url);
       setLoading(false);
       if (albumData) {
+        console.log(albumData);
         formik.setValues({
           ...formik.values,
           title: formik.values.title || albumData.title || "",
+          date: albumData.date || formik.values.date,
           thumbnail_url:
             formik.values.thumbnail_url || albumData.thumbnail_url || "",
         });
