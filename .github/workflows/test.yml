@@ -10,4 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run Backend Tests
-        run: scripts/test-backend.sh
+      env:          
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}  
+      run: scripts/test-backend.sh

@@ -23,6 +23,8 @@ services:
       - .:/code
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+
     ports:
       - "8080:8080"
       - "5678:5678"
