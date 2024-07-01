@@ -24,11 +24,12 @@ services:
       - .:/code
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - CORS_ALLOWED_ORIGINS=https://localhost,http://127.0.0.1
+      - SLACK_WEBHOOK_URL=http://fakewebsite.com
+      - DEBUG=false
+      - ENV=Test
     ports:
       - "8080:8080"
       - "5678:5678"
     depends_on:
       - db
-

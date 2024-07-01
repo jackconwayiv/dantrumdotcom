@@ -4,6 +4,7 @@ from rest_framework import status
 from django.urls import reverse
 from api.models import Album, User
 from api.serializers import AlbumSerializer
+from unittest.mock import patch
 
 class AlbumModelTest(TestCase):
     def setUp(self):
@@ -60,11 +61,12 @@ class AlbumViewSetTests(APITestCase):
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
-        self.assertEqual(
-            response.data["results"][0]["title"], "Album 1"
-        )
+        self.assertEqual(response.data["results"][0]["title"], "Album 1")
 
-    def test_create_album(self):
+    @patch('api.views.send_slack_message')
+    def test_create_album(self, mock_send_slack_message):
+        mock_send_slack_message.return_value = None  # Mock the Slack function to do nothing
+
         url = reverse("album-list")
         data = {
             "title": "New Album",
@@ -73,7 +75,7 @@ class AlbumViewSetTests(APITestCase):
             "thumbnail_url": "http://new.com/thumbnail.jpg",
             "date": "2024-05-29",
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Album.objects.count(), 1)
         self.assertEqual(Album.objects.get(id=response.data["id"]).owner, self.user)
@@ -116,4 +118,3 @@ class AlbumPermissionTests(APITestCase):
         url = reverse("album-detail", args=[self.album.id])
         response = self.client.put(url, {"title": "Updated Album"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
