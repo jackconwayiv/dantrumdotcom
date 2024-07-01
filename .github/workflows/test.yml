@@ -23,9 +23,11 @@ jobs:
 
       - name: Set up environment variables
         run: echo "CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}" >> $GITHUB_ENV
+              echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
 
       - name: Debug environment variables
         run: echo "CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}"
+              echo "SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}"
 
       - name: Make entrypoint script executable
         run: chmod +x scripts/docker-cicd-entrypoint.sh
@@ -42,3 +44,4 @@ jobs:
           CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: scripts/test-backend.sh
+
