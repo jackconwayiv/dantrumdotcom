@@ -1,5 +1,14 @@
 name: Test
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
+      - "**/feature/**"
+  pull_request:
+    branches:
+      - main
+
 jobs:
   test-backend:
     name: Test backend
@@ -7,9 +16,24 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up environment variables
+        run: echo "CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}" >> $GITHUB_ENV
+
+      - name: Make entrypoint script executable
+        run: chmod +x scripts/docker-cicd-entrypoint.sh
+
+      - name: Make test-backend.sh executable
+        run: chmod +x scripts/test-backend.sh
+
+      - name: List files for debugging
+        run: ls -R
+
       - name: Run Backend Tests
-      env:          
-          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}  
-      run: scripts/test-backend.sh
+        env:
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+        run: scripts/test-backend.sh
