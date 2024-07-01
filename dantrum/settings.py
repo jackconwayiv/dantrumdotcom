@@ -32,7 +32,11 @@ DEBUG = DJANGO_ENV == "development"
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost").split(",")
 
 # CORS configuration
-CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
+# CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=["http://localhost", "http://127.0.0.1"])
+
+# Ensure CORS_ALLOWED_ORIGINS does not contain empty strings
+CORS_ALLOWED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
