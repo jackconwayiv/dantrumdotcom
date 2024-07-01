@@ -1,10 +1,10 @@
 name: Test
 
-on: 
+on:
   push:
     branches:
       - main
-      - '**/feature/**'
+      - "**/feature/**"
   pull_request:
     branches:
       - main
@@ -38,7 +38,7 @@ jobs:
 
       - name: Run Backend Tests
         env:
-          DATABASE_URL: postgres://user:password@db:5432/test_db
+          DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
           CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: scripts/test-backend.sh
