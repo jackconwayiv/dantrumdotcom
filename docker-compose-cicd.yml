@@ -25,7 +25,7 @@ services:
     environment:
       - DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
       - CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-      = SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
+      - SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
     ports:
       - "8080:8080"
       - "5678:5678"
