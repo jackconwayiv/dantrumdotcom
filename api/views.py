@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup
 from django.db.models.functions import ExtractYear
 from django.views.decorators.csrf import csrf_exempt
@@ -6,6 +7,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from datetime import datetime
 
 from utils.slack_notifications import send_slack_message
 
@@ -19,7 +21,6 @@ from .serializers import (
     URLSerializer,
     UserSerializer,
 )
-
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -91,10 +92,60 @@ class FetchAlbumData(APIView):
                 else "No URL found"
             )
 
+            # Initialize album_date as None
+            album_date = None
+
+            # Regular expression pattern to find month and day like "Jul 2", "Aug 12", "Dec 28"
+            date_pattern = re.compile(r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s\d{1,2}\b', re.IGNORECASE)
+            year_pattern = re.compile(r'\b\d{4}\b')
+            month_map = {
+                "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
+                "Jul": "07", "Aug": "08", "Sep": "09", "Sept": "09", "Oct": "10", "Nov": "11", "Dec": "12"
+            }
+
+            # Search for the pattern in all div elements
+            div_elements = soup.find_all('div')
+            for div in div_elements:
+                if div.string and date_pattern.search(div.string):
+                    # Extract the date string
+                    date_str = date_pattern.search(div.string).group()
+                    
+                    # Split the date string to get month and day
+                    month_str, day_str = date_str.split()
+                    
+                    # Convert month abbreviation to two-digit number
+                    month = month_map[month_str.capitalize()]
+                    
+                    # Ensure day is two digits
+                    day = f"{int(day_str):02d}"
+                    
+                    # Extract the year from the same div
+                    year_match = year_pattern.search(div.string)
+                    if year_match:
+                        year = year_match.group()
+                    else:
+                        # Fallback to find a four-digit string within the div
+                        for word in div.string.split():
+                            if len(word) == 4 and word.isdigit():
+                                year = word
+                                break
+                        else:
+                            year = datetime.now().year  # Default to current year if no year found
+
+                    # Construct the date in YYYY-MM-DD format
+                    album_date = f"{year}-{month}-{day}"
+
+                    break
+
+            # Fallback if no date found
+            if not album_date:
+                album_date = "No date found"
+
             data = {
                 "title": title,
                 "thumbnail_url": thumbnail,
                 "link_url": album_url,
+                "date": album_date
             }
             return Response(data)
         else:
