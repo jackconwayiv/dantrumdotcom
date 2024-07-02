@@ -15,7 +15,7 @@ export interface Album {
   link_url: string;
   thumbnail_url?: string;
   date: string;
-  owner?: string;
+  owner?: User;
 }
 
 export interface Quote {
@@ -24,7 +24,7 @@ export interface Quote {
   date: string;
   date_created?: string;
   date_updated?: string;
-  owner?: string;
+  owner?: User;
 }
 
 export interface Resource {
@@ -33,7 +33,7 @@ export interface Resource {
   description?: string;
   url: string;
   thumbnail_url?: string;
-  owner?: string;
+  owner?: User;
 }
 
 export interface Friend {
@@ -55,6 +55,7 @@ export interface User {
   date_of_birth: string;
   last_login?: string;
   date_joined?: string;
+  is_staff?: boolean;
   // is_active: boolean;
   // albums: Album[];
   // quotes: Quote[];

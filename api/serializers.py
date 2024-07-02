@@ -6,42 +6,6 @@ from social_django.models import UserSocialAuth
 
 from api.models import Album, Quote, Resource, User
 
-
-class AlbumSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source="owner.email")
-
-    class Meta:
-        model = Album
-        fields = [
-            "id",
-            "title",
-            "description",
-            "link_url",
-            "thumbnail_url",
-            "date",
-            "owner",
-        ]
-
-
-class QuoteSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source="owner.email")
-
-    class Meta:
-        model = Quote
-        fields = ["id", "text", "date", "owner"]
-
-
-class URLSerializer(serializers.Serializer):
-    url = serializers.URLField()
-
-class ResourceSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source="owner.email")
-
-    class Meta:
-        model = Resource
-        fields = ["id", "title", "description", "url", "thumbnail_url", "owner"]
-
-
 class UserSocialAuthSerializer(serializers.ModelSerializer):
     picture = serializers.SerializerMethodField()
 
@@ -87,6 +51,46 @@ class AuthenticatedUserSerializer(serializers.ModelSerializer):
             "email",
             "social_auth",
             "date_of_birth",
+            "is_staff",
             "last_login",
             "date_joined",
         ]
+
+class OwnerSerializer(serializers.ModelSerializer):
+    social_auth = UserSocialAuthSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = ["email", "first_name", "last_name", "username", "social_auth"]
+
+class AlbumSerializer(serializers.ModelSerializer):
+    owner = OwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Album
+        fields = [
+            "id",
+            "title",
+            "description",
+            "link_url",
+            "thumbnail_url",
+            "date",
+            "owner",
+        ]
+
+class QuoteSerializer(serializers.ModelSerializer):
+    owner = OwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Quote
+        fields = ["id", "text", "date", "owner"]
+
+class URLSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
+class ResourceSerializer(serializers.ModelSerializer):
+    owner = OwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Resource
+        fields = ["id", "title", "description", "url", "thumbnail_url", "owner"]

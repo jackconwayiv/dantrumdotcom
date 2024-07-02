@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
 import { Resource, User } from "../helpers/types";
-import { isOwner } from "../helpers/utils";
+import { isOwner, renderSharedBy } from "../helpers/utils";
 
 interface ResourceCardProps {
   user: User;
@@ -73,11 +73,8 @@ const ResourceCard = ({
                   {resource.description}
                 </Text>
               </Flex>
-              <Flex>
-                <Text p={1} fontSize="10px" fontFamily={"Comic Sans MS"}>
-                  Shared by {resource.owner}
-                </Text>
-              </Flex>
+              <Spacer />
+              <Flex>{resource.owner && renderSharedBy(resource.owner)}</Flex>
             </Flex>
           </Box>
         </Flex>
