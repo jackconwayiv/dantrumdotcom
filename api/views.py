@@ -2,17 +2,15 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from django.db.models.functions import ExtractYear
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from datetime import datetime
-
+from django.contrib.auth import get_user_model
 from utils.slack_notifications import send_slack_message
-
 from .models import Album, Quote, Resource, User
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsOwnerOrRestricted
 from .serializers import (
     AlbumSerializer,
     AuthenticatedUserSerializer,
@@ -219,13 +217,16 @@ class URLSummaryView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+User = get_user_model()
+
+User = get_user_model()
 
 class UserViewSet(viewsets.ModelViewSet):
     """
     This viewset provides `retrieve`, `update`, `partial_update`, `list`, and `me` actions.
     """
-
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrRestricted]
 
     def get_queryset(self):
         if self.action == "me":
@@ -235,7 +236,15 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "me":
             return AuthenticatedUserSerializer
+        if self.action == 'retrieve' and self.get_object() == self.request.user:
+            return AuthenticatedUserSerializer
         return UserSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(instance)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="me")
     def me(self, request):

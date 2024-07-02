@@ -1,16 +1,10 @@
 import datetime
-
 from django.conf import settings
 from django.contrib.auth.models import (
-    AbstractBaseUser,
     AbstractUser,
     BaseUserManager,
-    User,
 )
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.utils import timezone
-
 
 class CreatedUpdated(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +12,6 @@ class CreatedUpdated(models.Model):
 
     class Meta:
         abstract = True
-
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -45,7 +38,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = models.CharField(
         max_length=200, null=True, blank=True
-    )  # Make username nullable
+    )
     date_of_birth = models.DateField(null=True, blank=True)
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
 
@@ -95,6 +88,3 @@ class Quote(CreatedUpdated):
 
     def __str__(self):
         return f"{self.text}"
-
-
-
