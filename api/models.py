@@ -1,16 +1,10 @@
 import datetime
-
 from django.conf import settings
 from django.contrib.auth.models import (
-    AbstractBaseUser,
     AbstractUser,
     BaseUserManager,
-    User,
 )
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.utils import timezone
-
 
 class CreatedUpdated(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +12,6 @@ class CreatedUpdated(models.Model):
 
     class Meta:
         abstract = True
-
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -45,7 +38,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = models.CharField(
         max_length=200, null=True, blank=True
-    )  # Make username nullable
+    )
     date_of_birth = models.DateField(null=True, blank=True)
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
 
@@ -62,7 +55,7 @@ class Album(CreatedUpdated):
 
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    link_url = models.CharField(max_length=4000)
+    link_url = models.CharField(max_length=4000, unique=True)
     thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
     date = models.DateField(default=datetime.date.today, editable=True)
     owner = models.ForeignKey(
@@ -73,6 +66,19 @@ class Album(CreatedUpdated):
         return self.title
 
 
+class Resource(CreatedUpdated):
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    url = models.CharField(max_length=4000, unique=True)
+    thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="resources", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title
+
 class Quote(CreatedUpdated):
     text = models.TextField()
     date = models.DateField(default=datetime.date.today, editable=True)
@@ -82,16 +88,3 @@ class Quote(CreatedUpdated):
 
     def __str__(self):
         return f"{self.text}"
-
-
-class Resource(CreatedUpdated):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True)
-    url = models.CharField(max_length=4000)
-    thumbnail_url = models.CharField(max_length=4000, blank=True, null=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="resources", on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return self.title

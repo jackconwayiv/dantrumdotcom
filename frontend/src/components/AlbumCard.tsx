@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
 import { Album, User } from "../helpers/types";
-import { isOwner } from "../helpers/utils";
+import { isOwner, renderSharedBy } from "../helpers/utils";
 
 interface AlbumCardProps {
   user: User;
@@ -73,11 +73,8 @@ const AlbumCard = ({
                   {album.description}
                 </Text>
               </Flex>
-              <Flex>
-                <Text p={1} fontSize="10px" fontFamily={"Comic Sans MS"}>
-                  Shared by {album.owner}
-                </Text>
-              </Flex>
+              <Spacer />
+              <Flex>{album.owner && renderSharedBy(album.owner)}</Flex>
             </Flex>
           </Box>
         </Flex>

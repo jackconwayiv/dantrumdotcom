@@ -21,6 +21,7 @@ import { FaBirthdayCake, FaSignOutAlt } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
+import { renderFullName } from "../helpers/utils";
 
 interface ProfileProps {
   user: User;
@@ -101,9 +102,7 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
         </Flex>
         <Flex m={5} direction="column">
           <Heading size="lg" m={4}>
-            {user.first_name && `${user.first_name} `}
-            {user.username && ` "${user.username}" `}
-            {user.last_name && ` ${user.last_name}`}
+            {renderFullName(user)}
           </Heading>
           <Flex alignItems="center" m={4}>
             <Tooltip label="Birthday" fontSize="md">
