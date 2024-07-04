@@ -8,7 +8,7 @@ import {
   Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FaCamera, FaMapSigns } from "react-icons/fa";
+import { FaAddressBook, FaCamera, FaMapSigns } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { User } from "../helpers/types";
@@ -103,7 +103,7 @@ function Navbar({ user }: NavbarProps) {
               />
             </Flex>
           </Tooltip>
-          {/* <Tooltip label="Friends" fontSize="md">
+          <Tooltip label="Friends" fontSize="md">
             <Flex>
               <Box
                 as={FaAddressBook}
@@ -114,7 +114,7 @@ function Navbar({ user }: NavbarProps) {
                 onClick={() => navigate("/app/friends")}
               />
             </Flex>
-          </Tooltip> */}
+          </Tooltip>
           <Flex alignItems="baseline" justifyContent="baseline">
             {/* <Box m={0} p={0}>
               <Menu>

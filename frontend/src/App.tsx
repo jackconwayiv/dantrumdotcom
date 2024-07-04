@@ -51,7 +51,10 @@ function App() {
               path="/app/resources/"
               element={<ResourcesView user={user} />}
             />
-            <Route path="/app/friends/" element={<FriendsDirectory />} />
+            <Route
+              path="/app/friends/"
+              element={<FriendsDirectory user={user} />}
+            />
             <Route path="/app/friends/:id/" element={<FriendProfile />} />
             <Route
               path="/app/profile/"

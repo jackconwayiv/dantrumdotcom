@@ -219,8 +219,6 @@ class URLSummaryView(APIView):
 
 User = get_user_model()
 
-User = get_user_model()
-
 class UserViewSet(viewsets.ModelViewSet):
     """
     This viewset provides `retrieve`, `update`, `partial_update`, `list`, and `me` actions.
@@ -229,8 +227,11 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrRestricted]
 
     def get_queryset(self):
+        user = self.request.user
         if self.action == "me":
-            return User.objects.filter(pk=self.request.user.pk)
+            return User.objects.filter(pk=user.pk)
+        if user.is_staff:
+            return User.objects.all()
         return User.objects.filter(is_active=True)
 
     def get_serializer_class(self):
@@ -259,3 +260,24 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["post"], url_path="activate")
+    def toggle_active(self, request, pk=None):
+        user = request.user
+        if not user.is_staff:
+            return Response({"detail": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            friend = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if friend == user:
+            return Response({"detail": "You cannot change your own status."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if friend.is_active:
+            return Response({"detail": "User is already active."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        friend.is_active = True
+        friend.save()
+        return Response({"detail": "User has been activated."}, status=status.HTTP_200_OK)

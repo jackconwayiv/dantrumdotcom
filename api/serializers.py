@@ -34,6 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "social_auth",
             "date_of_birth",
+            "is_active"
         ]
 
 
