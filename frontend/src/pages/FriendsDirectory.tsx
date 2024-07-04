@@ -1,15 +1,29 @@
-import { Avatar, Flex, Heading, Text, Wrap } from "@chakra-ui/react";
+import {
+  Avatar,
+  Button,
+  Flex,
+  Heading,
+  Text,
+  Wrap,
+  useToast,
+} from "@chakra-ui/react";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchFriends } from "../api/users";
-import { Friend } from "../helpers/types";
+import { Friend, User } from "../helpers/types";
 
-export default function FriendsDirectory() {
+interface FriendsDirectoryProps {
+  user: User;
+}
+
+export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     const getFriends = async () => {
@@ -26,6 +40,42 @@ export default function FriendsDirectory() {
     getFriends();
   }, []);
 
+  const handleToggle = async (userId: number) => {
+    try {
+      const response = await axios.post(`/api/users/${userId}/activate/`);
+      toast({
+        title: "Successful activation!",
+        description: `${response.data.detail} You've made their day!`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      // Re-fetch the users list
+      const usersResponse = await fetchFriends();
+      setFriends(usersResponse.results);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.detail ||
+            "An error occurred while toggling user status.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {JSON.stringify(error)}</div>;
 
@@ -37,10 +87,13 @@ export default function FriendsDirectory() {
         height="60px"
         width="100%"
         cursor="pointer"
-        onClick={() => navigate(`/friends/${friend.id}`)}
         alignItems="center"
       >
-        <Flex p={2} width="65px">
+        <Flex
+          p={2}
+          width="65px"
+          onClick={() => navigate(`/app/friends/${friend.id}`)}
+        >
           {friend.social_auth.length > 0 && (
             <Avatar
               name={friend.username}
@@ -50,61 +103,51 @@ export default function FriendsDirectory() {
             />
           )}
         </Flex>
-        <Flex direction="column" p={2}>
-          {friend.username && <Text>{friend.username}</Text>}
-          {friend.first_name ||
-            (friend.last_name && (
-              <Text>
-                {friend.first_name} {friend.last_name}
+        <Flex
+          direction="column"
+          p={2}
+          onClick={() => navigate(`/app/friends/${friend.id}`)}
+        >
+          {friend.username && (
+            <Text color={!friend.is_active ? "red" : "black"}>
+              {friend.username}
+            </Text>
+          )}
+          {friend.first_name || friend.last_name ? (
+            <Text color={!friend.is_active ? "red" : "black"}>
+              {friend.first_name} {friend.last_name}
+            </Text>
+          ) : (
+            !friend.username &&
+            !friend.first_name &&
+            !friend.last_name && (
+              <Text color={!friend.is_active ? "red" : "black"}>
+                {friend.email}
               </Text>
-            ))}
-          {!friend.username && !friend.first_name && !friend.last_name && (
-            <Text>{friend.email}</Text>
+            )
           )}
         </Flex>
+        {user.is_staff && !friend.is_active && (
+          <Flex alignItems="center" ml="auto" p={2}>
+            <Button colorScheme="green" onClick={() => handleToggle(friend.id)}>
+              Activate
+            </Button>
+          </Flex>
+        )}
       </Flex>
     );
   };
 
-  if (friends)
-    //else handle error
-    return (
-      <Flex direction="column" width="100%">
-        <Heading size="md" fontFamily="Comic Sans MS">
-          {friends.length > 0 && friends.length} Friends
-        </Heading>
+  return (
+    <Flex direction="column" width="100%" p={2}>
+      <Heading size="md" fontFamily="Comic Sans MS" mb={4}>
+        {friends.length > 0 && friends.length} Friends
+      </Heading>
 
-        <Wrap>
-          {friends.length > 0 &&
-            friends.map((friend, i) => renderFriendCard(friend, i))}
-        </Wrap>
-        {/* {friends.map((friend, i) => (
-              <Card
-                padding={3}
-                cursor="pointer"
-                height="175px"
-                width="300px"
-                key={i}
-                alignItems="center"
-                onClick={() => navigate(`/friends/${friend.id}`)}
-              >
-                {friend.social_auth.length > 0 && (
-                  <Avatar
-                    name={friend.username}
-                    referrerPolicy="no-referrer"
-                    src={friend.social_auth[0].picture}
-                  />
-                )}
-                {friend.username && <Text>{friend.username}</Text>}
-                {friend.username && (
-                  <Text>
-                    {friend.first_name} {friend.last_name}
-                  </Text>
-                )}
-                {friend.email && <Text>{friend.email}</Text>}
-                {friend.date_of_birth && <Text>{friend.date_of_birth}</Text>}
-              </Card>
-            ))}{" "}  */}
-      </Flex>
-    );
+      <Wrap>
+        {friends.length > 0 &&
+          friends.map((friend, i) => renderFriendCard(friend, i))}
+      </Wrap>
+    </Flex>
+  );
 }

@@ -39,7 +39,7 @@ const FriendProfile = () => {
   }
   if (friend)
     return (
-      <Flex direction="column" width="100%">
+      <Flex direction="column" width="100%" p={2} m={2}>
         {friend.social_auth && friend.social_auth[0] && (
           <Avatar
             name={friend.username}
