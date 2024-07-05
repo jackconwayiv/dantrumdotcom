@@ -19,6 +19,7 @@ from .serializers import (
     URLSerializer,
     UserSerializer,
 )
+from django.db.models import Case, When, Value, IntegerField
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -230,14 +231,22 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if self.action == "me":
             return User.objects.filter(pk=user.pk)
+
+        queryset = User.objects.exclude(email="admin@dantrum.com").annotate(
+            last_login_order=Case(
+                When(last_login__isnull=True, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField()
+            )
+        ).order_by('last_login_order', '-last_login')
+
         if user.is_staff:
-            return User.objects.all()
-        return User.objects.filter(is_active=True)
+            return queryset
+        filtered_queryset = queryset.filter(is_active=True)
+        return filtered_queryset
 
     def get_serializer_class(self):
-        if self.action == "me":
-            return AuthenticatedUserSerializer
-        if self.action == 'retrieve' and self.get_object() == self.request.user:
+        if self.action == "me" or (self.action == 'retrieve' and self.get_object() == self.request.user):
             return AuthenticatedUserSerializer
         return UserSerializer
 
@@ -247,7 +256,21 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = serializer_class(instance)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get", "put", "patch"], url_path="me")
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'is_staff' in request.data or 'is_superuser' in request.data:
+            if request.user == instance:
+                return Response({'detail': 'You do not have permission to change your own staff or superuser status.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'is_staff' in request.data or 'is_superuser' in request.data:
+            if request.user == instance:
+                return Response({'detail': 'You do not have permission to change your own staff or superuser status.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get", "put", "patch"], url_path="me", url_name="me")
     def me(self, request):
         user = request.user
         if request.method == "GET":
@@ -261,8 +284,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["post"], url_path="activate")
-    def toggle_active(self, request, pk=None):
+    @action(detail=True, methods=["post"], url_path="activate", url_name="activate")
+    def activate(self, request, pk=None):
         user = request.user
         if not user.is_staff:
             return Response({"detail": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
