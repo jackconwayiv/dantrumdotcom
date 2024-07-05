@@ -22,12 +22,6 @@ class CreatedUpdatedModelTests(TestCase):
         album.refresh_from_db()
         self.assertGreater(album.updated_at, old_updated_at)
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.urls import reverse
-from rest_framework.test import APIClient
-from rest_framework import status
-
 class UserManagerTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -35,9 +29,6 @@ class UserManagerTests(TestCase):
         cls.user = cls.User.objects.create_user(email="user1@example.com", password="test1234")
         cls.other_user = cls.User.objects.create_user(email="user2@example.com", password="test5678")
         cls.superuser = cls.User.objects.create_superuser(email="admin@example.com", password="admin1234")
-
-    def setUp(self):
-        self.client = APIClient()
 
     def test_create_user(self):
         user = self.User.objects.create_user(email="user3@example.com", password="test1234")

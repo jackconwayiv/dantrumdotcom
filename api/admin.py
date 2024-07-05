@@ -67,6 +67,7 @@ class UserAdmin(BaseUserAdmin):
         "date_of_birth",
         "is_active",
         "is_staff",
+        "last_login"
     ]
     list_filter = ["is_active"]
     fieldsets = [

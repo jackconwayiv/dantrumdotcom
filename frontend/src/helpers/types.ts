@@ -45,6 +45,7 @@ export interface Friend {
   social_auth: SocialAuth[];
   date_of_birth: string;
   is_active: boolean;
+  last_login?: string;
 }
 
 export interface User {
