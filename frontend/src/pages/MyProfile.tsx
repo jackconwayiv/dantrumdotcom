@@ -88,15 +88,17 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
     return (
       <Flex direction="column" width="100%">
         <Flex alignItems="center" justifyContent="space-between" m={4}>
-          {user.social_auth && user.social_auth[0] && (
-            <Avatar
-              name={user.username}
-              referrerPolicy="no-referrer"
-              src={user.social_auth[0].picture}
-              margin={5}
-              size="xl"
-            />
-          )}
+          <Avatar
+            name={user.username}
+            referrerPolicy="no-referrer"
+            src={
+              user.social_auth && user.social_auth[0]
+                ? user.social_auth[0].picture
+                : "/avatar.jpg"
+            }
+            margin={5}
+            size="xl"
+          />
         </Flex>
         <Flex m={5} direction="column">
           <Heading size="lg" m={4}>

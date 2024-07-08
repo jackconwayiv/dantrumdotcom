@@ -112,14 +112,16 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
           width="65px"
           onClick={() => navigate(`/app/friends/${friend.id}`)}
         >
-          {friend.social_auth.length > 0 && (
-            <Avatar
-              name={friend.username}
-              referrerPolicy="no-referrer"
-              src={friend.social_auth[0].picture}
-              size="md"
-            />
-          )}
+          <Avatar
+            name={friend.username}
+            referrerPolicy="no-referrer"
+            src={
+              friend.social_auth && friend.social_auth[0]
+                ? friend.social_auth[0].picture
+                : "/avatar.jpg"
+            }
+            size="md"
+          />
         </Flex>
         <Flex
           direction="column"

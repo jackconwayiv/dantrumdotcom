@@ -24,9 +24,17 @@ export const renderNickname = (user: User) => {
 };
 
 const renderAvatar = (user: User) => {
-  if (user.social_auth && user.social_auth[0] && user.social_auth[0].picture) {
-    return <Avatar mr={1} size="xs" src={user.social_auth[0].picture} />;
-  }
+  return (
+    <Avatar
+      mr={1}
+      size="xs"
+      src={
+        user.social_auth && user.social_auth[0]
+          ? user.social_auth[0].picture
+          : "/avatar.jpg"
+      }
+    />
+  );
 };
 
 export const renderSharedBy = (user: User) => {

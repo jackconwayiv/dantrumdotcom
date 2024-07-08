@@ -40,15 +40,18 @@ const FriendProfile = () => {
   if (friend)
     return (
       <Flex direction="column" width="100%" p={2} m={2}>
-        {friend.social_auth && friend.social_auth[0] && (
-          <Avatar
-            name={friend.username}
-            referrerPolicy="no-referrer"
-            src={friend.social_auth[0].picture}
-            margin={3}
-            size="xl"
-          />
-        )}
+        <Avatar
+          name={friend.username}
+          referrerPolicy="no-referrer"
+          src={
+            friend.social_auth && friend.social_auth[0]
+              ? friend.social_auth[0].picture
+              : "/avatar.jpg"
+          }
+          margin={3}
+          size="xl"
+        />
+
         <Heading fontFamily="Comic Sans MS" m={3}>
           {renderFullName(friend)}
         </Heading>

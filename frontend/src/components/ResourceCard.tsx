@@ -55,7 +55,7 @@ const ResourceCard = ({
               maxHeight={{ base: "200px", sm: "200px" }}
               objectFit="cover"
               border="1px silver solid"
-              src={resource.thumbnail_url}
+              src={resource.thumbnail_url || "/placeholder.jpg"}
               alt={resource.title}
             />
           </Box>

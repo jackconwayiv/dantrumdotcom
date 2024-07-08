@@ -132,9 +132,9 @@ function Navbar({ user }: NavbarProps) {
               justifySelf="baseline"
               onClick={() => navigate("/app/profile")}
               src={
-                user.social_auth &&
-                user.social_auth[0] &&
-                user.social_auth[0].picture
+                user.social_auth && user.social_auth[0]
+                  ? user.social_auth[0].picture
+                  : "/avatar.jpg"
               }
             />
             {/* </MenuButton>

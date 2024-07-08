@@ -55,7 +55,7 @@ const AlbumCard = ({
               maxHeight={{ base: "200px", sm: "200px" }}
               objectFit="cover"
               border="1px silver solid"
-              src={album.thumbnail_url}
+              src={album.thumbnail_url || "/placeholder.jpg"}
               alt={album.title}
             />
           </Box>
