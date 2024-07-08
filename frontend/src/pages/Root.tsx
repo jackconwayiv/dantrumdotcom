@@ -1,9 +1,68 @@
-import { Flex, Heading } from "@chakra-ui/react";
-import { FaCamera, FaMapSigns, FaUserCircle } from "react-icons/fa";
+import { Flex, Heading, Text } from "@chakra-ui/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import {
+  FaAddressBook,
+  FaCamera,
+  FaMapSigns,
+  FaUserCircle,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ImageCarousel from "../components/ImageCarousel";
+import { User } from "../helpers/types";
+import { isBirthday, renderBirthday, renderNickname } from "../helpers/utils";
 
-export default function Root() {
+interface RootProps {
+  user: User;
+}
+
+export default function Root({ user }: RootProps) {
+  const [birthdays, setBirthdays] = useState<User[]>([]);
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUpcomingBirthdays = async () => {
+      try {
+        const response = await axios.get<User[]>("/api/birthdays/", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your auth method
+          },
+        });
+        setBirthdays(response.data);
+      } catch (err) {
+        // setError("Failed to fetch upcoming birthdays");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchUpcomingBirthdays();
+  }, []);
+
+  const renderList = () => {
+    return birthdays.map((user: User, i: number) => (
+      <Text key={i}>
+        {`${renderNickname(user)}: ${renderBirthday(user.date_of_birth)}`}
+      </Text>
+    ));
+  };
+
+  const renderBirthdays = () => {
+    if (birthdays && birthdays.length > 0) {
+      return (
+        <Flex direction="column" alignItems="center">
+          <Text fontWeight="bold" fontFamily="Comic Sans MS">
+            🎉 UPCOMING {birthdays.length > 1 ? `BIRTHDAYS` : `BIRTHDAY`} ALERT!
+          </Text>
+          <Text fontFamily="Comic Sans MS"></Text>
+          {renderList()}
+        </Flex>
+      );
+    }
+    return null;
+  };
+
   const navigate = useNavigate();
   return (
     <Flex direction="column">
@@ -17,8 +76,11 @@ export default function Root() {
         /> */}
 
         <Heading textAlign="center" fontFamily="Comic Sans MS" my={6}>
-          YO! IT'S DANTRUM.COM
+          {isBirthday(user)
+            ? `HAPPY BIRTHDAY ${renderNickname(user).toUpperCase()}!!`
+            : `YO! IT'S DANTRUM.COM`}
         </Heading>
+        {birthdays && birthdays.length > 0 && renderBirthdays()}
 
         <Flex
           alignItems="center"
@@ -65,7 +127,7 @@ export default function Root() {
             Resources
           </Heading>
         </Flex>
-        {/* <Flex
+        <Flex
           alignItems="center"
           width="90%"
           m={2}
@@ -78,7 +140,7 @@ export default function Root() {
           <Heading m={3} size="md">
             Friends
           </Heading>
-        </Flex> */}
+        </Flex>
         <Flex
           alignItems="center"
           width="90%"

@@ -42,7 +42,7 @@ function App() {
         <Flex direction="column" width="100%" maxW="850px" minHeight="100vh">
           <Navbar user={user} />
           <Routes>
-            <Route path="/app/" element={<Root />} />
+            <Route path="/app/" element={<Root user={user} />} />
 
             <Route path="/app/albums/" element={<AlbumsView user={user} />} />
             <Route path="/app/calendar/" element={<CalendarView />} />

@@ -6,7 +6,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from utils.slack_notifications import send_slack_message
 from .models import Album, Quote, Resource, User
@@ -219,6 +219,31 @@ class URLSummaryView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 User = get_user_model()
+
+class BirthdayListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        user = request.user
+        if not user.is_active:
+            return Response(status=403)
+
+        today = datetime.now().date()
+        start_date = today - timedelta(days=2)
+        end_date = today + timedelta(days=6)
+
+        active_users = User.objects.filter(is_active=True).exclude(date_of_birth__isnull=True)
+
+        result = []
+        for user in active_users:
+            dob = user.date_of_birth
+            dob_this_year = dob.replace(year=today.year)
+            if start_date <= dob_this_year <= end_date:
+                result.append(user)
+
+        serializer = UserSerializer(result, many=True)
+        return Response(serializer.data)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

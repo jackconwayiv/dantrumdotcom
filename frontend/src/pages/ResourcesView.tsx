@@ -67,48 +67,35 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     }
   }, [currentResource]);
 
+  const fetchResources = async () => {
+    try {
+      const response = await axios.get(`/api/resources/`);
+      setResources(response.data.results);
+      setLoading(false);
+    } catch (error) {
+      console.error(`Couldn't retrieve resources: ${error}`);
+      setError("Couldn't retrieve resources");
+      return false;
+    }
+  };
+
   useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const response = await axios.get(`/api/resources/`);
-        setResources(response.data.results);
-        setLoading(false);
-      } catch (error) {
-        console.error(`Couldn't retrieve resources: ${error}`);
-        setError("Couldn't retrieve resources");
-        return false;
-      }
-    };
     fetchResources();
   }, []);
 
   const handleSubmit = async (values: Resource) => {
     try {
-      const savedResource: Resource = await saveResource(values);
-      if (currentResource) {
-        setResources(
-          resources.map((resource) =>
-            resource.id === savedResource.id ? savedResource : resource
-          )
-        );
-        toast({
-          title: "Resource Updated",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      } else {
-        setResources([savedResource, ...(resources || [])]);
-        toast({
-          title: "New Resource Created",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
+      await saveResource(values);
+      toast({
+        title: currentResource ? "Resource Updated" : "New Resource Created",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
       setCurrentResource(null);
       formik.resetForm();
       onClose();
+      fetchResources();
     } catch (error: unknown) {
       let errorMessage = "Check console log for details.";
 
@@ -189,6 +176,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
         resources={resources}
         setResources={setResources}
         onClose={onClose}
+        fetchResources={fetchResources}
         currentResource={currentResource}
         setCurrentResource={setCurrentResource}
         isOpen={isOpen}

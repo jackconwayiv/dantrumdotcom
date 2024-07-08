@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Box,
   Button,
   Flex,
   Heading,
@@ -11,17 +10,16 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Tooltip,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { isAxiosError } from "axios";
 import { useFormik } from "formik";
-import { FaBirthdayCake, FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
-import { renderFullName } from "../helpers/utils";
+import { renderBirthday, renderFullName } from "../helpers/utils";
 
 interface ProfileProps {
   user: User;
@@ -90,28 +88,25 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
     return (
       <Flex direction="column" width="100%">
         <Flex alignItems="center" justifyContent="space-between" m={4}>
-          {user.social_auth && user.social_auth[0] && (
-            <Avatar
-              name={user.username}
-              referrerPolicy="no-referrer"
-              src={user.social_auth[0].picture}
-              margin={5}
-              size="xl"
-            />
-          )}
+          <Avatar
+            name={user.username}
+            referrerPolicy="no-referrer"
+            src={
+              user.social_auth && user.social_auth[0]
+                ? user.social_auth[0].picture
+                : "/avatar.jpg"
+            }
+            margin={5}
+            size="xl"
+          />
         </Flex>
         <Flex m={5} direction="column">
           <Heading size="lg" m={4}>
             {renderFullName(user)}
           </Heading>
           <Flex alignItems="center" m={4}>
-            <Tooltip label="Birthday" fontSize="md">
-              <Box mr={3}>
-                <FaBirthdayCake />
-              </Box>
-            </Tooltip>
             <Heading size="md">
-              {user.date_of_birth || "no birthday provided"}
+              🎂 {renderBirthday(user.date_of_birth) || "no birthday provided"}
             </Heading>
           </Flex>
           <Heading size="md" m={4}>

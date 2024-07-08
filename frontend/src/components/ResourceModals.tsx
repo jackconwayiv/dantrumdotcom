@@ -30,6 +30,7 @@ import { Resource } from "../helpers/types";
 interface ResourceModalsProps {
   resources: Resource[];
   isOpen: boolean;
+  fetchResources: () => void;
   onClose: () => void;
   currentResource: Resource | null;
   setCurrentResource: React.Dispatch<React.SetStateAction<Resource | null>>;
@@ -39,13 +40,12 @@ interface ResourceModalsProps {
 }
 
 export const ResourceModals = ({
-  resources,
   isOpen,
   onClose,
   currentResource,
   setCurrentResource,
-  setResources,
   formik,
+  fetchResources,
   validate,
 }: ResourceModalsProps) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -96,15 +96,15 @@ export const ResourceModals = ({
   const handleDelete = async () => {
     try {
       await deleteResource(currentResource!.id || 0);
-      setResources(
-        resources.filter((resource) => resource.id !== currentResource!.id)
-      );
       toast({
         title: "Resource Deleted",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
+      setCurrentResource(null);
+      fetchResources();
+      onAlertClose();
     } catch (error) {
       let errorMessage = "Check console log for details.";
       if (isAxiosError(error)) {

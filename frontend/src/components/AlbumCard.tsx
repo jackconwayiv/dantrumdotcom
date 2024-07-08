@@ -9,8 +9,9 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 import { Album, User } from "../helpers/types";
-import { isOwner, renderSharedBy } from "../helpers/utils";
+import { isOwner, renderAlbumDate, renderSharedBy } from "../helpers/utils";
 
 interface AlbumCardProps {
   user: User;
@@ -25,6 +26,8 @@ const AlbumCard = ({
   onOpen,
   setCurrentAlbum,
 }: AlbumCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
@@ -33,13 +36,13 @@ const AlbumCard = ({
       key={album.id}
       width="95%"
     >
-      <a
-        href={album.link_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ textDecoration: "none", cursor: "alias" }}
-      >
-        <Flex direction={{ base: "column", sm: "row" }}>
+      <Flex direction={{ base: "column", sm: "row" }}>
+        <a
+          href={album.link_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none", cursor: "pointer" }}
+        >
           <Box
             width={{ base: "100%", sm: "250px" }}
             height={{ base: "auto", sm: "200px" }}
@@ -52,12 +55,19 @@ const AlbumCard = ({
               maxHeight={{ base: "200px", sm: "200px" }}
               objectFit="cover"
               border="1px silver solid"
-              src={album.thumbnail_url}
+              src={album.thumbnail_url || "/placeholder.jpg"}
               alt={album.title}
             />
           </Box>
-          <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
-            <Flex direction="column">
+        </a>
+        <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
+          <Flex direction="column">
+            <a
+              href={album.link_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none", cursor: "pointer" }}
+            >
               <Flex justifyContent="space-between">
                 <Heading
                   fontFamily={"Comic Sans MS"}
@@ -65,7 +75,9 @@ const AlbumCard = ({
                   size="md"
                   p={1}
                 >
-                  {album.date} {album.title.toUpperCase()}
+                  {!album.title.toUpperCase().includes("RANDOM") &&
+                    renderAlbumDate(album.date)}{" "}
+                  {album.title.toUpperCase()}
                 </Heading>
               </Flex>
               <Flex>
@@ -73,19 +85,26 @@ const AlbumCard = ({
                   {album.description}
                 </Text>
               </Flex>
-              <Spacer />
-              <Flex>{album.owner && renderSharedBy(album.owner)}</Flex>
+            </a>
+            <Spacer />
+            <Flex
+              cursor="pointer"
+              onClick={() => {
+                if (album.owner) navigate(`/app/friends/${album.owner.id}`);
+              }}
+            >
+              {album.owner && renderSharedBy(album.owner)}
             </Flex>
-          </Box>
-        </Flex>
-      </a>
+          </Flex>
+        </Box>
+      </Flex>
       <Spacer />
       <Flex justifyContent="end">
         {isOwner(user, album) ? (
           <Tooltip label={`Edit ${album.title}`} placement="top" fontSize="md">
             <Box>
               <FaGear
-                cursor="context-menu"
+                cursor="pointer"
                 size="25px"
                 onClick={() => {
                   setCurrentAlbum(album);

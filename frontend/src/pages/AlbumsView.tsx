@@ -32,24 +32,25 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  useEffect(() => {
-    const fetchAlbums = async () => {
-      setLoading(true);
-      try {
-        let response;
-        if (selectedYear === "mine") {
-          response = await axios.get("/api/albums/mine/");
-        } else {
-          response = await axios.get(`/api/albums/year/${selectedYear}/`);
-        }
-        setAlbums(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error(`Couldn't retrieve albums: ${error}`);
-        setError(error);
-        setLoading(false);
+  const fetchAlbums = async () => {
+    setLoading(true);
+    try {
+      let response;
+      if (selectedYear === "mine") {
+        response = await axios.get("/api/albums/mine/");
+      } else {
+        response = await axios.get(`/api/albums/year/${selectedYear}/`);
       }
-    };
+      setAlbums(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(`Couldn't retrieve albums: ${error}`);
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAlbums();
   }, [selectedYear]);
 
@@ -113,31 +114,17 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   const handleSubmit = async (values: Album) => {
     try {
-      const savedAlbum: Album = await saveAlbum(values);
-      if (currentAlbum) {
-        setAlbums(
-          albums.map((album) =>
-            album.id === savedAlbum.id ? savedAlbum : album
-          )
-        );
-        toast({
-          title: "Album Updated",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      } else {
-        setAlbums([savedAlbum, ...(albums || [])]);
-        toast({
-          title: "New Album Created",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
+      await saveAlbum(values);
+      toast({
+        title: currentAlbum ? "Album Updated" : "New Album Created",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
       setCurrentAlbum(null);
       formik.resetForm();
       onClose();
+      fetchAlbums();
     } catch (error: unknown) {
       let errorMessage = "Check console log for details.";
 
@@ -211,14 +198,13 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           albums.map((album) => renderAlbum(album))}
       </Flex>
       <AlbumModals
-        albums={albums}
-        setAlbums={setAlbums}
         currentAlbum={currentAlbum}
         setCurrentAlbum={setCurrentAlbum}
         isOpen={isOpen}
         onClose={onClose}
         formik={formik}
         validate={validate}
+        fetchAlbums={fetchAlbums}
       />
     </Flex>
   );
