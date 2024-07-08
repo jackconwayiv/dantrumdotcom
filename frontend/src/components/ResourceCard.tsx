@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 import { Resource, User } from "../helpers/types";
 import { isOwner, renderSharedBy } from "../helpers/utils";
 
@@ -25,6 +26,8 @@ const ResourceCard = ({
   onOpen,
   setCurrentResource,
 }: ResourceCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card
       direction={{ base: "column", sm: "row" }}
@@ -33,13 +36,13 @@ const ResourceCard = ({
       key={resource.id}
       width="95%"
     >
-      <a
-        href={resource.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ textDecoration: "none", cursor: "pointer" }}
-      >
-        <Flex direction={{ base: "column", sm: "row" }}>
+      <Flex direction={{ base: "column", sm: "row" }}>
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none", cursor: "pointer" }}
+        >
           <Box
             width={{ base: "100%", sm: "250px" }}
             height={{ base: "auto", sm: "200px" }}
@@ -56,8 +59,15 @@ const ResourceCard = ({
               alt={resource.title}
             />
           </Box>
-          <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
-            <Flex direction="column">
+        </a>
+        <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
+          <Flex direction="column">
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none", cursor: "pointer" }}
+            >
               <Flex justifyContent="space-between">
                 <Heading
                   fontFamily={"Comic Sans MS"}
@@ -73,12 +83,20 @@ const ResourceCard = ({
                   {resource.description}
                 </Text>
               </Flex>
-              <Spacer />
-              <Flex>{resource.owner && renderSharedBy(resource.owner)}</Flex>
+            </a>
+            <Spacer />
+            <Flex
+              cursor="pointer"
+              onClick={() => {
+                if (resource.owner)
+                  navigate(`/app/friends/${resource.owner.id}`);
+              }}
+            >
+              {resource.owner && renderSharedBy(resource.owner)}
             </Flex>
-          </Box>
-        </Flex>
-      </a>
+          </Flex>
+        </Box>
+      </Flex>
       <Spacer />
       <Flex justifyContent="end">
         {isOwner(user, resource) ? (

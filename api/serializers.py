@@ -63,7 +63,7 @@ class OwnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "first_name", "last_name", "username", "social_auth"]
+        fields = ["id", "email", "first_name", "last_name", "username", "social_auth"]
 
 class AlbumSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True)
