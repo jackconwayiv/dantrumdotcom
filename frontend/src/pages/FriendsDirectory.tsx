@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Box,
   Button,
   Flex,
   Heading,
@@ -10,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FaBirthdayCake } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { fetchFriends } from "../api/users";
 import { Friend, User } from "../helpers/types";
@@ -131,16 +129,11 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
           {renderFullName(friend)}
           {friend.date_of_birth && (
             <Flex alignItems="center">
-              <Box mr={1}>
-                <FaBirthdayCake
-                  color={isBirthday(friend) ? "orange" : "black"}
-                />
-              </Box>
               <Text
                 color={isBirthday(friend) ? "orange" : "black"}
                 fontWeight={isBirthday(friend) ? "bold" : "normal"}
               >
-                {renderBirthday(friend.date_of_birth)}
+                🎂 {renderBirthday(friend.date_of_birth)}
               </Text>
             </Flex>
           )}

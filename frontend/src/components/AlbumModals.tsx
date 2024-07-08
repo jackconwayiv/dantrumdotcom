@@ -28,25 +28,23 @@ import { deleteAlbum, fetchAlbumDataFromBackend } from "../api/albums";
 import { Album } from "../helpers/types";
 
 interface AlbumModalsProps {
-  albums: Album[];
   isOpen: boolean;
   onClose: () => void;
   currentAlbum: Album | null;
   setCurrentAlbum: React.Dispatch<React.SetStateAction<Album | null>>;
-  setAlbums: React.Dispatch<React.SetStateAction<Album[]>>;
   formik: any;
   validate: (values: Album) => any;
+  fetchAlbums: () => void;
 }
 
 export const AlbumModals = ({
-  albums,
   isOpen,
   onClose,
   currentAlbum,
   setCurrentAlbum,
-  setAlbums,
   formik,
   validate,
+  fetchAlbums,
 }: AlbumModalsProps) => {
   const [loading, setLoading] = useState(false);
 
@@ -67,16 +65,17 @@ export const AlbumModals = ({
   };
 
   const handleDelete = async () => {
-    //this sets currentAlbum earlier due to Alert Dialog popup
     try {
       await deleteAlbum(currentAlbum!.id || 0);
-      setAlbums(albums.filter((album) => album.id !== currentAlbum!.id));
       toast({
         title: "Album Deleted",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
+      setCurrentAlbum(null);
+      fetchAlbums();
+      onAlertClose();
     } catch (error) {
       let errorMessage = "Check console log for details.";
       if (isAxiosError(error)) {
@@ -92,6 +91,7 @@ export const AlbumModals = ({
         duration: 9000,
         isClosable: true,
       });
+      onAlertClose();
     }
   };
 

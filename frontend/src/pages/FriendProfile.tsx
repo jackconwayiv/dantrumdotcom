@@ -1,10 +1,10 @@
-import { Avatar, Box, Flex, Heading, Tooltip } from "@chakra-ui/react";
+import { Avatar, Flex, Heading } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { FaBirthdayCake } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { fetchUserById } from "../api/users";
 import { Friend } from "../helpers/types";
+import { isBirthday, renderBirthday, renderFullName } from "../helpers/utils";
 
 const FriendProfile = () => {
   const { id } = useParams();
@@ -45,29 +45,19 @@ const FriendProfile = () => {
             name={friend.username}
             referrerPolicy="no-referrer"
             src={friend.social_auth[0].picture}
-            margin={5}
+            margin={3}
             size="xl"
           />
         )}
-        {friend.first_name || friend.last_name ? (
-          <Heading size="lg">
-            {friend.first_name} {friend.username && `"${friend.username}" `}
-            {friend.last_name}
-          </Heading>
-        ) : (
-          <Heading size="lg">no name on record</Heading>
-        )}
-        <Flex alignItems="center">
-          <Tooltip label="Birthday" fontSize="md">
-            <Box mr={3}>
-              <FaBirthdayCake />
-            </Box>
-          </Tooltip>
-          <Heading size="md">
-            {friend.date_of_birth || "no birthday provided"}
+        <Heading fontFamily="Comic Sans MS" m={3}>
+          {renderFullName(friend)}
+        </Heading>
+        <Flex alignItems="center" m={3}>
+          <Heading size="md" color={isBirthday(friend) ? "orange" : "black"}>
+            🎂 {renderBirthday(friend.date_of_birth) || "no birthday provided"}
           </Heading>
         </Flex>
-        <Heading size="md">{friend.email}</Heading>
+        {/* <Heading size="md">{friend.email}</Heading> */}
       </Flex>
     );
 
