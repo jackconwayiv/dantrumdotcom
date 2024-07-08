@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { FaGear } from "react-icons/fa6";
 import { Album, User } from "../helpers/types";
-import { isOwner, renderSharedBy } from "../helpers/utils";
+import { isOwner, renderAlbumDate, renderSharedBy } from "../helpers/utils";
 
 interface AlbumCardProps {
   user: User;
@@ -65,7 +65,7 @@ const AlbumCard = ({
                   size="md"
                   p={1}
                 >
-                  {album.date} {album.title.toUpperCase()}
+                  {renderAlbumDate(album.date)} {album.title.toUpperCase()}
                 </Heading>
               </Flex>
               <Flex>

@@ -66,13 +66,7 @@ export const renderBirthday = (dateString: string): string => {
 };
 
 export const renderAlbumDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const options: Intl.DateTimeFormatOptions = {
-    month: "long",
-    year: "numeric",
-  };
-  const monthYear = date.toLocaleDateString("en-US", options);
-  return monthYear;
+  return dayjs(dateString).format("MM-YYYY");
 };
 
 export function getNextBirthday(dateString: string): number {
