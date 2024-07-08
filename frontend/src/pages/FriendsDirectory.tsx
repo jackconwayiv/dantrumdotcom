@@ -50,10 +50,15 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
     const sortFriendsByBirthday = () => {
       const sorted = friends
         .filter((friend) => friend.email !== user.email)
-        .sort(
-          (a, b) =>
-            getNextBirthday(a.date_of_birth) - getNextBirthday(b.date_of_birth)
-        );
+        .sort((a, b) => {
+          const nextBirthdayA = getNextBirthday(a.date_of_birth);
+          const nextBirthdayB = getNextBirthday(b.date_of_birth);
+          if (nextBirthdayA === 0 && nextBirthdayB === 0) return 0;
+          if (nextBirthdayA === 0) return 1;
+          if (nextBirthdayB === 0) return -1;
+
+          return nextBirthdayA - nextBirthdayB;
+        });
       setSortedFriends(sorted);
     };
 

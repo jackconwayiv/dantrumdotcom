@@ -65,15 +65,22 @@ export const renderSharedBy = (user: User) => {
   );
 };
 
-export const renderBirthday = (dateString: string): string => {
-  return dayjs(dateString).format("MMMM D");
-};
-
 export const renderAlbumDate = (dateString: string): string => {
   return dayjs(dateString).format("MM-YYYY");
 };
 
+export const renderBirthday = (dateString: string): string => {
+  if (!dayjs(dateString).isValid()) {
+    return "Invalid date";
+  }
+  return dayjs(dateString).format("MMMM D");
+};
+
 export function getNextBirthday(dateString: string): number {
+  if (!dayjs(dateString).isValid()) {
+    return 0; // or some other default value indicating an invalid date
+  }
+
   const today = dayjs();
   const [, month, day] = dateString.split("-").map(Number);
 
@@ -93,7 +100,7 @@ export function isBirthday(user: User): boolean {
   const today = dayjs();
   const { date_of_birth } = user;
 
-  if (!date_of_birth) {
+  if (!date_of_birth || !dayjs(date_of_birth).isValid()) {
     return false;
   }
 
