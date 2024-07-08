@@ -37,7 +37,7 @@ const ResourceCard = ({
         href={resource.url}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ textDecoration: "none", cursor: "alias" }}
+        style={{ textDecoration: "none", cursor: "pointer" }}
       >
         <Flex direction={{ base: "column", sm: "row" }}>
           <Box
@@ -89,7 +89,7 @@ const ResourceCard = ({
           >
             <Box>
               <FaGear
-                cursor="context-menu"
+                cursor="pointer"
                 size="25px"
                 onClick={() => {
                   setCurrentResource(resource);

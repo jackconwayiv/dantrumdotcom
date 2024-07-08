@@ -37,7 +37,7 @@ const AlbumCard = ({
         href={album.link_url}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ textDecoration: "none", cursor: "alias" }}
+        style={{ textDecoration: "none", cursor: "pointer" }}
       >
         <Flex direction={{ base: "column", sm: "row" }}>
           <Box
@@ -65,7 +65,9 @@ const AlbumCard = ({
                   size="md"
                   p={1}
                 >
-                  {renderAlbumDate(album.date)} {album.title.toUpperCase()}
+                  {!album.title.toUpperCase().includes("RANDOM") &&
+                    renderAlbumDate(album.date)}{" "}
+                  {album.title.toUpperCase()}
                 </Heading>
               </Flex>
               <Flex>
@@ -85,7 +87,7 @@ const AlbumCard = ({
           <Tooltip label={`Edit ${album.title}`} placement="top" fontSize="md">
             <Box>
               <FaGear
-                cursor="context-menu"
+                cursor="pointer"
                 size="25px"
                 onClick={() => {
                   setCurrentAlbum(album);

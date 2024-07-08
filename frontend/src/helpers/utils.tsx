@@ -14,29 +14,22 @@ export const renderFullName = (user: User) => {
   return nameString;
 };
 
+export const renderNickname = (user: User) => {
+  let nameString = "";
+  if (user.first_name) nameString += `${user.first_name} `;
+
+  if (user.last_name) nameString += `${user.last_name}`;
+  if (user.username) nameString = user.username;
+  return nameString;
+};
+
+const renderAvatar = (user: User) => {
+  if (user.social_auth && user.social_auth[0] && user.social_auth[0].picture) {
+    return <Avatar mr={1} size="xs" src={user.social_auth[0].picture} />;
+  }
+};
+
 export const renderSharedBy = (user: User) => {
-  const renderNickname = (user: User) => {
-    let nameString = "";
-    if (user.first_name) nameString += `${user.first_name} `;
-
-    if (user.last_name) nameString += `${user.last_name}`;
-    if (user.username) nameString = user.username;
-    return (
-      <Text fontSize="10px" fontFamily={"Comic Sans MS"} alignItems="end">
-        {nameString}
-      </Text>
-    );
-  };
-  const renderAvatar = (user: User) => {
-    if (
-      user.social_auth &&
-      user.social_auth[0] &&
-      user.social_auth[0].picture
-    ) {
-      return <Avatar mr={1} size="xs" src={user.social_auth[0].picture} />;
-    }
-  };
-
   return (
     <Flex
       direction="row"
@@ -54,7 +47,10 @@ export const renderSharedBy = (user: User) => {
           >
             Shared by
           </Text>
-          {renderAvatar(user)} {renderNickname(user)}
+          {renderAvatar(user)}{" "}
+          <Text fontSize="10px" fontFamily={"Comic Sans MS"} alignItems="end">
+            {renderNickname(user)}
+          </Text>
         </>
       }
     </Flex>

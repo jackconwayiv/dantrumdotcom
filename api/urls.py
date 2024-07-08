@@ -17,6 +17,7 @@ urlpatterns = [
     # path("", views.index, name="index"),
     path("", include(router.urls)),
     path("years/", views.album_years, name="album-years"),
+    path("birthdays/", views.BirthdayListView.as_view(), name="birthdays"),
     path("summary/", views.URLSummaryView.as_view(), name="url-summary"),
     path("fetch-album-data/", views.FetchAlbumData.as_view(), name="fetch_album_data"),
     path("api-auth/", include("rest_framework.urls")),
