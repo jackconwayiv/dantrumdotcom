@@ -14,12 +14,12 @@ const YearSelector = ({ selectedYear, setSelectedYear }: YearSelectorProps) => {
 
   useEffect(() => {
     const fetchYears = async () => {
-      try {
-        const response = await axios.get("/api/years/");
+      const response = await axios.get("/api/years/");
+      if (response) {
         setYears(response.data);
         setLoading(false);
-      } catch (error: any) {
-        console.error(`Couldn't retrieve years: ${error}`);
+      } else {
+        console.error(`Couldn't retrieve album years: ${error}`);
         setError(error);
         setLoading(false);
       }

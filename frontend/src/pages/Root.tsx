@@ -19,24 +19,22 @@ interface RootProps {
 export default function Root({ user }: RootProps) {
   const [birthdays, setBirthdays] = useState<User[]>([]);
   // const [loading, setLoading] = useState<boolean>(true);
-  // const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUpcomingBirthdays = async () => {
-      try {
-        const response = await axios.get<User[]>("/api/birthdays/", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your auth method
-          },
-        });
+      const response = await axios.get<User[]>("/api/birthdays/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your auth method
+        },
+      });
+      if (response) {
         setBirthdays(response.data);
-      } catch (err) {
-        // setError("Failed to fetch upcoming birthdays");
-      } finally {
-        // setLoading(false);
+      } else {
+        setError("Failed to fetch upcoming birthdays");
+        console.error(error);
       }
     };
-
     fetchUpcomingBirthdays();
   }, []);
 

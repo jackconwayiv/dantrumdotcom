@@ -7,7 +7,6 @@ export const fetchUserProfile = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching user profile:", error);
-    throw error;
   }
 };
 
@@ -19,7 +18,6 @@ export const fetchFriends = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching friends:", error);
-    throw error;
   }
 };
 
@@ -29,7 +27,6 @@ export const fetchUserById = async (id: string) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching user by id (${id}):`, error);
-    throw error;
   }
 };
 
@@ -39,6 +36,5 @@ export const updateUser = async (formData: User) => {
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
-    throw error;
   }
 };

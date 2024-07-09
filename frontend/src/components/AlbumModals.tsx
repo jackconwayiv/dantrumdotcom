@@ -21,7 +21,6 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { isAxiosError } from "axios";
 import { useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteAlbum, fetchAlbumDataFromBackend } from "../api/albums";
@@ -65,10 +64,10 @@ export const AlbumModals = ({
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteAlbum(currentAlbum!.id || 0);
+    const deletedAlbum = await deleteAlbum(currentAlbum!.id || 0);
+    if (deletedAlbum) {
       toast({
-        title: "Album Deleted",
+        title: "Album Deleted!",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -76,17 +75,10 @@ export const AlbumModals = ({
       setCurrentAlbum(null);
       fetchAlbums();
       onAlertClose();
-    } catch (error) {
-      let errorMessage = "Check console log for details.";
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      console.error("Error deleting album:", error);
+    } else {
       toast({
-        title: "Error deleting album:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to delete this album.",
         status: "error",
         duration: 9000,
         isClosable: true,
