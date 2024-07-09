@@ -71,14 +71,14 @@ export const renderAlbumDate = (dateString: string): string => {
 
 export const renderBirthday = (dateString: string): string => {
   if (!dayjs(dateString).isValid()) {
-    return "Invalid date";
+    return "birthday not found";
   }
   return dayjs(dateString).format("MMMM D");
 };
 
 export function getNextBirthday(dateString: string): number {
   if (!dayjs(dateString).isValid()) {
-    return 0; // or some other default value indicating an invalid date
+    return 0;
   }
 
   const today = dayjs();
