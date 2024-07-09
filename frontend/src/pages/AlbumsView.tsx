@@ -6,7 +6,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
@@ -34,16 +34,17 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
 
   const fetchAlbums = async () => {
     setLoading(true);
-    try {
-      let response;
-      if (selectedYear === "mine") {
-        response = await axios.get("/api/albums/mine/");
-      } else {
-        response = await axios.get(`/api/albums/year/${selectedYear}/`);
-      }
+
+    let response;
+    if (selectedYear === "mine") {
+      response = await axios.get("/api/albums/mine/");
+    } else {
+      response = await axios.get(`/api/albums/year/${selectedYear}/`);
+    }
+    if (response) {
       setAlbums(response.data);
       setLoading(false);
-    } catch (error) {
+    } else {
       console.error(`Couldn't retrieve albums: ${error}`);
       setError(error);
       setLoading(false);
@@ -113,10 +114,11 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   };
 
   const handleSubmit = async (values: Album) => {
-    try {
-      await saveAlbum(values);
+    const savedAlbums = await saveAlbum(values);
+    if (savedAlbums) {
       toast({
-        title: currentAlbum ? "Album Updated" : "New Album Created",
+        title: currentAlbum ? "Album Updated!" : "New Album Created!",
+        description: "Thanks for sharing.",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -125,18 +127,11 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
       formik.resetForm();
       onClose();
       fetchAlbums();
-    } catch (error: unknown) {
-      let errorMessage = "Check console log for details.";
-
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    } else {
       console.error("Error saving album:", error);
       toast({
-        title: "Error saving album:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to save this album.",
         status: "error",
         duration: 9000,
         isClosable: true,

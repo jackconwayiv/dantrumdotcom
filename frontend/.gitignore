@@ -27,3 +27,7 @@ build
 
 # MacOS files
 .DS_Store
+# Sentry Config File
+.env.sentry-build-plugin
+
+.env

@@ -13,7 +13,6 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { FaSignOutAlt } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
@@ -51,31 +50,23 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
   };
 
   const handleSubmit = async (values: User) => {
-    try {
-      const newUser = await updateUser(values);
+    const newUser = await updateUser(values);
+    if (newUser) {
       setUser({
         ...user,
         ...newUser,
       });
       toast({
-        title: "Profile updated.",
+        title: "Profile updated!",
         description: "Now look at you!",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
-    } catch (error: unknown) {
-      let errorMessage = "Check console log for details.";
-
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      console.error("Error updating user:", error);
+    } else {
       toast({
-        title: "Error updating your profile:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to update your profile.",
         status: "error",
         duration: 9000,
         isClosable: true,

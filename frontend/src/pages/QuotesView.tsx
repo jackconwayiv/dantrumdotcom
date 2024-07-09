@@ -21,7 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import { FaWrench } from "react-icons/fa";
@@ -51,11 +51,11 @@ export default function QuotesView({ user }: QuotesViewProps) {
 
   useEffect(() => {
     const fetchQuotes = async () => {
-      try {
-        const response = await axios.get(`/api/quotes`);
+      const response = await axios.get(`/api/quotes`);
+      if (response) {
         setQuotes(response.data.results);
         setLoading(false);
-      } catch (error) {
+      } else {
         console.error(`Couldn't retrieve quotes: ${error}`);
         setError(error);
         return false;
@@ -109,8 +109,8 @@ export default function QuotesView({ user }: QuotesViewProps) {
   };
 
   const handleSubmit = async (values: Quote) => {
-    try {
-      const savedQuote: Quote = await saveQuote(values);
+    const savedQuote: Quote = await saveQuote(values);
+    if (savedQuote) {
       if (currentQuote) {
         setQuotes(
           quotes.map((quote) =>
@@ -118,7 +118,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
           )
         );
         toast({
-          title: "Quote Updated",
+          title: "Quote Updated!",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -126,7 +126,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
       } else {
         setQuotes([savedQuote, ...quotes]);
         toast({
-          title: "New Quote Created",
+          title: "New Quote Created!",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -135,18 +135,11 @@ export default function QuotesView({ user }: QuotesViewProps) {
       setCurrentQuote(null);
       formik.resetForm();
       onClose();
-    } catch (error: unknown) {
-      let errorMessage = "Check console log for details.";
-
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    } else {
       console.error("Error saving quote:", error);
       toast({
-        title: "Error saving quote:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to save this quote.",
         status: "error",
         duration: 9000,
         isClosable: true,
@@ -157,26 +150,20 @@ export default function QuotesView({ user }: QuotesViewProps) {
 
   const handleDelete = async () => {
     //this sets currentQuote earlier due to Alert Dialog popup
-    try {
-      await deleteQuote(currentQuote!.id || 0);
+    const deletedQuote = await deleteQuote(currentQuote!.id || 0);
+    if (deletedQuote) {
       setQuotes(quotes.filter((quote) => quote.id !== currentQuote!.id));
       toast({
-        title: "Quote Deleted",
+        title: "Quote Deleted!",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
-    } catch (error) {
-      let errorMessage = "Check console log for details.";
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    } else {
       console.error("Error deleting quote:", error);
       toast({
-        title: "Error deleting quote:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to delete this quote.",
         status: "error",
         duration: 9000,
         isClosable: true,

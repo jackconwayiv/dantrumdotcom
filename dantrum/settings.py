@@ -18,6 +18,20 @@ import dj_database_url
 import environ
 from dotenv import find_dotenv, load_dotenv
 
+
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://d9dd3ff899810b6599de77809ab2644a@o4507573329199104.ingest.us.sentry.io/4507573335228416",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
+
 # Initialize the environment variables
 env = environ.Env(DJANGO_ENV=(str, "development"), DEBUG=(bool, False))
 

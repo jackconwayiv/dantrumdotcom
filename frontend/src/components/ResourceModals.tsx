@@ -21,7 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteResource } from "../api/resources";
@@ -72,8 +72,9 @@ export const ResourceModals = ({
 
     if (!errors.url) {
       setLoading(true);
-      try {
-        const response = await axios.post("/api/summary/", { url });
+
+      const response = await axios.post("/api/summary/", { url });
+      if (response) {
         setLoading(false);
         if (response.data) {
           formik.setValues({
@@ -86,18 +87,18 @@ export const ResourceModals = ({
           });
           setError(null);
         }
-      } catch (err) {
+      } else {
         setLoading(false);
-        setError("Couldn't auto-fetch resource details");
+        setError(`Couldn't auto-fetch resource details: ${error}`);
       }
     }
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteResource(currentResource!.id || 0);
+    const deletedResource = await deleteResource(currentResource!.id || 0);
+    if (deletedResource) {
       toast({
-        title: "Resource Deleted",
+        title: "Resource Deleted!",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -105,17 +106,10 @@ export const ResourceModals = ({
       setCurrentResource(null);
       fetchResources();
       onAlertClose();
-    } catch (error) {
-      let errorMessage = "Check console log for details.";
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      console.error("Error deleting resource:", error);
+    } else {
       toast({
-        title: "Error deleting resource:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to delete this resource.",
         status: "error",
         duration: 9000,
         isClosable: true,

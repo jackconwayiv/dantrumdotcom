@@ -15,16 +15,15 @@ export const saveResource = async (resourceDetails: Resource) => {
     return response.data;
   } catch (error) {
     console.error("Error saving resource:", error);
-    throw error;
   }
 };
 
 export const deleteResource = async (resourceId: number) => {
   try {
     const response = await axios.delete(`/api/resources/${resourceId}/`);
+    if (response.status === 204) return "success";
     return response.data;
   } catch (error) {
     console.error("Error deleting resource:", error);
-    throw error;
   }
 };

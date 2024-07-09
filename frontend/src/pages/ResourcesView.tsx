@@ -6,7 +6,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { FormikErrors, useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
@@ -68,11 +68,11 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   }, [currentResource]);
 
   const fetchResources = async () => {
-    try {
-      const response = await axios.get(`/api/resources/`);
+    const response = await axios.get(`/api/resources/`);
+    if (response) {
       setResources(response.data.results);
       setLoading(false);
-    } catch (error) {
+    } else {
       console.error(`Couldn't retrieve resources: ${error}`);
       setError("Couldn't retrieve resources");
       return false;
@@ -84,10 +84,10 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
   }, []);
 
   const handleSubmit = async (values: Resource) => {
-    try {
-      await saveResource(values);
+    const savedResource = await saveResource(values);
+    if (savedResource) {
       toast({
-        title: currentResource ? "Resource Updated" : "New Resource Created",
+        title: currentResource ? "Resource Updated!" : "New Resource Created!",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -96,18 +96,11 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
       formik.resetForm();
       onClose();
       fetchResources();
-    } catch (error: unknown) {
-      let errorMessage = "Check console log for details.";
-
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    } else {
       console.error("Error saving resource:", error);
       toast({
-        title: "Error saving resource:",
-        description: errorMessage,
+        title: "Error!",
+        description: "An error occurred while trying to save this resource.",
         status: "error",
         duration: 9000,
         isClosable: true,

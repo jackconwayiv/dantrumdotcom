@@ -15,17 +15,16 @@ export const saveAlbum = async (albumDetails: Album) => {
     return response.data;
   } catch (error) {
     console.error("Error saving album:", error);
-    throw error;
   }
 };
 
 export const deleteAlbum = async (albumId: number) => {
   try {
     const response = await axios.delete(`/api/albums/${albumId}/`);
+    if (response.status === 204) return "success";
     return response.data;
   } catch (error) {
     console.error("Error deleting album:", error);
-    throw error;
   }
 };
 

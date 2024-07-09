@@ -33,11 +33,11 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
 
   useEffect(() => {
     const getFriends = async () => {
-      try {
-        const data = await fetchFriends();
+      const data = await fetchFriends();
+      if (data) {
         setFriends(data.results);
         setLoading(false);
-      } catch (error) {
+      } else {
         setError(error);
         setLoading(false);
       }
@@ -68,40 +68,28 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
   }, [friends, user.email]);
 
   const handleToggle = async (userId: number) => {
-    try {
-      const response = await axios.post(`/api/users/${userId}/activate/`);
+    const activatedUser = await axios.post(`/api/users/${userId}/activate/`);
+    if (activatedUser) {
       toast({
-        title: "Successful activation!",
-        description: `${response.data.detail} You've made their day!`,
+        title: "Successful user activation!",
+        description: `You've made their day!`,
         status: "success",
         duration: 5000,
         isClosable: true,
       });
       const usersResponse = await fetchFriends();
-      setFriends(usersResponse.results);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast({
-          title: "Error",
-          description:
-            error.response?.data?.detail ||
-            "An error occurred while toggling user status.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+      setFriends(usersResponse?.results || friends);
+    } else {
+      toast({
+        title: "Error!",
+        description:
+          "An error occurred while trying to toggle this user's status.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
-
   const renderFriendCard = (friend: Friend, i: number) => {
     return (
       <Flex

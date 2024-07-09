@@ -14,11 +14,11 @@ const FriendProfile = () => {
 
   useEffect(() => {
     const getFriend = async () => {
-      try {
-        const data = await fetchUserById(id || "");
+      const data = await fetchUserById(id || "");
+      if (data) {
         setFriend(data);
         setLoading(false);
-      } catch (error: AxiosError | unknown) {
+      } else {
         setError(error);
         setLoading(false);
       }

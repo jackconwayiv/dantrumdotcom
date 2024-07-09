@@ -20,11 +20,12 @@ function App() {
 
   useEffect(() => {
     const getUserProfile = async () => {
-      try {
-        const data = await fetchUserProfile();
+      const data = await fetchUserProfile();
+      if (data) {
         setUser(data);
         setLoading(false);
-      } catch (error) {
+      } else {
+        console.error(error);
         setError(error);
         setLoading(false);
       }

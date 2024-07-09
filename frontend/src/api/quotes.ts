@@ -15,16 +15,15 @@ export const saveQuote = async (quoteDetails: Quote) => {
     return response.data;
   } catch (error) {
     console.error("Error saving quote:", error);
-    throw error;
   }
 };
 
 export const deleteQuote = async (quoteId: number) => {
   try {
     const response = await axios.delete(`/api/quotes/${quoteId}/`);
+    if (response.status === 204) return "success";
     return response.data;
   } catch (error) {
     console.error("Error deleting quote:", error);
-    throw error;
   }
 };
