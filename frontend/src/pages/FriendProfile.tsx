@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchUserById } from "../api/users";
 import { Friend } from "../helpers/types";
-import { isBirthday, renderBirthday, renderFullName } from "../helpers/utils";
+import { isBirthday, renderFullBirthday, renderFullName } from "../helpers/utils";
 
 const FriendProfile = () => {
   const { id } = useParams();
@@ -57,7 +57,8 @@ const FriendProfile = () => {
         </Heading>
         <Flex alignItems="center" m={3}>
           <Heading size="md" color={isBirthday(friend) ? "orange" : "black"}>
-            🎂 {renderBirthday(friend.date_of_birth) || "no birthday provided"}
+            🎂{" "}
+            {renderFullBirthday(friend.date_of_birth) || "no birthday provided"}
           </Heading>
         </Flex>
         {/* <Heading size="md">{friend.email}</Heading> */}

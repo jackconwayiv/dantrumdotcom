@@ -21,6 +21,8 @@ export default function Root({ user }: RootProps) {
   // const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUpcomingBirthdays = async () => {
       const response = await axios.get<User[]>("/api/birthdays/", {
@@ -40,7 +42,11 @@ export default function Root({ user }: RootProps) {
 
   const renderList = () => {
     return birthdays.map((user: User, i: number) => (
-      <Text key={i}>
+      <Text
+        cursor="pointer"
+        key={i}
+        onClick={() => navigate(`/app/friends/${user.id}`)}
+      >
         {`${renderNickname(user)}: ${renderBirthday(user.date_of_birth)}`}
       </Text>
     ));
@@ -61,7 +67,6 @@ export default function Root({ user }: RootProps) {
     return null;
   };
 
-  const navigate = useNavigate();
   return (
     <Flex direction="column">
       <ImageCarousel />
