@@ -97,7 +97,7 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
         <Tabs variant="enclosed" colorScheme="green">
           <TabList>
             <Tab>Public Profile</Tab>
-            <Tab>Family Tree</Tab>
+            {/* <Tab>Family Tree</Tab> */}
           </TabList>
           <TabPanels>
             <TabPanel p={2}>
@@ -119,9 +119,9 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
                 </Flex>
               </Flex>
             </TabPanel>
-            <TabPanel>
-              <p>two!</p>
-            </TabPanel>
+            {/* <TabPanel>
+              <Heading>Family Tree</Heading>
+            </TabPanel> */}
           </TabPanels>
         </Tabs>
 
