@@ -18,7 +18,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import { User } from "../helpers/types";
-import { renderBirthday, renderFullName } from "../helpers/utils";
+import { renderFullBirthday, renderFullName } from "../helpers/utils";
 
 interface ProfileProps {
   user: User;
@@ -97,7 +97,8 @@ export default function MyProfile({ user, setUser }: ProfileProps) {
           </Heading>
           <Flex alignItems="center" m={4}>
             <Heading size="md">
-              🎂 {renderBirthday(user.date_of_birth) || "no birthday provided"}
+              🎂{" "}
+              {renderFullBirthday(user.date_of_birth) || "no birthday provided"}
             </Heading>
           </Flex>
           <Heading size="md" m={4}>
