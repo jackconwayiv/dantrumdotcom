@@ -3,18 +3,27 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchUserById } from "../api/users";
-import { Friend } from "../helpers/types";
-import { isBirthday, renderFullBirthday, renderFullName } from "../helpers/utils";
+import { Friend, User } from "../helpers/types";
+import {
+  isBirthday,
+  renderFullBirthday,
+  renderFullName,
+} from "../helpers/utils";
 
-const FriendProfile = () => {
-  const { id } = useParams();
+interface UserProfileProps {
+  user: User;
+}
+
+const UserProfile = ({ user }: UserProfileProps) => {
+  const { id } = useParams<{ id?: string }>();
+  const userId = id || user.id;
   const [friend, setFriend] = useState<Friend>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown | null | AxiosError>(null);
 
   useEffect(() => {
     const getFriend = async () => {
-      const data = await fetchUserById(id || "");
+      const data = await fetchUserById(userId as string);
       if (data) {
         setFriend(data);
         setLoading(false);
@@ -25,7 +34,7 @@ const FriendProfile = () => {
     };
 
     getFriend();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -68,4 +77,4 @@ const FriendProfile = () => {
   return <div>User not found</div>;
 };
 
-export default FriendProfile;
+export default UserProfile;

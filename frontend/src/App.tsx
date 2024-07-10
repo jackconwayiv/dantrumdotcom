@@ -6,12 +6,12 @@ import Navbar from "./components/Navbar";
 import { User } from "./helpers/types";
 import AlbumsView from "./pages/AlbumsView";
 import CalendarView from "./pages/CalendarView";
-import FriendProfile from "./pages/FriendProfile";
 import FriendsDirectory from "./pages/FriendsDirectory";
-import MyProfile from "./pages/MyProfile";
+import MyProfile from "./pages/MyDashboard";
 import QuotesView from "./pages/QuotesView";
 import ResourcesView from "./pages/ResourcesView";
 import Root from "./pages/Root";
+import FriendProfile from "./pages/UserProfile";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,7 +56,10 @@ function App() {
               path="/app/friends/"
               element={<FriendsDirectory user={user} />}
             />
-            <Route path="/app/friends/:id/" element={<FriendProfile />} />
+            <Route
+              path="/app/friends/:id/"
+              element={<FriendProfile user={user} />}
+            />
             <Route
               path="/app/profile/"
               element={<MyProfile user={user} setUser={setUser} />}
