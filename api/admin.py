@@ -5,8 +5,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 
-from .models import Album, Quote, User, Resource
-
+from .models import Album, Quote, User, Resource, FamilyTreeMember, FamilyTreeRelation
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -100,6 +99,9 @@ class QuoteAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
+
+admin.site.register(FamilyTreeMember)
+admin.site.register(FamilyTreeRelation)
 admin.site.unregister(Group)
 admin.site.register(Album)
 admin.site.register(Resource)

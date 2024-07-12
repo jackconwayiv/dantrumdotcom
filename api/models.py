@@ -88,3 +88,38 @@ class Quote(CreatedUpdated):
 
     def __str__(self):
         return f"{self.text}"
+    
+class FamilyTreeMember(CreatedUpdated):
+    name = models.TextField()
+    title = models.TextField(null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField(null=True, blank=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="family_tree_members", on_delete=models.CASCADE
+    )
+
+    relations = models.ManyToManyField(
+        'self',
+        through='FamilyTreeRelation',
+        symmetrical=False,
+        related_name='related_to'
+    )
+
+    def __str__(self):
+        return self.name
+
+class FamilyTreeRelation(CreatedUpdated):
+    class RelationType(models.TextChoices):
+        VERTICAL = 'vertical', 'parent'
+        HORIZONTAL = 'horizontal', 'partner'
+
+    from_member = models.ForeignKey(FamilyTreeMember, related_name='from_relations', on_delete=models.CASCADE)
+    to_member = models.ForeignKey(FamilyTreeMember, related_name='to_relations', on_delete=models.CASCADE)
+    type = models.CharField(max_length=10, choices=RelationType.choices)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="family_tree_relations", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        relation_type_display = dict(FamilyTreeRelation.RelationType.choices).get(self.type, self.type)
+        return f"{self.from_member} is a {relation_type_display} of {self.to_member}"
