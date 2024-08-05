@@ -273,7 +273,6 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
 
   const determineGenerations = (
     selfId: number,
-    members: FamilyTreeMember[],
     relations: FamilyTreeRelation[]
   ): { [key: number]: number[] } => {
     const generations: { [key: number]: number[] } = {};
@@ -319,11 +318,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
     const selfMember = familyMembers.find((member) => member.title === "self");
     if (!selfMember) return null;
 
-    const generations = determineGenerations(
-      selfMember.id,
-      familyMembers,
-      familyRelations
-    );
+    const generations = determineGenerations(selfMember.id, familyRelations);
 
     const sortedGenerations = Object.keys(generations)
       .sort((a, b) => parseInt(a) - parseInt(b))
