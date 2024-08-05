@@ -95,13 +95,10 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
         </Flex>
         <Tabs variant="enclosed" colorScheme="green">
           <TabList>
-            <Tab>Family Tree</Tab>
             <Tab>Public Profile</Tab>
+            <Tab>Family Tree</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
-              <FamilyTreeView user={user} />
-            </TabPanel>
             <TabPanel p={2}>
               <Flex direction="column">
                 <Flex justifyContent="end">
@@ -120,6 +117,9 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
                   <UserProfile user={user} />
                 </Flex>
               </Flex>
+            </TabPanel>
+            <TabPanel>
+              <FamilyTreeView user={user} />
             </TabPanel>
           </TabPanels>
         </Tabs>

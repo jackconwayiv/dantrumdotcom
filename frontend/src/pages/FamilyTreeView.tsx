@@ -26,6 +26,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
+import { FaFlask, FaUserPlus } from "react-icons/fa";
+import { FaGear } from "react-icons/fa6";
 import {
   addMember,
   createSelf,
@@ -338,8 +340,10 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
               key={memberIndex}
               minHeight="150px"
               minWidth="150px"
-              m={2}
-              p={2}
+              height="150px"
+              width="150px"
+              m={1}
+              p={3}
             >
               <Flex
                 direction="column"
@@ -361,23 +365,22 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                     </Text>
                   </Box>
                 </Box>
-                <Flex direction="row" justifyContent="space-evenly">
-                  <Button
-                    mt={4}
-                    colorScheme="blue"
-                    onClick={() => openModal(member, false)}
-                  >
-                    Add
-                  </Button>
-                  {member.title !== "self" && (
-                    <Button
-                      mt={4}
-                      colorScheme="blue"
-                      onClick={() => openModal(member, true)}
-                    >
-                      Edit
-                    </Button>
-                  )}
+                <Flex direction="row" justifyContent="space-between">
+                  <FaUserPlus
+                    cursor="pointer"
+                    size="25px"
+                    onClick={() => {
+                      openModal(member, false);
+                    }}
+                  />
+
+                  <FaGear
+                    cursor="pointer"
+                    size="25px"
+                    onClick={() => {
+                      openModal(member, true);
+                    }}
+                  />
                 </Flex>
               </Flex>
             </Card>
@@ -391,18 +394,19 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
     <Box p={4}>
       {familyMembers.length === 0 && (
         <Button colorScheme="teal" onClick={handleCreateSelf} mb={4}>
-          Create Self
+          Create Family Tree
         </Button>
       )}
-
-      <Heading size="md" mb={4}>
-        Family Members
+      <Heading size="md" mb={2}>
+        Family Tree
       </Heading>
-
+      <Flex direction="row" alignItems="center" my={2}>
+        <FaFlask />
+        <Text ml={1}>This family tree app is in experimental phase.</Text>
+      </Flex>
       <Box overflow="auto" maxH="600px" maxW="800px" border="1px black solid">
         {renderFamilyTree()}
       </Box>
-
       <Modal isOpen={isOpen} onClose={handleClose}>
         <ModalOverlay />
         <ModalContent>
@@ -420,17 +424,19 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                 }
               />
             </FormControl>
+            {formData.title !== "self" && (
+              <FormControl mt={4}>
+                <FormLabel>Title ('Uncle')</FormLabel>
+                <Input
+                  value={formData.title || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                />
+              </FormControl>
+            )}
             <FormControl mt={4}>
-              <FormLabel>Title</FormLabel>
-              <Input
-                value={formData.title || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-              />
-            </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Date of Birth</FormLabel>
+              <FormLabel>Date of Birth (optional)</FormLabel>
               <Input
                 type="date"
                 value={formData.date_of_birth || ""}
@@ -439,16 +445,18 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                 }
               />
             </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Date of Death</FormLabel>
-              <Input
-                type="date"
-                value={formData.date_of_death || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, date_of_death: e.target.value })
-                }
-              />
-            </FormControl>
+            {formData.title !== "self" && (
+              <FormControl mt={4}>
+                <FormLabel>Date of Death (optional)</FormLabel>
+                <Input
+                  type="date"
+                  value={formData.date_of_death || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date_of_death: e.target.value })
+                  }
+                />
+              </FormControl>
+            )}
             {!isEditMode && (
               <FormControl mt={4}>
                 <FormLabel>
@@ -476,12 +484,14 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                 <Button colorScheme="blue" mr={3} onClick={handleEditMember}>
                   Save Changes
                 </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={() => setIsDeleteAlertOpen(true)}
-                >
-                  Delete
-                </Button>
+                {formData.title !== "self" && (
+                  <Button
+                    colorScheme="red"
+                    onClick={() => setIsDeleteAlertOpen(true)}
+                  >
+                    Delete
+                  </Button>
+                )}
               </>
             ) : (
               <Button colorScheme="blue" mr={3} onClick={handleAddMember}>
@@ -494,7 +504,6 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
       <AlertDialog
         isOpen={isDeleteAlertOpen}
         leastDestructiveRef={cancelRef}
@@ -508,7 +517,8 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
 
             <AlertDialogBody>
               Are you sure you want to delete this family member? This action
-              cannot be undone.
+              cannot be undone and may cascade delete other related family
+              members.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -525,8 +535,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-
-      <Heading size="md" mt={8} mb={4}>
+      {/* <Heading size="md" mt={8} mb={4}>
         Family Relations
       </Heading>
       <ul>
@@ -538,7 +547,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
               {relation.to_member.name}.
             </li>
           ))}
-      </ul>
+      </ul> */}
     </Box>
   );
 };
