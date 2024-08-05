@@ -9,5 +9,20 @@ jobs:
       id-token: "write"
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build Docker Image
+        run: docker-compose -f docker-compose-cicd.yml build
+
       - name: Run Backend Tests
-        run: scripts/test-backend.sh
+        run: docker-compose -f docker-compose-cicd.yml up --abort-on-container-exit

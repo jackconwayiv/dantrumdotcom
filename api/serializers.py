@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from social_django.models import UserSocialAuth
 
-from api.models import Album, Quote, Resource, User
+from api.models import Album, Quote, Resource, User, FamilyTreeMember, FamilyTreeRelation
+
 
 class UserSocialAuthSerializer(serializers.ModelSerializer):
     picture = serializers.SerializerMethodField()
@@ -18,10 +19,7 @@ class UserSocialAuthSerializer(serializers.ModelSerializer):
             return obj.extra_data["picture"]
         return None
 
-
 class UserSerializer(serializers.ModelSerializer):
-    # albums = serializers.PrimaryKeyRelatedField(many=True, queryset=Album.objects.all())
-    # quotes = serializers.PrimaryKeyRelatedField(many=True, queryset=Quote.objects.all())
     social_auth = UserSocialAuthSerializer(many=True)
 
     class Meta:
@@ -40,8 +38,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AuthenticatedUserSerializer(serializers.ModelSerializer):
-    # albums = serializers.PrimaryKeyRelatedField(many=True, queryset=Album.objects.all())
-    # quotes = serializers.PrimaryKeyRelatedField(many=True, queryset=Quote.objects.all())
     social_auth = UserSocialAuthSerializer(many=True)
 
     class Meta:
@@ -97,3 +93,24 @@ class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
         fields = ["id", "title", "description", "url", "thumbnail_url", "owner"]
+
+class FamilyTreeMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FamilyTreeMember
+        fields = ['id', 'name', 'title', 'date_of_birth', 'date_of_death']
+
+class FamilyTreeRelationSerializer(serializers.ModelSerializer):
+    from_member = FamilyTreeMemberSerializer()
+    to_member = FamilyTreeMemberSerializer()
+
+    class Meta:
+        model = FamilyTreeRelation
+        fields = ['id', 'from_member', 'to_member', 'type', 'owner']
+
+class AddFamilyMemberSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    title = serializers.CharField(max_length=255, required=False, allow_null=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+    date_of_death = serializers.DateField(required=False, allow_null=True)
+    relation_type = serializers.ChoiceField(choices=[('parent', 'parent'), ('child', 'child'), ('partner', 'partner')])
+    related_member_id = serializers.IntegerField()

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from utils.slack_notifications import send_slack_message
-from .models import Album, Quote, Resource, User
+from .models import Album, Quote, Resource, User, FamilyTreeMember, FamilyTreeRelation
 from .permissions import IsOwnerOrReadOnly, IsOwnerOrRestricted
 from .serializers import (
     AlbumSerializer,
@@ -18,8 +18,12 @@ from .serializers import (
     ResourceSerializer,
     URLSerializer,
     UserSerializer,
+    AddFamilyMemberSerializer, 
+    FamilyTreeMemberSerializer,
+    FamilyTreeRelationSerializer
 )
 from django.db.models import Case, When, Value, IntegerField
+from django.shortcuts import get_object_or_404
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -183,7 +187,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
         send_slack_message(message)
 
-
 class URLSummaryView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = URLSerializer(data=request.data)
@@ -329,3 +332,92 @@ class UserViewSet(viewsets.ModelViewSet):
         friend.is_active = True
         friend.save()
         return Response({"detail": "User has been activated."}, status=status.HTTP_200_OK)
+    
+class FamilyTreeMemberViewSet(viewsets.ModelViewSet):
+    serializer_class = FamilyTreeMemberSerializer
+
+    def get_queryset(self):
+        return FamilyTreeMember.objects.all()
+
+    @action(detail=False, methods=['get'], url_path='by-owner/(?P<owner_id>[^/.]+)')
+    def get_members_by_owner(self, request, owner_id=None):
+        members = FamilyTreeMember.objects.filter(owner_id=owner_id)
+        if not members:
+            print(f"No family members found for owner id: {owner_id}")  # Add this line
+        serializer = self.get_serializer(members, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], url_path='add-member')
+    def add_member(self, request):
+        serializer = AddFamilyMemberSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data['name']
+            title = serializer.validated_data.get('title')
+            date_of_birth = serializer.validated_data.get('date_of_birth')
+            date_of_death = serializer.validated_data.get('date_of_death')
+            relation_type = serializer.validated_data['relation_type']
+            related_member_id = serializer.validated_data['related_member_id']
+
+            related_member = get_object_or_404(FamilyTreeMember, id=related_member_id)
+
+            new_member = FamilyTreeMember.objects.create(
+                name=name,
+                title=title,
+                date_of_birth=date_of_birth,
+                date_of_death=date_of_death,
+                owner=request.user
+            )
+
+            if relation_type == 'parent':
+                from_member = new_member
+                to_member = related_member
+                type = FamilyTreeRelation.RelationType.VERTICAL
+            elif relation_type == 'child':
+                from_member = related_member
+                to_member = new_member
+                type = FamilyTreeRelation.RelationType.VERTICAL
+            elif relation_type == 'partner':
+                from_member = related_member
+                to_member = new_member
+                type = FamilyTreeRelation.RelationType.HORIZONTAL
+
+            FamilyTreeRelation.objects.create(
+                from_member=from_member,
+                to_member=to_member,
+                type=type,
+                owner=request.user
+            )
+
+            return Response(FamilyTreeMemberSerializer(new_member).data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], url_path='create-self')
+    def create_self(self, request):
+        user = request.user
+        if FamilyTreeMember.objects.filter(owner=user, name=user.username).exists():
+            return Response({"error": "Family tree member for this user already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        family_member = FamilyTreeMember.objects.create(
+            name=user.username,
+            title='self',
+            date_of_birth=user.date_of_birth if user.date_of_birth else None,
+            date_of_death=None,
+            owner=user
+        )
+        return Response(FamilyTreeMemberSerializer(family_member).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get'], url_path='get-relations-by-id')
+    def get_relations_by_id(self, request):
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        relations = FamilyTreeRelation.objects.filter(owner=user).select_related('from_member', 'to_member')
+        serializer = FamilyTreeRelationSerializer(relations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

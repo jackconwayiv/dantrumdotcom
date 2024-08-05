@@ -1,6 +1,5 @@
 import {
   Button,
-  Divider,
   Flex,
   Heading,
   Tab,
@@ -18,6 +17,7 @@ import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import ProfileModals from "../components/ProfileModals";
 import { User } from "../helpers/types";
+import FamilyTreeView from "./FamilyTreeView";
 import UserProfile from "./UserProfile";
 
 interface MyDashboardProps {
@@ -93,11 +93,10 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
           </Flex>
           <Text p={2}>✉️ {user.email}</Text>
         </Flex>
-        <Divider />
         <Tabs variant="enclosed" colorScheme="green">
           <TabList>
             <Tab>Public Profile</Tab>
-            {/* <Tab>Family Tree</Tab> */}
+            <Tab>Family Tree</Tab>
           </TabList>
           <TabPanels>
             <TabPanel p={2}>
@@ -119,9 +118,9 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
                 </Flex>
               </Flex>
             </TabPanel>
-            {/* <TabPanel>
-              <Heading>Family Tree</Heading>
-            </TabPanel> */}
+            <TabPanel>
+              <FamilyTreeView user={user} />
+            </TabPanel>
           </TabPanels>
         </Tabs>
 

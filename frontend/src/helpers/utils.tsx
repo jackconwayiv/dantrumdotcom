@@ -81,6 +81,12 @@ export const renderFullBirthday = (dateString: string): string => {
   }
   return dayjs(dateString).format("MMMM D, YYYY");
 };
+export const renderShortBirthday = (dateString: string): string => {
+  if (!dayjs(dateString).isValid()) {
+    return "birthday not found";
+  }
+  return dayjs(dateString).format("M/D/YY");
+};
 
 export function getNextBirthday(dateString: string): number {
   if (!dayjs(dateString).isValid()) {

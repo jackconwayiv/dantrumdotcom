@@ -63,3 +63,29 @@ export interface User {
   // albums: Album[];
   // quotes: Quote[];
 }
+
+export interface FamilyTreeMember {
+  id: number;
+  name: string;
+  title?: string;
+  date_of_birth?: string;
+  date_of_death?: string;
+  owner: number;
+}
+
+export interface FamilyTreeRelation {
+  id: number;
+  from_member: FamilyTreeMember;
+  to_member: FamilyTreeMember;
+  type: "vertical" | "horizontal";
+  owner: number;
+}
+
+export interface AddMemberData {
+  name: string;
+  title?: string;
+  date_of_birth?: string | null;
+  date_of_death?: string | null;
+  relation_type: string;
+  related_member_id: number;
+}
