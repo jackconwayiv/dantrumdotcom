@@ -31,6 +31,7 @@ import {
   addMember,
   createSelf,
   deleteFamilyMember,
+  editFamilyMember,
   getFamilyMembersByOwner,
   getRelationsById,
 } from "../api/familyTree";
@@ -54,15 +55,16 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
   const [selectedMember, setSelectedMember] = useState<FamilyTreeMember | null>(
     null
   );
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose: onCloseModal } = useDisclosure();
   const [formData, setFormData] = useState<AddMemberData>({
     name: "",
     title: "",
     date_of_birth: "",
     date_of_death: "",
-    relation_type: "child", // Default value
+    relation_type: "child",
     related_member_id: 0,
   });
+  const [isEditMode, setIsEditMode] = useState(false);
   const toast = useToast();
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -142,7 +144,6 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
   };
 
   const handleAddMember = async () => {
-    // Validate and structure form data correctly
     const formattedData: AddMemberData = {
       ...formData,
       date_of_birth: formData.date_of_birth || null,
@@ -160,12 +161,45 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
       });
       fetchFamilyMembers();
       fetchFamilyRelations();
-      onClose();
+      handleClose();
     } catch (error) {
       console.error("Error adding member:", error);
       toast({
         title: "Error",
         description: "There was an error adding the family member.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleEditMember = async () => {
+    if (!selectedMember) return;
+
+    const formattedData: AddMemberData = {
+      ...formData,
+      date_of_birth: formData.date_of_birth || null,
+      date_of_death: formData.date_of_death || null,
+    };
+
+    try {
+      await editFamilyMember(selectedMember.id, formattedData);
+      toast({
+        title: "Family member updated.",
+        description: `Updated details for ${formData.name}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      fetchFamilyMembers();
+      fetchFamilyRelations();
+      handleClose();
+    } catch (error) {
+      console.error("Error updating member:", error);
+      toast({
+        title: "Error",
+        description: "There was an error updating the family member.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -187,6 +221,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
         fetchFamilyMembers();
         fetchFamilyRelations();
         setIsDeleteAlertOpen(false);
+        handleClose();
       } catch (error) {
         console.error("Error deleting member:", error);
         toast({
@@ -200,15 +235,32 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
     }
   };
 
-  const openModal = (member: FamilyTreeMember) => {
+  const openModal = (member: FamilyTreeMember, isEdit: boolean) => {
     setSelectedMember(member);
-    setFormData({ ...formData, related_member_id: member.id });
+    setFormData({
+      ...formData,
+      related_member_id: member.id,
+      name: isEdit ? member.name : "",
+      title: isEdit ? member.title : "",
+      date_of_birth: isEdit ? member.date_of_birth : "",
+      date_of_death: isEdit ? member.date_of_death : "",
+      relation_type: "child",
+    });
+    setIsEditMode(isEdit);
     onOpen();
   };
 
-  const openDeleteAlert = (member: FamilyTreeMember) => {
-    setSelectedMember(member);
-    setIsDeleteAlertOpen(true);
+  const handleClose = () => {
+    setFormData({
+      name: "",
+      title: "",
+      date_of_birth: "",
+      date_of_death: "",
+      relation_type: "child",
+      related_member_id: 0,
+    });
+    setSelectedMember(null);
+    onCloseModal();
   };
 
   useEffect(() => {
@@ -247,27 +299,31 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                 <Button
                   mt={4}
                   colorScheme="blue"
-                  onClick={() => openModal(member)}
+                  onClick={() => openModal(member, false)}
                 >
                   Add Relative
                 </Button>
-                <Button
-                  mt={4}
-                  colorScheme="red"
-                  onClick={() => openDeleteAlert(member)}
-                >
-                  Delete
-                </Button>
+                {member.title !== "self" && (
+                  <Button
+                    mt={4}
+                    colorScheme="blue"
+                    onClick={() => openModal(member, true)}
+                  >
+                    Edit
+                  </Button>
+                )}
               </Flex>
             </Card>
           ))}
         </Wrap>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={handleClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Related Family Member</ModalHeader>
+          <ModalHeader>
+            {isEditMode ? "Edit Family Member" : "Add Related Family Member"}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
@@ -308,25 +364,41 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
                 }
               />
             </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Relation Type</FormLabel>
-              <Select
-                value={formData.relation_type}
-                onChange={(e) =>
-                  setFormData({ ...formData, relation_type: e.target.value })
-                }
-              >
-                <option value="parent">Parent</option>
-                <option value="child">Child</option>
-                <option value="partner">Partner</option>
-              </Select>
-            </FormControl>
+            {!isEditMode && (
+              <FormControl mt={4}>
+                <FormLabel>Relation Type</FormLabel>
+                <Select
+                  value={formData.relation_type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, relation_type: e.target.value })
+                  }
+                >
+                  <option value="parent">Parent</option>
+                  <option value="child">Child</option>
+                  <option value="partner">Partner</option>
+                </Select>
+              </FormControl>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleAddMember}>
-              Add Member
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
+            {isEditMode ? (
+              <>
+                <Button colorScheme="blue" mr={3} onClick={handleEditMember}>
+                  Save Changes
+                </Button>
+                <Button
+                  colorScheme="red"
+                  onClick={() => setIsDeleteAlertOpen(true)}
+                >
+                  Delete
+                </Button>
+              </>
+            ) : (
+              <Button colorScheme="blue" mr={3} onClick={handleAddMember}>
+                Add Member
+              </Button>
+            )}
+            <Button variant="ghost" onClick={handleClose}>
               Cancel
             </Button>
           </ModalFooter>

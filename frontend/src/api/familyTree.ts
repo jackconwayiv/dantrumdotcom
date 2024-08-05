@@ -32,7 +32,9 @@ export const createSelf = async (): Promise<FamilyTreeMember> => {
   }
 };
 
-export const getRelationsById = async (userId: number): Promise<FamilyTreeRelation[]> => {
+export const getRelationsById = async (
+  userId: number
+): Promise<FamilyTreeRelation[]> => {
   try {
     const response = await axios.get<FamilyTreeRelation[]>(
       `/api/family-tree/get-relations-by-id/?user_id=${userId}`
@@ -73,6 +75,22 @@ export const deleteFamilyMember = async (id: number): Promise<void> => {
     await axios.delete(`/api/family-tree/${id}/`);
   } catch (error) {
     console.error("Error deleting family member:", error);
+    throw error;
+  }
+};
+
+export const editFamilyMember = async (
+  id: number,
+  data: AddMemberData
+): Promise<FamilyTreeMember> => {
+  try {
+    const response = await axios.put<FamilyTreeMember>(
+      `/api/family-tree/${id}/`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error editing the family member:", error);
     throw error;
   }
 };
