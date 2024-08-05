@@ -24,7 +24,6 @@ import {
   Text,
   useDisclosure,
   useToast,
-  Wrap,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -41,7 +40,7 @@ import {
   FamilyTreeRelation,
   User,
 } from "../helpers/types";
-import { renderFullBirthday } from "../helpers/utils";
+import { renderShortBirthday } from "../helpers/utils";
 
 interface FamilyTreeProps {
   user: User | undefined;
@@ -270,6 +269,124 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
     }
   }, [user]);
 
+  const determineGenerations = (
+    selfId: number,
+    members: FamilyTreeMember[],
+    relations: FamilyTreeRelation[]
+  ): { [key: number]: number[] } => {
+    const generations: { [key: number]: number[] } = {};
+    const memberGenerations: { [id: number]: number } = {};
+    const processedMembers = new Set<number>();
+
+    const queue = [{ id: selfId, generation: 0 }];
+    while (queue.length > 0) {
+      const { id, generation } = queue.shift()!;
+      if (processedMembers.has(id)) continue;
+      processedMembers.add(id);
+      memberGenerations[id] = generation;
+      if (!generations[generation]) generations[generation] = [];
+      generations[generation].push(id);
+
+      relations.forEach((relation) => {
+        if (
+          relation.from_member.id === id &&
+          !processedMembers.has(relation.to_member.id)
+        ) {
+          queue.push({
+            id: relation.to_member.id,
+            generation:
+              relation.type === "vertical" ? generation + 1 : generation,
+          });
+        } else if (
+          relation.to_member.id === id &&
+          !processedMembers.has(relation.from_member.id)
+        ) {
+          queue.push({
+            id: relation.from_member.id,
+            generation:
+              relation.type === "vertical" ? generation - 1 : generation,
+          });
+        }
+      });
+    }
+
+    return generations;
+  };
+
+  const renderFamilyTree = () => {
+    const selfMember = familyMembers.find((member) => member.title === "self");
+    if (!selfMember) return null;
+
+    const generations = determineGenerations(
+      selfMember.id,
+      familyMembers,
+      familyRelations
+    );
+
+    const sortedGenerations = Object.keys(generations)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map((key) => generations[parseInt(key)]);
+
+    return sortedGenerations.map((generation, genIndex) => (
+      <Flex key={genIndex} direction="row">
+        {generation.map((memberId, memberIndex) => {
+          const member = familyMembers.find((m) => m.id === memberId);
+          if (!member) return <Box key={memberIndex} />;
+
+          return (
+            <Card
+              key={memberIndex}
+              minHeight="150px"
+              minWidth="150px"
+              m={2}
+              p={2}
+            >
+              <Flex
+                direction="column"
+                height="100%"
+                justifyContent="space-between"
+              >
+                <Box>
+                  <Heading size="md" textAlign="center">
+                    {`${member.title || ""} ${member.name}`}
+                  </Heading>
+                  <Box textAlign="center">
+                    <Text>
+                      {member.date_of_birth &&
+                        renderShortBirthday(member.date_of_birth)}
+                      {member.date_of_birth &&
+                        member.date_of_death &&
+                        ` - 
+                        ${renderShortBirthday(member.date_of_death)}`}
+                    </Text>
+                  </Box>
+                </Box>
+                <Flex direction="row" justifyContent="space-evenly">
+                  <Button
+                    mt={4}
+                    colorScheme="blue"
+                    onClick={() => openModal(member, false)}
+                  >
+                    Add
+                  </Button>
+                  {member.title !== "self" && (
+                    <Button
+                      mt={4}
+                      colorScheme="blue"
+                      onClick={() => openModal(member, true)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </Flex>
+              </Flex>
+            </Card>
+          );
+        })}
+      </Flex>
+    ));
+  };
+
   return (
     <Box p={4}>
       {familyMembers.length === 0 && (
@@ -282,47 +399,15 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
         Family Members
       </Heading>
 
-      {Array.isArray(familyMembers) && (
-        <Wrap>
-          {familyMembers.map((member) => (
-            <Card key={member.id} p={2} m={2} width="300px">
-              <Heading size="md">
-                {member.name} {member.title && `(${member.title})`}
-              </Heading>
-              {member.date_of_birth && (
-                <Text>{renderFullBirthday(member.date_of_birth)}</Text>
-              )}
-              {member.date_of_death && (
-                <Text> - {renderFullBirthday(member.date_of_death)}</Text>
-              )}
-              <Flex direction="row" justifyContent="space-evenly">
-                <Button
-                  mt={4}
-                  colorScheme="blue"
-                  onClick={() => openModal(member, false)}
-                >
-                  Add Relative
-                </Button>
-                {member.title !== "self" && (
-                  <Button
-                    mt={4}
-                    colorScheme="blue"
-                    onClick={() => openModal(member, true)}
-                  >
-                    Edit
-                  </Button>
-                )}
-              </Flex>
-            </Card>
-          ))}
-        </Wrap>
-      )}
+      <Box overflow="auto" maxH="600px" maxW="800px" border="1px black solid">
+        {renderFamilyTree()}
+      </Box>
 
       <Modal isOpen={isOpen} onClose={handleClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            {isEditMode ? "Edit Family Member" : "Add Related Family Member"}
+            {isEditMode ? "Edit Relative" : `Add Relative`}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -366,7 +451,12 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
             </FormControl>
             {!isEditMode && (
               <FormControl mt={4}>
-                <FormLabel>Relation Type</FormLabel>
+                <FormLabel>
+                  Relationship to{" "}
+                  {selectedMember && selectedMember.name
+                    ? selectedMember.name
+                    : ``}
+                </FormLabel>
                 <Select
                   value={formData.relation_type}
                   onChange={(e) =>
