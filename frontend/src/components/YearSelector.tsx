@@ -1,52 +1,29 @@
-import { Box, Select, Spinner, Text } from "@chakra-ui/react";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { Box, Select } from "@chakra-ui/react";
+import React from "react";
 
 interface YearSelectorProps {
+  years: number[];
   selectedYear: string | number;
-  setSelectedYear: React.Dispatch<React.SetStateAction<string | number>>;
+  setSelectedYear: (year: string | number) => void;
 }
 
-const YearSelector = ({ selectedYear, setSelectedYear }: YearSelectorProps) => {
-  const [years, setYears] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchYears = async () => {
-      const response = await axios.get("/api/years/");
-      if (response) {
-        setYears(response.data);
-        setLoading(false);
-      } else {
-        console.error(`Couldn't retrieve album years: ${error}`);
-        setError(error);
-        setLoading(false);
-      }
-    };
-    fetchYears();
-  }, []);
-
+const YearSelector = ({
+  years,
+  selectedYear,
+  setSelectedYear,
+}: YearSelectorProps) => {
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (value === "mine") {
       setSelectedYear("mine");
     } else {
-      setSelectedYear(value);
+      setSelectedYear(Number(value));
     }
   };
 
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <Text>Error: {JSON.stringify(error)}</Text>;
-  }
-
   return (
     <Box>
-      <Select defaultValue={selectedYear} onChange={(e) => handleYearChange(e)}>
+      <Select value={String(selectedYear)} onChange={handleYearChange}>
         {years.map((year) => (
           <option key={year} value={year}>
             {year}
@@ -59,3 +36,9 @@ const YearSelector = ({ selectedYear, setSelectedYear }: YearSelectorProps) => {
 };
 
 export default YearSelector;
+
+export function defaultAlbumYear(years: number[]): number {
+  const currentYear = new Date().getFullYear();
+  if (years.includes(currentYear)) return currentYear;
+  return years[0];
+}

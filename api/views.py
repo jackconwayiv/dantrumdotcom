@@ -24,6 +24,7 @@ from .serializers import (
 )
 from django.db.models import Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404
+from .querysets import with_owner_and_social_auth
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -36,7 +37,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        return Album.objects.all().order_by("-date")
+        return with_owner_and_social_auth(Album.objects.all()).order_by("-date")
 
     def perform_create(self, serializer):
         instance = serializer.save(owner=self.request.user)
@@ -48,14 +49,13 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path=r"year/(?P<year>\d{4})")
     def year(self, request, year=None):
-        albums = Album.objects.filter(date__year=year).order_by("-date")
+        albums = self.get_queryset().filter(date__year=year)
         serializer = self.get_serializer(albums, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"], url_path="mine")
     def mine(self, request):
-        user = self.request.user
-        albums = Album.objects.filter(owner=user).order_by("-date")
+        albums = self.get_queryset().filter(owner=self.request.user)
         serializer = self.get_serializer(albums, many=True)
         return Response(serializer.data)
 
@@ -165,6 +165,9 @@ class QuoteViewSet(viewsets.ModelViewSet):
     serializer_class = QuoteSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
+    def get_queryset(self):
+        return with_owner_and_social_auth(Quote.objects.all()).order_by("-date")
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -178,6 +181,9 @@ class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all().order_by("-created_at")
     serializer_class = ResourceSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        return with_owner_and_social_auth(Resource.objects.all()).order_by("-created_at")
 
     def perform_create(self, serializer):
         instance = serializer.save(owner=self.request.user)
@@ -235,7 +241,11 @@ class BirthdayListView(APIView):
         start_date = today - timedelta(days=2)
         end_date = today + timedelta(days=6)
 
-        active_users = User.objects.filter(is_active=True).exclude(date_of_birth__isnull=True)
+        active_users = (
+            User.objects.filter(is_active=True)
+            .exclude(date_of_birth__isnull=True)
+            .prefetch_related("social_auth")
+        )
 
         result = []
         for user in active_users:
@@ -258,7 +268,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if self.action == "me":
-            return User.objects.filter(pk=user.pk)
+            return User.objects.filter(pk=user.pk).prefetch_related("social_auth")
 
         queryset = User.objects.exclude(email="admin@dantrum.com").annotate(
             last_login_order=Case(
@@ -266,7 +276,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 default=Value(0),
                 output_field=IntegerField()
             )
-        ).order_by('last_login_order', '-last_login')
+        ).order_by('last_login_order', '-last_login').prefetch_related("social_auth")
 
         if user.is_staff:
             return queryset

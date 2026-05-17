@@ -13,7 +13,7 @@ import { FaPlus } from "react-icons/fa";
 import { saveAlbum } from "../api/albums";
 import AlbumCard from "../components/AlbumCard";
 import { AlbumModals } from "../components/AlbumModals";
-import YearSelector from "../components/YearSelector";
+import YearSelector, { defaultAlbumYear } from "../components/YearSelector";
 import { Album, User } from "../helpers/types";
 
 interface AlbumsViewProps {
@@ -22,37 +22,63 @@ interface AlbumsViewProps {
 
 const AlbumsView = ({ user }: AlbumsViewProps) => {
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [years, setYears] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
   const [currentAlbum, setCurrentAlbum] = useState<Album | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | number>(
-    new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState<string | number | undefined>(
+    undefined
   );
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const fetchAlbums = async () => {
-    setLoading(true);
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const response = await axios.get<number[]>("/api/years/");
+        const availableYears = response.data;
+        setYears(availableYears);
+        if (availableYears.length > 0) {
+          setSelectedYear(defaultAlbumYear(availableYears));
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Couldn't retrieve album years:", err);
+        setError(err);
+        setLoading(false);
+      }
+    };
+    fetchYears();
+  }, []);
 
-    let response;
-    if (selectedYear === "mine") {
-      response = await axios.get("/api/albums/mine/");
-    } else {
-      response = await axios.get(`/api/albums/year/${selectedYear}/`);
-    }
-    if (response) {
+  const fetchAlbums = async () => {
+    if (selectedYear === undefined) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      let response;
+      if (selectedYear === "mine") {
+        response = await axios.get("/api/albums/mine/");
+      } else {
+        response = await axios.get(`/api/albums/year/${selectedYear}/`);
+      }
       setAlbums(response.data);
-      setLoading(false);
-    } else {
-      console.error(`Couldn't retrieve albums: ${error}`);
-      setError(error);
+    } catch (err) {
+      console.error("Couldn't retrieve albums:", err);
+      setError(err);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAlbums();
+    if (selectedYear !== undefined) {
+      fetchAlbums();
+    }
   }, [selectedYear]);
 
   const validate = (values: Album) => {
@@ -126,6 +152,8 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
       setCurrentAlbum(null);
       formik.resetForm();
       onClose();
+      const yearsResponse = await axios.get<number[]>("/api/years/");
+      setYears(yearsResponse.data);
       fetchAlbums();
     } else {
       console.error("Error saving album:", error);
@@ -148,11 +176,20 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     );
   };
 
-  if (loading) {
+  if (loading || (years.length > 0 && selectedYear === undefined)) {
     return (
       <Flex direction="column" width="100%" p={2}>
         {renderHeading()}
         <Text>Loading...</Text>
+      </Flex>
+    );
+  }
+
+  if (years.length === 0) {
+    return (
+      <Flex direction="column" width="100%" p={2}>
+        {renderHeading()}
+        <Text>No albums yet.</Text>
       </Flex>
     );
   }
@@ -166,11 +203,21 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     );
   }
 
+  if (selectedYear === undefined) {
+    return (
+      <Flex direction="column" width="100%" p={2}>
+        {renderHeading()}
+        <Text>Loading...</Text>
+      </Flex>
+    );
+  }
+
   return (
     <Flex direction="column" width="100%" p={2}>
       {renderHeading()}
       <Flex justifyContent="space-evenly">
         <YearSelector
+          years={years}
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
         />
