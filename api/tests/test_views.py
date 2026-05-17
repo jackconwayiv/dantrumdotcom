@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -93,11 +92,9 @@ class AlbumViewSetTests(APITestCase):
                 owner=self.user,
             )
         url = reverse("album-list")
-        with CaptureQueriesContext() as context:
+        with self.assertNumQueries(3):
             response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # 1 count + 1 albums/owners + 1 social_auth prefetch
-        self.assertLessEqual(len(context.captured_queries), 3)
 
 
 class QuoteViewSetQueryTests(APITestCase):
@@ -120,10 +117,9 @@ class QuoteViewSetQueryTests(APITestCase):
         for i in range(3):
             Quote.objects.create(text=f"Quote {i}", date=f"2024-05-{20 + i}", owner=self.user)
         url = reverse("quote-list")
-        with CaptureQueriesContext() as context:
+        with self.assertNumQueries(3):
             response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertLessEqual(len(context.captured_queries), 3)
 
 
 class UserViewSetQueryTests(APITestCase):
@@ -152,11 +148,9 @@ class UserViewSetQueryTests(APITestCase):
                 extra_data={"picture": f"http://example.com/pic{i}.jpg"},
             )
         url = reverse("user-list")
-        with CaptureQueriesContext() as context:
+        with self.assertNumQueries(3):
             response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # 1 count + 1 users + 1 social_auth prefetch
-        self.assertLessEqual(len(context.captured_queries), 3)
 
 
 class BirthdayListViewQueryTests(APITestCase):
@@ -186,8 +180,6 @@ class BirthdayListViewQueryTests(APITestCase):
                 extra_data={"picture": f"http://example.com/bday{i}.jpg"},
             )
         url = reverse("birthdays")
-        with CaptureQueriesContext() as context:
+        with self.assertNumQueries(2):
             response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # 1 users + 1 social_auth prefetch
-        self.assertLessEqual(len(context.captured_queries), 2)
