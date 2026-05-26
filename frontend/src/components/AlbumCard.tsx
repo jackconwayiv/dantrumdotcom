@@ -29,87 +29,44 @@ const AlbumCard = ({
   const navigate = useNavigate();
 
   return (
-    <Card
-      direction={{ base: "column", sm: "row" }}
-      padding={1}
-      margin={2}
-      key={album.id}
-      width="95%"
-    >
-      <Flex direction={{ base: "column", sm: "row" }} width="100%">
+    <Card direction="column" padding={1} height="100%" width="100%">
+      <Flex direction="column" height="100%">
         <a
           href={album.link_url}
           target="_blank"
           rel="noopener noreferrer"
           style={{ textDecoration: "none", cursor: "pointer" }}
         >
-          <Box
-            width={{ base: "100%", sm: "250px" }}
-            height={{ base: "auto", sm: "200px" }}
-            overflow="hidden"
-            flexShrink={0}
-          >
+          <Box width="100%" height="160px" overflow="hidden" flexShrink={0}>
             <Image
               width="100%"
               height="100%"
-              maxHeight={{ base: "200px", sm: "200px" }}
+              maxHeight="160px"
               objectFit="cover"
-              border="1px silver solid"
+              border="1px solid"
+              borderColor="oasis.gray"
               src={album.thumbnail_url || "/placeholder.jpg"}
               alt={album.title}
             />
           </Box>
         </a>
-        <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }} width="100%">
-          <Flex direction="column" width="100%">
+        <Box mt={3} flex="1">
+          <Flex direction="column">
             <a
               href={album.link_url}
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: "none", cursor: "pointer" }}
             >
-              <Flex direction="row" width="100%" justifyContent="space-between">
-                <Flex justifyContent="space-between">
-                  <Heading
-                    fontFamily={"Comic Sans MS"}
-                    fontWeight="bold"
-                    size="md"
-                    p={1}
-                  >
-                    {album.title.toUpperCase()}
-                  </Heading>
-                </Flex>
-                <Flex justifyContent="end">
-                  {isOwner(user, album) ? (
-                    <Tooltip
-                      label={`Edit ${album.title}`}
-                      placement="top"
-                      fontSize="md"
-                    >
-                      <Box>
-                        <FaGear
-                          cursor="pointer"
-                          size="25px"
-                          onClick={() => {
-                            setCurrentAlbum(album);
-                            onOpen();
-                          }}
-                        />
-                      </Box>
-                    </Tooltip>
-                  ) : (
-                    <></>
-                  )}
-                </Flex>
-              </Flex>
-              <Flex>
-                <Text p={1} fontFamily={"Comic Sans MS"}>
-                  {album.description}
-                </Text>
-              </Flex>
+              <Heading fontWeight="bold" size="md" p={1}>
+                {album.title.toUpperCase()}
+              </Heading>
+              <Text p={1} color="oasis.text">
+                {album.description}
+              </Text>
             </a>
             <Spacer />
-            <Flex direction="row" justifyContent="space-between">
+            <Flex justifyContent="space-between" alignItems="center">
               <Flex
                 cursor="pointer"
                 onClick={() => {
@@ -119,7 +76,7 @@ const AlbumCard = ({
                 {album.owner && renderSharedBy(album.owner)}
               </Flex>
               {!album.title.toUpperCase().includes("RANDOM") && (
-                <Text p={1} fontSize="10px" fontFamily={"Comic Sans MS"}>
+                <Text fontSize="xs" color="gray.600">
                   {renderAlbumDate(album.date)}
                 </Text>
               )}
@@ -128,6 +85,26 @@ const AlbumCard = ({
         </Box>
       </Flex>
       <Spacer />
+      <Flex justifyContent="end">
+        {isOwner(user, album) ? (
+          <Tooltip
+            label={`Edit ${album.title}`}
+            placement="top"
+            fontSize="md"
+          >
+            <Box>
+              <FaGear
+                cursor="pointer"
+                size="25px"
+                onClick={() => {
+                  setCurrentAlbum(album);
+                  onOpen();
+                }}
+              />
+            </Box>
+          </Tooltip>
+        ) : null}
+      </Flex>
     </Card>
   );
 };

@@ -1,19 +1,19 @@
-import {
-  Button,
-  Flex,
-  Heading,
-  Text,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
-import axios from "axios";
+import { Flex, SimpleGrid, Text, useDisclosure, useToast } from "@chakra-ui/react";
+import AppButton from "../components/ui/AppButton";
+import PageHeading from "../components/ui/PageHeading";
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { saveAlbum } from "../api/albums";
+import {
+  fetchAlbumYears,
+  fetchAlbumsForYear,
+  fetchMyAlbums,
+  saveAlbum,
+} from "../api/albums";
 import AlbumCard from "../components/AlbumCard";
 import { AlbumModals } from "../components/AlbumModals";
-import YearSelector, { defaultAlbumYear } from "../components/YearSelector";
+import YearSelector from "../components/YearSelector";
+import { defaultAlbumYear } from "../components/defaultAlbumYear";
 import { Album, User } from "../helpers/types";
 
 interface AlbumsViewProps {
@@ -34,10 +34,13 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    const fetchYears = async () => {
+    const loadYears = async () => {
       try {
-        const response = await axios.get<number[]>("/api/years/");
-        const availableYears = response.data;
+        const availableYears = await fetchAlbumYears();
+        if (!availableYears) {
+          setLoading(false);
+          return;
+        }
         setYears(availableYears);
         if (availableYears.length > 0) {
           setSelectedYear(defaultAlbumYear(availableYears));
@@ -50,36 +53,34 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
         setLoading(false);
       }
     };
-    fetchYears();
+    loadYears();
   }, []);
 
-  const fetchAlbums = async () => {
+  const fetchAlbums = useCallback(async () => {
     if (selectedYear === undefined) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      let response;
-      if (selectedYear === "mine") {
-        response = await axios.get("/api/albums/mine/");
-      } else {
-        response = await axios.get(`/api/albums/year/${selectedYear}/`);
-      }
-      setAlbums(response.data);
+      const data =
+        selectedYear === "mine"
+          ? await fetchMyAlbums()
+          : await fetchAlbumsForYear(Number(selectedYear));
+      setAlbums(data ?? []);
     } catch (err) {
       console.error("Couldn't retrieve albums:", err);
       setError(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedYear]);
 
   useEffect(() => {
     if (selectedYear !== undefined) {
       fetchAlbums();
     }
-  }, [selectedYear]);
+  }, [selectedYear, fetchAlbums]);
 
   const validate = (values: Album) => {
     const errors = {} as any;
@@ -125,7 +126,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     } else {
       formik.resetForm();
     }
-  }, [currentAlbum]);
+  }, [currentAlbum, formik]);
 
   const renderAlbum = (album: Album) => {
     return (
@@ -140,11 +141,15 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
   };
 
   const handleSubmit = async (values: Album) => {
-    const savedAlbums = await saveAlbum(values);
-    if (savedAlbums) {
+    const savedAlbum = await saveAlbum(values);
+    if (savedAlbum) {
+      const albumDate = new Date(savedAlbum.date);
+      const timelineHint = !currentAlbum
+        ? ` It will show on the Timeline for ${albumDate.toLocaleString("default", { month: "long" })} ${albumDate.getFullYear()}.`
+        : "";
       toast({
         title: currentAlbum ? "Album Updated!" : "New Album Created!",
-        description: "Thanks for sharing.",
+        description: `Thanks for sharing.${timelineHint}`,
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -152,9 +157,25 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
       setCurrentAlbum(null);
       formik.resetForm();
       onClose();
-      const yearsResponse = await axios.get<number[]>("/api/years/");
-      setYears(yearsResponse.data);
-      fetchAlbums();
+
+      const albumYear = new Date(savedAlbum.date).getFullYear();
+      if (!currentAlbum && !years.includes(albumYear)) {
+        const updatedYears = await fetchAlbumYears();
+        if (updatedYears) {
+          setYears(updatedYears);
+        }
+      }
+
+      if (currentAlbum) {
+        setAlbums((prev) =>
+          prev.map((album) => (album.id === savedAlbum.id ? savedAlbum : album))
+        );
+      } else if (
+        selectedYear === "mine" ||
+        selectedYear === albumYear
+      ) {
+        setAlbums((prev) => [savedAlbum, ...prev]);
+      }
     } else {
       console.error("Error saving album:", error);
       toast({
@@ -168,13 +189,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
     }
   };
 
-  const renderHeading = () => {
-    return (
-      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
-        FOTO ALBUMS
-      </Heading>
-    );
-  };
+  const renderHeading = () => <PageHeading>FOTO ALBUMS</PageHeading>;
 
   if (loading || (years.length > 0 && selectedYear === undefined)) {
     return (
@@ -221,24 +236,25 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
         />
-        <Button
+        <AppButton
           leftIcon={<FaPlus />}
-          borderRadius="25px"
-          colorScheme="green"
-          variant="outline"
+          colorTone="success"
           onClick={() => {
             setCurrentAlbum(null);
             onOpen();
           }}
         >
           New Album
-        </Button>
+        </AppButton>
       </Flex>
-      <Flex direction="column" alignItems="center">
-        {albums &&
-          albums.length > 0 &&
-          albums.map((album) => renderAlbum(album))}
-      </Flex>
+      <SimpleGrid
+        columns={{ base: 1, md: 2 }}
+        spacing={4}
+        width="100%"
+        mt={2}
+      >
+        {albums.map((album) => renderAlbum(album))}
+      </SimpleGrid>
       <AlbumModals
         currentAlbum={currentAlbum}
         setCurrentAlbum={setCurrentAlbum}

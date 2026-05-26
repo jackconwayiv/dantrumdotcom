@@ -9,7 +9,16 @@ from rest_framework.views import APIView
 from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from utils.slack_notifications import send_slack_message
-from .models import Album, Quote, Resource, User, FamilyTreeMember, FamilyTreeRelation
+from .models import (
+    Album,
+    Quote,
+    Resource,
+    User,
+    FamilyTreeMember,
+    FamilyTreeRelation,
+    TimelineAlbumExclusion,
+    TimelineEvent,
+)
 from .permissions import IsOwnerOrReadOnly, IsOwnerOrRestricted
 from .serializers import (
     AlbumSerializer,
@@ -18,13 +27,18 @@ from .serializers import (
     ResourceSerializer,
     URLSerializer,
     UserSerializer,
-    AddFamilyMemberSerializer, 
+    AddFamilyMemberSerializer,
     FamilyTreeMemberSerializer,
-    FamilyTreeRelationSerializer
+    FamilyTreeRelationSerializer,
+    TimelineEventSerializer,
 )
+from . import timeline as timeline_service
 from django.db.models import Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404
+from .birthdays import birthday_window_filter
 from .querysets import with_owner_and_social_auth
+
+EXTERNAL_REQUEST_TIMEOUT = 10
 
 class AlbumViewSet(viewsets.ModelViewSet):
     """
@@ -37,7 +51,13 @@ class AlbumViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        return with_owner_and_social_auth(Album.objects.all()).order_by("-date")
+        # Avoid N+1 queries when AlbumSerializer accesses `timeline_exclusion`
+        # (TimelineAlbumExclusion is a OneToOne relationship).
+        return (
+            with_owner_and_social_auth(
+                Album.objects.select_related("timeline_exclusion").all()
+            ).order_by("-date")
+        )
 
     def perform_create(self, serializer):
         instance = serializer.save(owner=self.request.user)
@@ -55,7 +75,10 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="mine")
     def mine(self, request):
-        albums = self.get_queryset().filter(owner=self.request.user)
+        albums = (
+            self.get_queryset()
+            .filter(owner=self.request.user)
+        )
         serializer = self.get_serializer(albums, many=True)
         return Response(serializer.data)
 
@@ -66,8 +89,9 @@ def album_years(request):
         Album.objects.annotate(year=ExtractYear("date"))
         .values_list("year", flat=True)
         .distinct()
+        .order_by("-year")
     )
-    return Response(sorted(years, reverse=True))
+    return Response(list(years))
 
 
 class FetchAlbumData(APIView):
@@ -76,7 +100,7 @@ class FetchAlbumData(APIView):
         if serializer.is_valid():
             url = serializer.validated_data.get("url")
 
-            response = requests.get(url)
+            response = requests.get(url, timeout=EXTERNAL_REQUEST_TIMEOUT)
             soup = BeautifulSoup(response.content, "html.parser")
 
             title = (
@@ -199,7 +223,7 @@ class URLSummaryView(APIView):
         if serializer.is_valid():
             url = serializer.validated_data["url"]
             try:
-                response = requests.get(url)
+                response = requests.get(url, timeout=EXTERNAL_REQUEST_TIMEOUT)
                 response.raise_for_status()
                 soup = BeautifulSoup(response.content, "html.parser")
 
@@ -241,20 +265,15 @@ class BirthdayListView(APIView):
         start_date = today - timedelta(days=2)
         end_date = today + timedelta(days=6)
 
-        active_users = (
+        upcoming_birthdays = (
             User.objects.filter(is_active=True)
             .exclude(date_of_birth__isnull=True)
+            .filter(birthday_window_filter(start_date, end_date))
             .prefetch_related("social_auth")
+            .order_by("date_of_birth")
         )
 
-        result = []
-        for user in active_users:
-            dob = user.date_of_birth
-            dob_this_year = dob.replace(year=today.year)
-            if start_date <= dob_this_year <= end_date:
-                result.append(user)
-
-        serializer = UserSerializer(result, many=True)
+        serializer = UserSerializer(upcoming_birthdays, many=True)
         return Response(serializer.data)
 
 
@@ -310,7 +329,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="me", url_name="me")
     def me(self, request):
-        user = request.user
+        user = (
+            User.objects.filter(pk=request.user.pk)
+            .prefetch_related("social_auth")
+            .first()
+        )
         if request.method == "GET":
             serializer = self.get_serializer(user)
             return Response(serializer.data)
@@ -347,11 +370,11 @@ class FamilyTreeMemberViewSet(viewsets.ModelViewSet):
     serializer_class = FamilyTreeMemberSerializer
 
     def get_queryset(self):
-        return FamilyTreeMember.objects.all()
+        return FamilyTreeMember.objects.select_related("owner")
 
     @action(detail=False, methods=['get'], url_path='by-owner/(?P<owner_id>[^/.]+)')
     def get_members_by_owner(self, request, owner_id=None):
-        members = FamilyTreeMember.objects.filter(owner_id=owner_id)
+        members = self.get_queryset().filter(owner_id=owner_id)
         if not members:
             print(f"No family members found for owner id: {owner_id}")  # Add this line
         serializer = self.get_serializer(members, many=True)
@@ -431,3 +454,67 @@ class FamilyTreeMemberViewSet(viewsets.ModelViewSet):
         relations = FamilyTreeRelation.objects.filter(owner=user).select_related('from_member', 'to_member')
         serializer = FamilyTreeRelationSerializer(relations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TimelineEventViewSet(viewsets.ModelViewSet):
+    serializer_class = TimelineEventSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        return (
+            TimelineEvent.objects.select_related("owner")
+            .prefetch_related("owner__social_auth")
+            .order_by("-date")
+        )
+
+    def perform_create(self, serializer):
+        instance = serializer.save(owner=self.request.user)
+        # Notify Slack only for upcoming events (next 30 days).
+        today = datetime.now().date()
+        end = today + timedelta(days=30)
+        if today <= instance.date <= end:
+            message = (
+                f"> Upcoming timeline event '{instance.title}' on {instance.date} "
+                f"has been shared to dantrum.com by {instance.owner}."
+            )
+            send_slack_message(message)
+
+    @action(detail=False, methods=["get"], url_path="mine")
+    def mine(self, request):
+        qs = self.get_queryset().filter(owner=request.user)
+        return Response(self.get_serializer(qs, many=True).data)
+
+
+@api_view(["GET"])
+def timeline_summary(request):
+    return Response(timeline_service.build_timeline_summary())
+
+
+@api_view(["GET"])
+def timeline_month_detail(request, year, month):
+    if month < 1 or month > 12:
+        return Response({"detail": "Invalid month."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        timeline_service.get_month_detail(int(year), int(month), request.user)
+    )
+
+
+@api_view(["POST", "DELETE"])
+def timeline_album_exclude(request, album_id):
+    album = get_object_or_404(Album, pk=album_id)
+
+    if album.owner != request.user:
+        return Response(
+            {"detail": "You do not have permission to modify this album on the timeline."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if request.method == "POST":
+        TimelineAlbumExclusion.objects.get_or_create(
+            album=album,
+            defaults={"excluded_by": request.user},
+        )
+        return Response(status=status.HTTP_201_CREATED)
+
+    TimelineAlbumExclusion.objects.filter(album=album).delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

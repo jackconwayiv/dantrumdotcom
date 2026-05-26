@@ -38,3 +38,12 @@ export const updateUser = async (formData: User) => {
     console.error("Error updating user:", error);
   }
 };
+
+export const activateUser = async (userId: number) => {
+  try {
+    const response = await axios.post(`/api/users/${userId}/activate/`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error activating user ${userId}:`, error);
+  }
+};

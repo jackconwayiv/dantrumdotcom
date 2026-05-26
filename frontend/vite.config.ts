@@ -11,6 +11,11 @@ export default defineConfig(({ mode }) => {
         authToken: process.env.SENTRY_AUTH_TOKEN,
         org: "dantrumcom-rk",
         project: "dantrum-front",
+        errorHandler: (err) => {
+          // In some environments (e.g. CI / sandbox) sourcemap upload can fail due
+          // to network/proxy restrictions. We don't want a broken deploy build.
+          console.warn("[sentry-vite-plugin] upload failed:", err?.message ?? err);
+        },
       }),
     ],
     server: {

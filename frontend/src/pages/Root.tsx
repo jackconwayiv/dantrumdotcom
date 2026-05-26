@@ -1,14 +1,16 @@
-import { Flex, Heading, Text } from "@chakra-ui/react";
-import axios from "axios";
+import { Box, Flex, Heading, SimpleGrid, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { fetchUpcomingBirthdays } from "../api/birthdays";
 import {
   FaAddressBook,
   FaCamera,
   FaMapSigns,
+  FaStream,
   FaUserCircle,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import ImageCarousel from "../components/ImageCarousel";
+import AccentFeature from "../components/ui/AccentFeature";
+import HomeRecentCarousel from "../components/HomeRecentCarousel";
 import { User } from "../helpers/types";
 import { isBirthday, renderBirthday, renderNickname } from "../helpers/utils";
 
@@ -18,36 +20,31 @@ interface RootProps {
 
 export default function Root({ user }: RootProps) {
   const [birthdays, setBirthdays] = useState<User[]>([]);
-  // const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUpcomingBirthdays = async () => {
-      const response = await axios.get<User[]>("/api/birthdays/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your auth method
-        },
-      });
-      if (response) {
-        setBirthdays(response.data);
+    const loadBirthdays = async () => {
+      const data = await fetchUpcomingBirthdays();
+      if (data) {
+        setBirthdays(data);
       } else {
         setError("Failed to fetch upcoming birthdays");
-        console.error(error);
       }
     };
-    fetchUpcomingBirthdays();
+    loadBirthdays();
   }, []);
 
   const renderList = () => {
-    return birthdays.map((user: User, i: number) => (
+    return birthdays.map((birthdayUser: User, i: number) => (
       <Text
         cursor="pointer"
         key={i}
-        onClick={() => navigate(`/app/friends/${user.id}`)}
+        onClick={() => navigate(`/app/friends/${birthdayUser.id}`)}
+        _hover={{ color: "brand.600" }}
       >
-        {`${renderNickname(user)}: ${renderBirthday(user.date_of_birth)}`}
+        {`${renderNickname(birthdayUser)}: ${renderBirthday(birthdayUser.date_of_birth)}`}
       </Text>
     ));
   };
@@ -55,110 +52,98 @@ export default function Root({ user }: RootProps) {
   const renderBirthdays = () => {
     if (birthdays && birthdays.length > 0) {
       return (
-        <Flex direction="column" alignItems="center">
-          <Text fontWeight="bold" fontFamily="Comic Sans MS">
+        <Box
+          bg="oasis.orange.100"
+          border="1px solid"
+          borderColor="oasis.gray"
+          borderRadius="card"
+          p={4}
+          mb={4}
+          width="90%"
+        >
+          <Text fontWeight="bold" color="oasis.orange.600" mb={2}>
             🎉 UPCOMING {birthdays.length > 1 ? `BIRTHDAYS` : `BIRTHDAY`} ALERT!
           </Text>
-          <Text fontFamily="Comic Sans MS"></Text>
           {renderList()}
-        </Flex>
+        </Box>
       );
     }
     return null;
   };
 
   return (
-    <Flex direction="column">
-      <ImageCarousel />
-      <Flex direction="column" alignItems="center" p={2}>
-        {/* <Image
-          src="splash_art.jpg"
-          objectFit="cover"
-          width="50%"
-          border="1px black solid"
-        /> */}
+    <Flex direction="column" alignItems="center" p={4}>
+      <Heading textAlign="center" size="xl" my={6}>
+        {isBirthday(user)
+          ? `HAPPY BIRTHDAY ${renderNickname(user).toUpperCase()}!!`
+          : `YO! IT'S DANTRUM`}
+      </Heading>
 
-        <Heading textAlign="center" fontFamily="Comic Sans MS" my={6}>
-          {isBirthday(user)
-            ? `HAPPY BIRTHDAY ${renderNickname(user).toUpperCase()}!!`
-            : `YO! IT'S DANTRUM.COM`}
-        </Heading>
-        {birthdays && birthdays.length > 0 && renderBirthdays()}
+      {birthdays && birthdays.length > 0 && renderBirthdays()}
 
-        <Flex
-          alignItems="center"
-          width="90%"
-          m={2}
-          p={2}
-          _hover={{ bgColor: "green.100" }}
-          cursor="pointer"
+      <HomeRecentCarousel />
+
+      <SimpleGrid
+        columns={{ base: 1, md: 2 }}
+        spacing={3}
+        width="95%"
+        mt={2}
+      >
+        <AccentFeature
+          accent="purple"
+          width="100%"
           onClick={() => navigate("/app/albums")}
         >
-          <FaCamera size="30px" />
-          <Heading m={3} size="md">
+          <FaCamera size="30px" color="var(--purple)" />
+          <Heading m={3} size="md" color="oasis.text">
             Photos
           </Heading>
-        </Flex>
-        {/* <Button m={1} onClick={() => navigate("/app/calendar")}>
-          Calendar
-        </Button> */}
-        {/* <Flex
-          alignItems="center"
-          width="90%"
-          m={2}
-          p={2}
-          _hover={{ bgColor: "green.100" }}
-          cursor="pointer"
-          onClick={() => navigate("/app/quotes")}
+        </AccentFeature>
+
+        <AccentFeature
+          accent="green"
+          width="100%"
+          onClick={() => navigate("/app/timeline")}
         >
-          <FaFeatherAlt size="30px" />
-          <Heading m={3} size="md">
-            Quotes
+          <FaStream size="30px" color="var(--green)" />
+          <Heading m={3} size="md" color="oasis.text">
+            Timeline
           </Heading>
-        </Flex> */}
-        <Flex
-          alignItems="center"
-          width="90%"
-          m={2}
-          p={2}
-          _hover={{ bgColor: "green.100" }}
-          cursor="pointer"
+        </AccentFeature>
+
+        <AccentFeature
+          accent="orange"
+          width="100%"
           onClick={() => navigate("/app/resources")}
         >
-          <FaMapSigns size="30px" />
-          <Heading m={3} size="md">
+          <FaMapSigns size="30px" color="var(--orange)" />
+          <Heading m={3} size="md" color="oasis.text">
             Resources
           </Heading>
-        </Flex>
-        <Flex
-          alignItems="center"
-          width="90%"
-          m={2}
-          p={2}
-          _hover={{ bgColor: "green.100" }}
-          cursor="pointer"
+        </AccentFeature>
+
+        <AccentFeature
+          accent="purple"
+          width="100%"
           onClick={() => navigate("/app/friends")}
         >
-          <FaAddressBook size="30px" />
-          <Heading m={3} size="md">
+          <FaAddressBook size="30px" color="var(--purple)" />
+          <Heading m={3} size="md" color="oasis.text">
             Friends
           </Heading>
-        </Flex>
-        <Flex
-          alignItems="center"
-          width="90%"
-          m={2}
-          p={2}
-          _hover={{ bgColor: "green.100" }}
-          cursor="pointer"
+        </AccentFeature>
+
+        <AccentFeature
+          accent="green"
+          width="100%"
           onClick={() => navigate("/app/profile")}
         >
-          <FaUserCircle size="30px" />
-          <Heading m={3} size="md">
+          <FaUserCircle size="30px" color="var(--green)" />
+          <Heading m={3} size="md" color="oasis.text">
             Profile
           </Heading>
-        </Flex>
-      </Flex>
+        </AccentFeature>
+      </SimpleGrid>
     </Flex>
   );
 }

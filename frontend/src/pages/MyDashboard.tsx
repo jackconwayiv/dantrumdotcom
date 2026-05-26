@@ -16,6 +16,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { updateUser } from "../api/users";
 import ProfileModals from "../components/ProfileModals";
+import AppButton from "../components/ui/AppButton";
 import { User } from "../helpers/types";
 import FamilyTreeView from "./FamilyTreeView";
 import UserProfile from "./UserProfile";
@@ -84,7 +85,7 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
             <Button
               variant="outline"
               colorScheme="red"
-              borderRadius="25px"
+              borderRadius="full"
               leftIcon={<FaSignOutAlt />}
               onClick={handleLogoutClick}
             >
@@ -93,7 +94,7 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
           </Flex>
           <Text p={2}>✉️ {user.email}</Text>
         </Flex>
-        <Tabs variant="enclosed" colorScheme="green">
+        <Tabs variant="enclosed" colorScheme="brand">
           <TabList>
             <Tab>Public Profile</Tab>
             <Tab>Family Tree</Tab>
@@ -102,15 +103,13 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
             <TabPanel p={2}>
               <Flex direction="column">
                 <Flex justifyContent="end">
-                  <Button
-                    borderRadius="25px"
-                    variant="outline"
-                    colorScheme="green"
+                  <AppButton
+                    colorTone="soft"
                     leftIcon={<FaGear />}
                     onClick={onOpen}
                   >
                     Edit Profile
-                  </Button>
+                  </AppButton>
                 </Flex>
 
                 <Flex direction="column">

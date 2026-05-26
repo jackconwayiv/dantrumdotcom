@@ -1,5 +1,4 @@
 import {
-  Button,
   Flex,
   Input,
   Modal,
@@ -9,6 +8,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
+import AppButton from "./ui/AppButton";
 
 interface ProfileModalsProps {
   formik: any;
@@ -21,7 +21,7 @@ const ProfileModals = ({ formik, isOpen, onClose }: ProfileModalsProps) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader fontFamily="Comic Sans MS">Edit Profile</ModalHeader>
+        <ModalHeader>Edit Profile</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={formik.handleSubmit}>
@@ -62,17 +62,12 @@ const ProfileModals = ({ formik, isOpen, onClose }: ProfileModalsProps) => {
               />
             </Flex>
             <Flex justifyContent="space-evenly" marginY={6}>
-              <Button borderRadius="25px" onClick={onClose}>
+              <AppButton colorTone="outline" onClick={onClose}>
                 Cancel
-              </Button>
-              <Button
-                colorScheme="green"
-                borderRadius="25px"
-                type="submit"
-                onClick={onClose}
-              >
+              </AppButton>
+              <AppButton colorTone="success" type="submit" onClick={onClose}>
                 Save
-              </Button>
+              </AppButton>
             </Flex>
           </form>
         </ModalBody>

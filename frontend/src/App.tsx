@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { fetchUserProfile } from "./api/users";
@@ -6,6 +6,8 @@ import Navbar from "./components/Navbar";
 import { User } from "./helpers/types";
 import AlbumsView from "./pages/AlbumsView";
 import CalendarView from "./pages/CalendarView";
+import TimelineView from "./pages/TimelineView";
+import TimelineMyEventsView from "./pages/TimelineMyEventsView";
 import FriendsDirectory from "./pages/FriendsDirectory";
 import MyProfile from "./pages/MyDashboard";
 import QuotesView from "./pages/QuotesView";
@@ -25,8 +27,9 @@ function App() {
         setUser(data);
         setLoading(false);
       } else {
-        console.error(error);
-        setError(error);
+        const err = new Error("Failed to fetch user profile");
+        console.error(err);
+        setError(err);
         setLoading(false);
       }
     };
@@ -34,8 +37,20 @@ function App() {
     getUserProfile();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {JSON.stringify(error)}</div>;
+  if (loading) {
+    return (
+      <Flex justifyContent="center" alignItems="center" minH="100vh" bg="oasis.bg">
+        <Spinner color="brand.500" size="lg" />
+      </Flex>
+    );
+  }
+  if (error) {
+    return (
+      <Flex justifyContent="center" alignItems="center" minH="100vh" bg="oasis.bg" p={4}>
+        <Text color="oasis.orange.600">Error: {JSON.stringify(error)}</Text>
+      </Flex>
+    );
+  }
 
   if (user)
     return (
@@ -47,6 +62,11 @@ function App() {
 
             <Route path="/app/albums/" element={<AlbumsView user={user} />} />
             <Route path="/app/calendar/" element={<CalendarView />} />
+            <Route path="/app/timeline/" element={<TimelineView user={user} />} />
+            <Route
+              path="/app/timeline/my-events/"
+              element={<TimelineMyEventsView user={user} />}
+            />
             <Route path="/app/quotes/" element={<QuotesView user={user} />} />
             <Route
               path="/app/resources/"

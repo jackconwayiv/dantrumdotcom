@@ -1,16 +1,9 @@
-import {
-  Avatar,
-  Button,
-  Flex,
-  Heading,
-  Text,
-  Wrap,
-  useToast,
-} from "@chakra-ui/react";
-import axios from "axios";
+import { Avatar, Flex, Text, Wrap, useToast } from "@chakra-ui/react";
+import AppButton from "../components/ui/AppButton";
+import PageHeading from "../components/ui/PageHeading";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchFriends } from "../api/users";
+import { activateUser, fetchFriends } from "../api/users";
 import { Friend, User } from "../helpers/types";
 import {
   getNextBirthday,
@@ -38,7 +31,7 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
         setFriends(data.results);
         setLoading(false);
       } else {
-        setError(error);
+        setError(new Error("Couldn't retrieve friends"));
         setLoading(false);
       }
     };
@@ -68,8 +61,8 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
   }, [friends, user.email]);
 
   const handleToggle = async (userId: number) => {
-    const activatedUser = await axios.post(`/api/users/${userId}/activate/`);
-    if (activatedUser) {
+    const result = await activateUser(userId);
+    if (result) {
       toast({
         title: "Successful user activation!",
         description: `You've made their day!`,
@@ -77,8 +70,11 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
         duration: 5000,
         isClosable: true,
       });
-      const usersResponse = await fetchFriends();
-      setFriends(usersResponse?.results || friends);
+      setFriends((prev) =>
+        prev.map((friend) =>
+          friend.id === userId ? { ...friend, is_active: true } : friend
+        )
+      );
     } else {
       toast({
         title: "Error!",
@@ -125,7 +121,7 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
           {friend.date_of_birth && (
             <Flex alignItems="center">
               <Text
-                color={isBirthday(friend) ? "orange" : "black"}
+                color={isBirthday(friend) ? "oasis.orange.600" : "oasis.text"}
                 fontWeight={isBirthday(friend) ? "bold" : "normal"}
               >
                 🎂 {renderBirthday(friend.date_of_birth)}
@@ -135,9 +131,9 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
         </Flex>
         {user.is_staff && !friend.is_active && (
           <Flex alignItems="center" ml="auto" p={2}>
-            <Button colorScheme="green" onClick={() => handleToggle(friend.id)}>
+            <AppButton colorTone="success" onClick={() => handleToggle(friend.id)}>
               Activate
-            </Button>
+            </AppButton>
           </Flex>
         )}
       </Flex>
@@ -149,9 +145,9 @@ export default function FriendsDirectory({ user }: FriendsDirectoryProps) {
 
   return (
     <Flex direction="column" width="100%" p={2}>
-      <Heading size="md" fontFamily="Comic Sans MS" mb={4}>
+      <PageHeading size="md">
         {friends.length > 0 && friends.length - 1} Friends
-      </Heading>
+      </PageHeading>
 
       <Wrap>
         {sortedFriends.length > 0 &&

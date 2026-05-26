@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
+import AppButton from "./ui/AppButton";
 import { deleteAlbum, fetchAlbumDataFromBackend } from "../api/albums";
 import { Album } from "../helpers/types";
 
@@ -114,7 +115,7 @@ export const AlbumModals = ({
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontFamily={"Comic Sans MS"}>
+          <ModalHeader>
             {currentAlbum ? "Edit Foto Album" : "Add Foto Album"}
           </ModalHeader>
           <ModalCloseButton />
@@ -198,32 +199,29 @@ export const AlbumModals = ({
               </Flex>
 
               <Flex marginY={6} justifyContent="space-evenly">
-                <Button
-                  borderRadius="25px"
-                  colorScheme="gray"
-                  variant="outline"
+                <AppButton
+                  colorTone="outline"
                   onClick={() => {
                     !currentAlbum && formik.resetForm();
                     onClose();
                   }}
                 >
                   Cancel
-                </Button>
+                </AppButton>
                 {currentAlbum && (
-                  <Button
-                    colorScheme="red"
-                    borderRadius="25px"
+                  <AppButton
+                    colorTone="cta"
                     onClick={() => {
                       onClose();
                       onAlertOpen();
                     }}
                   >
                     <FaRegTrashAlt />
-                  </Button>
+                  </AppButton>
                 )}
-                <Button colorScheme="green" borderRadius="25px" type="submit">
+                <AppButton colorTone="success" type="submit">
                   {currentAlbum ? "Save Changes" : "Create Album"}
-                </Button>
+                </AppButton>
               </Flex>
             </form>
           </ModalBody>
@@ -237,11 +235,7 @@ export const AlbumModals = ({
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader
-              fontFamily={"Comic Sans MS"}
-              fontSize="lg"
-              fontWeight="bold"
-            >
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Delete Album: {currentAlbum && currentAlbum.title}
             </AlertDialogHeader>
 
@@ -254,21 +248,14 @@ export const AlbumModals = ({
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                borderRadius="25px"
-                colorScheme="gray"
-                variant="outline"
-                onClick={() => {
+              <Button ref={cancelRef} variant="outline" onClick={() => {
                   setCurrentAlbum(null);
                   onAlertClose();
-                }}
-              >
+                }}>
                 Cancel
               </Button>
-              <Button
-                colorScheme="red"
-                borderRadius="25px"
+              <AppButton
+                colorTone="cta"
                 onClick={() => {
                   handleDelete();
                   setCurrentAlbum(null);
@@ -277,7 +264,7 @@ export const AlbumModals = ({
                 ml={3}
               >
                 Delete
-              </Button>
+              </AppButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>

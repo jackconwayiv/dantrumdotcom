@@ -1,5 +1,16 @@
 import axios from "axios";
-import { Resource } from "../helpers/types";
+import { DjangoPaginatedResponse, Resource } from "../helpers/types";
+
+export const fetchResources = async () => {
+  try {
+    const response = await axios.get<DjangoPaginatedResponse<Resource>>(
+      "/api/resources/"
+    );
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+  }
+};
 
 export const saveResource = async (resourceDetails: Resource) => {
   try {

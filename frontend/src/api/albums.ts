@@ -1,6 +1,33 @@
 import axios from "axios";
 import { Album } from "../helpers/types";
 
+export const fetchAlbumYears = async () => {
+  try {
+    const response = await axios.get<number[]>("/api/years/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching album years:", error);
+  }
+};
+
+export const fetchAlbumsForYear = async (year: number) => {
+  try {
+    const response = await axios.get<Album[]>(`/api/albums/year/${year}/`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching albums for year ${year}:`, error);
+  }
+};
+
+export const fetchMyAlbums = async () => {
+  try {
+    const response = await axios.get<Album[]>("/api/albums/mine/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching my albums:", error);
+  }
+};
+
 export const saveAlbum = async (albumDetails: Album) => {
   try {
     let response;

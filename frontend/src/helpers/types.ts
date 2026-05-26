@@ -16,6 +16,7 @@ export interface Album {
   thumbnail_url?: string;
   date: string;
   owner?: User;
+  timeline_excluded?: boolean;
 }
 
 export interface Quote {
@@ -34,6 +35,30 @@ export interface Resource {
   url: string;
   thumbnail_url?: string;
   owner?: User;
+}
+
+export type HomeRecentKind = "album" | "resource" | "event" | "birthday";
+
+export interface HomeRecentResponse {
+  items: HomeRecentItem[];
+  counts: {
+    event: number;
+    birthday: number;
+    album: number;
+    resource: number;
+  };
+}
+
+export interface HomeRecentItem {
+  kind: HomeRecentKind;
+  id: number;
+  title: string;
+  description?: string;
+  link_url: string;
+  thumbnail_url?: string;
+  sort_date: string;
+  owner?: User;
+  date?: string;
 }
 
 export interface Friend {
@@ -79,6 +104,44 @@ export interface FamilyTreeRelation {
   to_member: FamilyTreeMember;
   type: "vertical" | "horizontal";
   owner: number;
+}
+
+export type TimelineEventType = "album" | "event" | "birthday";
+
+export interface TimelineMonthEvent {
+  id: string;
+  type: TimelineEventType;
+  title: string;
+  date: string | null;
+  sort_date: string;
+  owner: User;
+  link_url: string | null;
+  description: string | null;
+  can_remove_from_timeline: boolean;
+}
+
+export interface TimelineYearSummary {
+  year: number;
+  months_with_events: number[];
+}
+
+export interface TimelineSummary {
+  years: TimelineYearSummary[];
+}
+
+export interface TimelineMonthDetail {
+  year: number;
+  month: number;
+  month_name: string;
+  events: TimelineMonthEvent[];
+}
+
+export interface TimelineCustomEvent {
+  id?: number;
+  title: string;
+  date: string;
+  description?: string;
+  owner?: User;
 }
 
 export interface AddMemberData {

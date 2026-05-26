@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DJANGO_ENV="${DJANGO_ENV:-production}"
+
 echo "Collect static files"
 python manage.py collectstatic --noinput
 

@@ -1,16 +1,10 @@
-import {
-  Button,
-  Flex,
-  Heading,
-  Text,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
-import axios from "axios";
+import { Flex, SimpleGrid, Text, useDisclosure, useToast } from "@chakra-ui/react";
+import AppButton from "../components/ui/AppButton";
+import PageHeading from "../components/ui/PageHeading";
 import { FormikErrors, useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { saveResource } from "../api/resources";
+import { fetchResources, saveResource } from "../api/resources";
 import ResourceCard from "../components/ResourceCard";
 import { ResourceModals } from "../components/ResourceModals";
 import { Resource, User } from "../helpers/types";
@@ -65,22 +59,25 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     } else {
       formik.resetForm();
     }
-  }, [currentResource]);
+  }, [currentResource, formik]);
 
-  const fetchResources = async () => {
-    const response = await axios.get(`/api/resources/`);
-    if (response) {
-      setResources(response.data.results);
-      setLoading(false);
-    } else {
-      console.error(`Couldn't retrieve resources: ${error}`);
+  const loadResources = async () => {
+    try {
+      const data = await fetchResources();
+      if (data) {
+        setResources(data);
+      } else {
+        setError("Couldn't retrieve resources");
+      }
+    } catch {
       setError("Couldn't retrieve resources");
-      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchResources();
+    loadResources();
   }, []);
 
   const handleSubmit = async (values: Resource) => {
@@ -95,7 +92,15 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
       setCurrentResource(null);
       formik.resetForm();
       onClose();
-      fetchResources();
+      if (currentResource) {
+        setResources((prev) =>
+          prev.map((resource) =>
+            resource.id === savedResource.id ? savedResource : resource
+          )
+        );
+      } else {
+        setResources((prev) => [savedResource, ...prev]);
+      }
     } else {
       console.error("Error saving resource:", error);
       toast({
@@ -109,13 +114,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     }
   };
 
-  const renderHeading = () => {
-    return (
-      <Heading fontFamily={"Comic Sans MS"} size="lg" mb={4}>
-        LINKS & RESOURCES
-      </Heading>
-    );
-  };
+  const renderHeading = () => <PageHeading>LINKS & RESOURCES</PageHeading>;
 
   if (loading) {
     return (
@@ -139,37 +138,38 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
     <Flex direction="column" width="100%" p={2}>
       {renderHeading()}
       <Flex justifyContent="space-evenly">
-        <Button
+        <AppButton
           leftIcon={<FaPlus />}
-          borderRadius="25px"
-          colorScheme="green"
-          variant="outline"
+          colorTone="success"
           onClick={() => {
             setCurrentResource(null);
             onOpen();
           }}
         >
           New Resource
-        </Button>
+        </AppButton>
       </Flex>
-      <Flex direction="column" alignItems="center">
-        {resources &&
-          resources.length > 0 &&
-          resources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              user={user}
-              resource={resource}
-              onOpen={onOpen}
-              setCurrentResource={setCurrentResource}
-            />
-          ))}
-      </Flex>
+      <SimpleGrid
+        columns={{ base: 1, md: 2 }}
+        spacing={4}
+        width="100%"
+        mt={2}
+      >
+        {resources.map((resource) => (
+          <ResourceCard
+            key={resource.id}
+            user={user}
+            resource={resource}
+            onOpen={onOpen}
+            setCurrentResource={setCurrentResource}
+          />
+        ))}
+      </SimpleGrid>
       <ResourceModals
         resources={resources}
         setResources={setResources}
         onClose={onClose}
-        fetchResources={fetchResources}
+        fetchResources={loadResources}
         currentResource={currentResource}
         setCurrentResource={setCurrentResource}
         isOpen={isOpen}

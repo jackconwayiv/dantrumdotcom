@@ -4,7 +4,16 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from social_django.models import UserSocialAuth
 
-from api.models import Album, Quote, Resource, User, FamilyTreeMember, FamilyTreeRelation
+from api.models import (
+    Album,
+    Quote,
+    Resource,
+    User,
+    FamilyTreeMember,
+    FamilyTreeRelation,
+    TimelineEvent,
+    TimelineAlbumExclusion,
+)
 
 
 class UserSocialAuthSerializer(serializers.ModelSerializer):
@@ -64,6 +73,7 @@ class OwnerSerializer(serializers.ModelSerializer):
 
 class AlbumSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True)
+    timeline_excluded = serializers.SerializerMethodField()
 
     class Meta:
         model = Album
@@ -75,7 +85,15 @@ class AlbumSerializer(serializers.ModelSerializer):
             "thumbnail_url",
             "date",
             "owner",
+            "timeline_excluded",
         ]
+
+    def get_timeline_excluded(self, obj):
+        try:
+            # With `select_related("timeline_exclusion")`, this won't hit the DB.
+            return obj.timeline_exclusion is not None
+        except TimelineAlbumExclusion.DoesNotExist:
+            return False
 
 class QuoteSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True)
@@ -106,6 +124,15 @@ class FamilyTreeRelationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FamilyTreeRelation
         fields = ['id', 'from_member', 'to_member', 'type', 'owner']
+
+class TimelineEventSerializer(serializers.ModelSerializer):
+    owner = OwnerSerializer(read_only=True)
+
+    class Meta:
+        model = TimelineEvent
+        fields = ["id", "title", "date", "description", "owner", "created_at", "updated_at"]
+        read_only_fields = ["id", "owner", "created_at", "updated_at"]
+
 
 class AddFamilyMemberSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)

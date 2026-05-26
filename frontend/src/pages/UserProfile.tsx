@@ -28,13 +28,13 @@ const UserProfile = ({ user }: UserProfileProps) => {
         setFriend(data);
         setLoading(false);
       } else {
-        setError(error);
+        setError(new Error("User not found"));
         setLoading(false);
       }
     };
 
     getFriend();
-  }, [id, user]);
+  }, [userId]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -61,7 +61,7 @@ const UserProfile = ({ user }: UserProfileProps) => {
           size="xl"
         />
 
-        <Heading fontFamily="Comic Sans MS" m={3}>
+        <Heading m={3}>
           {renderFullName(friend)}
         </Heading>
         <Flex alignItems="center" m={3}>

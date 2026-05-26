@@ -8,20 +8,33 @@ import {
   Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FaAddressBook, FaCamera, FaMapSigns } from "react-icons/fa";
+import { FaAddressBook, FaCamera, FaMapSigns, FaStream } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { User } from "../helpers/types";
+import { navActiveColor } from "../theme/semantic";
 
 interface NavbarProps {
   user: User;
 }
+
+const navIconProps = (isActive: boolean) => ({
+  size: "30px" as const,
+  color: isActive ? navActiveColor : "oasis.text",
+  cursor: "pointer" as const,
+  _hover: { color: isActive ? navActiveColor : "brand.500" },
+  transition: "color 0.15s ease",
+});
 
 function Navbar({ user }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  const isActive = (path: string) =>
+    currentPath === path || currentPath.startsWith(`${path}/`);
+
   if (user)
     return (
       <Flex
@@ -30,6 +43,9 @@ function Navbar({ user }: NavbarProps) {
         maxWidth="800px"
         alignItems="space-between"
         p={2}
+        borderBottom="1px solid"
+        borderColor="oasis.gray"
+        bg="oasis.surface"
       >
         <Flex
           direction="row"
@@ -46,12 +62,12 @@ function Navbar({ user }: NavbarProps) {
             />
             {!isMobile && (
               <Heading
-                fontFamily="Tahoma"
                 size="xl"
                 cursor="pointer"
                 onClick={() => navigate("/app")}
+                ml={2}
               >
-                ANTRUM.COM
+                ANTRUM
               </Heading>
             )}
           </Flex>
@@ -59,46 +75,25 @@ function Navbar({ user }: NavbarProps) {
             <Flex>
               <Box
                 as={FaCamera}
-                size="30px"
-                color={currentPath === "/app/albums" ? "green.500" : "black"}
-                _hover={{ color: "green.300" }}
-                cursor="pointer"
+                {...navIconProps(isActive("/app/albums"))}
                 onClick={() => navigate("/app/albums")}
               />
             </Flex>
           </Tooltip>
-          {/* <Tooltip label="Calendar" fontSize="md">
+          <Tooltip label="Timeline" fontSize="md">
             <Flex>
               <Box
-                as={FaCalendarAlt}
-                size="30px"
-                color={currentPath === "/app/calendar" ? "green.500" : "black"}
-                _hover={{ color: "green.300" }}
-                cursor="pointer"
-                onClick={() => navigate("/app/calendar")}
+                as={FaStream}
+                {...navIconProps(isActive("/app/timeline"))}
+                onClick={() => navigate("/app/timeline")}
               />
             </Flex>
-          </Tooltip> */}
-          {/* <Tooltip label="Quotes" fontSize="md">
-            <Flex>
-              <Box
-                as={FaFeatherAlt}
-                size="30px"
-                color={currentPath === "/app/quotes" ? "green.500" : "black"}
-                _hover={{ color: "green.300" }}
-                cursor="pointer"
-                onClick={() => navigate("/app/quotes")}
-              />
-            </Flex>
-          </Tooltip> */}
+          </Tooltip>
           <Tooltip label="Resources" fontSize="md">
             <Flex>
               <Box
                 as={FaMapSigns}
-                size="30px"
-                color={currentPath === "/app/resources" ? "green.500" : "black"}
-                _hover={{ color: "green.300" }}
-                cursor="pointer"
+                {...navIconProps(isActive("/app/resources"))}
                 onClick={() => navigate("/app/resources")}
               />
             </Flex>
@@ -107,48 +102,28 @@ function Navbar({ user }: NavbarProps) {
             <Flex>
               <Box
                 as={FaAddressBook}
-                size="30px"
-                color={currentPath === "/app/friends" ? "green.500" : "black"}
-                _hover={{ color: "green.300" }}
-                cursor="pointer"
+                {...navIconProps(isActive("/app/friends"))}
                 onClick={() => navigate("/app/friends")}
               />
             </Flex>
           </Tooltip>
           <Flex alignItems="baseline" justifyContent="baseline">
-            {/* <Box m={0} p={0}>
-              <Menu>
-                <MenuButton
-                  as={Flex}
-                  alignItems="baseline"
-                  justifyContent="baseline"
-                > */}
             <Avatar
               name={user.username}
               cursor="pointer"
               referrerPolicy="no-referrer"
-              border="1px silver solid"
+              border="2px solid"
+              borderColor="oasis.gray"
               alignSelf="baseline"
               justifySelf="baseline"
               onClick={() => navigate("/app/profile")}
+              _hover={{ borderColor: "brand.500" }}
               src={
                 user.social_auth && user.social_auth[0]
                   ? user.social_auth[0].picture
                   : "/avatar.jpg"
               }
             />
-            {/* </MenuButton>
-                <MenuList>
-                  <MenuItem
-                    icon={<FaGear />}
-                    onClick={() => navigate("/app/profile")}
-                  >
-                    Edit Profile
-                  </MenuItem>
-                  <MenuItem icon={<FaSignOutAlt />}>Logout</MenuItem>
-                </MenuList>
-              </Menu>
-            </Box> */}
           </Flex>
         </Flex>
         <Spacer m={4} />

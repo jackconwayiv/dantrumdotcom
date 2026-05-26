@@ -7,7 +7,6 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
-  Heading,
   Input,
   Modal,
   ModalBody,
@@ -21,11 +20,12 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import { FaWrench } from "react-icons/fa";
-import { deleteQuote, saveQuote } from "../api/quotes";
+import { deleteQuote, fetchQuotes, saveQuote } from "../api/quotes";
+import AppButton from "../components/ui/AppButton";
+import PageHeading from "../components/ui/PageHeading";
 import { Quote, User } from "../helpers/types";
 import { isOwner } from "../helpers/utils";
 
@@ -50,18 +50,21 @@ export default function QuotesView({ user }: QuotesViewProps) {
   const cancelRef = useRef(null);
 
   useEffect(() => {
-    const fetchQuotes = async () => {
-      const response = await axios.get(`/api/quotes`);
-      if (response) {
-        setQuotes(response.data.results);
+    const loadQuotes = async () => {
+      try {
+        const data = await fetchQuotes();
+        if (data) {
+          setQuotes(data);
+        } else {
+          setError("Couldn't retrieve quotes");
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
         setLoading(false);
-      } else {
-        console.error(`Couldn't retrieve quotes: ${error}`);
-        setError(error);
-        return false;
       }
     };
-    fetchQuotes();
+    loadQuotes();
   }, []);
 
   const validate = (values: Quote) => {
@@ -98,7 +101,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
     } else {
       formik.resetForm();
     }
-  }, [currentQuote]);
+  }, [currentQuote, formik]);
 
   const renderAlert = (error: string) => {
     return (
@@ -200,7 +203,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
   if (loading) {
     return (
       <Flex direction="column" width="100%">
-        <Heading>QUOTES</Heading>
+        <PageHeading>QUOTES</PageHeading>
         <Text>Loading...</Text>
       </Flex>
     );
@@ -209,7 +212,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
   if (error) {
     return (
       <Flex direction="column" width="100%">
-        <Heading>QUOTES</Heading>
+        <PageHeading>QUOTES</PageHeading>
         <Text>Error: {JSON.stringify(error)}</Text>
       </Flex>
     );
@@ -217,7 +220,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
 
   return (
     <Flex direction="column" width="100%">
-      <Heading>QUOTES</Heading>
+      <PageHeading>QUOTES</PageHeading>
       <Button
         width="120px"
         m={4}
@@ -264,27 +267,28 @@ export default function QuotesView({ user }: QuotesViewProps) {
                   : null}
               </Flex>
               <Flex marginY={6} justifyContent="space-evenly">
-                <Button
+                <AppButton
+                  colorTone="outline"
                   onClick={() => {
                     !currentQuote && formik.resetForm();
                     onClose();
                   }}
                 >
                   Cancel
-                </Button>
-                <Button colorScheme="green" type="submit">
+                </AppButton>
+                <AppButton colorTone="success" type="submit">
                   {currentQuote ? "Save Changes" : "Create Quote"}
-                </Button>
+                </AppButton>
                 {currentQuote && (
-                  <Button
-                    colorScheme="red"
+                  <AppButton
+                    colorTone="cta"
                     onClick={() => {
                       onClose();
                       onAlertOpen();
                     }}
                   >
                     Delete
-                  </Button>
+                  </AppButton>
                 )}
               </Flex>
             </form>
@@ -312,6 +316,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
             <AlertDialogFooter>
               <Button
                 ref={cancelRef}
+                variant="outline"
                 onClick={() => {
                   setCurrentQuote(null);
                   onAlertClose();
@@ -319,8 +324,8 @@ export default function QuotesView({ user }: QuotesViewProps) {
               >
                 Cancel
               </Button>
-              <Button
-                colorScheme="red"
+              <AppButton
+                colorTone="cta"
                 onClick={() => {
                   handleDelete();
                   setCurrentQuote(null);
@@ -329,7 +334,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
                 ml={3}
               >
                 Delete
-              </Button>
+              </AppButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>

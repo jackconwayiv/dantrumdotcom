@@ -66,6 +66,37 @@ class Album(CreatedUpdated):
         return self.title
 
 
+class TimelineEvent(CreatedUpdated):
+    title = models.CharField(max_length=200)
+    date = models.DateField()
+    description = models.TextField(blank=True, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="timeline_events",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return self.title
+
+
+class TimelineAlbumExclusion(models.Model):
+    album = models.OneToOneField(
+        Album,
+        related_name="timeline_exclusion",
+        on_delete=models.CASCADE,
+    )
+    excluded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="timeline_album_exclusions",
+        on_delete=models.CASCADE,
+    )
+    excluded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Timeline exclusion for album {self.album_id}"
+
+
 class Resource(CreatedUpdated):
     
     title = models.CharField(max_length=200)

@@ -30,37 +30,32 @@ const ResourceCard = ({
 
   return (
     <Card
-      direction={{ base: "column", sm: "row" }}
+      direction="column"
       padding={1}
-      margin={2}
-      key={resource.id}
-      width="95%"
+      height="100%"
+      width="100%"
     >
-      <Flex direction={{ base: "column", sm: "row" }}>
+      <Flex direction="column" height="100%">
         <a
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
           style={{ textDecoration: "none", cursor: "pointer" }}
         >
-          <Box
-            width={{ base: "100%", sm: "250px" }}
-            height={{ base: "auto", sm: "200px" }}
-            overflow="hidden"
-            flexShrink={0}
-          >
+          <Box width="100%" height="160px" overflow="hidden" flexShrink={0}>
             <Image
               width="100%"
               height="100%"
-              maxHeight={{ base: "200px", sm: "200px" }}
+              maxHeight="160px"
               objectFit="cover"
-              border="1px silver solid"
+              border="1px solid"
+              borderColor="oasis.gray"
               src={resource.thumbnail_url || "/placeholder.jpg"}
               alt={resource.title}
             />
           </Box>
         </a>
-        <Box ml={{ base: 0, sm: 4 }} mt={{ base: 4, sm: 0 }}>
+        <Box mt={3} flex="1">
           <Flex direction="column">
             <a
               href={resource.url}
@@ -70,7 +65,6 @@ const ResourceCard = ({
             >
               <Flex justifyContent="space-between">
                 <Heading
-                  fontFamily={"Comic Sans MS"}
                   fontWeight="bold"
                   size="md"
                   p={1}
@@ -79,7 +73,7 @@ const ResourceCard = ({
                 </Heading>
               </Flex>
               <Flex>
-                <Text p={1} fontFamily={"Comic Sans MS"}>
+                <Text p={1} color="oasis.text">
                   {resource.description}
                 </Text>
               </Flex>

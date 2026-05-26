@@ -25,7 +25,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaFlask, FaUserPlus } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import {
@@ -42,6 +42,8 @@ import {
   FamilyTreeRelation,
   User,
 } from "../helpers/types";
+import AppButton from "../components/ui/AppButton";
+import PageHeading from "../components/ui/PageHeading";
 import { renderShortBirthday } from "../helpers/utils";
 
 interface FamilyTreeProps {
@@ -92,7 +94,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
     }
   };
 
-  const fetchFamilyMembers = async () => {
+  const fetchFamilyMembers = useCallback(async () => {
     if (user && user.id !== undefined) {
       try {
         const members: FamilyTreeMember[] = await getFamilyMembersByOwner(
@@ -117,9 +119,9 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
         isClosable: true,
       });
     }
-  };
+  }, [toast, user]);
 
-  const fetchFamilyRelations = async () => {
+  const fetchFamilyRelations = useCallback(async () => {
     if (user && user.id !== undefined) {
       try {
         const relations: FamilyTreeRelation[] = await getRelationsById(user.id);
@@ -142,7 +144,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
         isClosable: true,
       });
     }
-  };
+  }, [toast, user]);
 
   const handleAddMember = async () => {
     const formattedData: AddMemberData = {
@@ -269,7 +271,7 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
       fetchFamilyMembers();
       fetchFamilyRelations();
     }
-  }, [user]);
+  }, [user, fetchFamilyMembers, fetchFamilyRelations]);
 
   const determineGenerations = (
     selfId: number,
@@ -388,18 +390,23 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
   return (
     <Box p={4}>
       {familyMembers.length === 0 && (
-        <Button colorScheme="teal" onClick={handleCreateSelf} mb={4}>
+        <AppButton colorTone="success" onClick={handleCreateSelf} mb={4}>
           Create Family Tree
-        </Button>
+        </AppButton>
       )}
-      <Heading size="md" mb={2}>
-        Family Tree
-      </Heading>
+      <PageHeading size="md">Family Tree</PageHeading>
       <Flex direction="row" alignItems="center" my={2}>
         <FaFlask />
         <Text ml={1}>This family tree app is in experimental phase.</Text>
       </Flex>
-      <Box overflow="auto" maxH="600px" maxW="800px" border="1px black solid">
+      <Box
+        overflow="auto"
+        maxH="600px"
+        maxW="800px"
+        border="1px solid"
+        borderColor="oasis.gray"
+        borderRadius="card"
+      >
         {renderFamilyTree()}
       </Box>
       <Modal isOpen={isOpen} onClose={handleClose}>
@@ -476,26 +483,23 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
           <ModalFooter>
             {isEditMode ? (
               <>
-                <Button colorScheme="blue" mr={3} onClick={handleEditMember}>
+                <AppButton colorTone="success" mr={3} onClick={handleEditMember}>
                   Save Changes
-                </Button>
+                </AppButton>
                 {formData.title !== "self" && (
-                  <Button
-                    colorScheme="red"
-                    onClick={() => setIsDeleteAlertOpen(true)}
-                  >
+                  <AppButton colorTone="cta" onClick={() => setIsDeleteAlertOpen(true)}>
                     Delete
-                  </Button>
+                  </AppButton>
                 )}
               </>
             ) : (
-              <Button colorScheme="blue" mr={3} onClick={handleAddMember}>
+              <AppButton colorTone="primary" mr={3} onClick={handleAddMember}>
                 Add Member
-              </Button>
+              </AppButton>
             )}
-            <Button variant="ghost" onClick={handleClose}>
+            <AppButton colorTone="outline" onClick={handleClose}>
               Cancel
-            </Button>
+            </AppButton>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -519,13 +523,14 @@ const FamilyTreeView = ({ user }: FamilyTreeProps) => {
             <AlertDialogFooter>
               <Button
                 ref={cancelRef}
+                variant="outline"
                 onClick={() => setIsDeleteAlertOpen(false)}
               >
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleDeleteMember} ml={3}>
+              <AppButton colorTone="cta" onClick={handleDeleteMember} ml={3}>
                 Delete
-              </Button>
+              </AppButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>

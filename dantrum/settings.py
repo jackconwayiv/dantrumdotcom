@@ -19,19 +19,6 @@ import environ
 from dotenv import find_dotenv, load_dotenv
 
 
-import sentry_sdk
-
-sentry_sdk.init(
-    dsn="https://d9dd3ff899810b6599de77809ab2644a@o4507573329199104.ingest.us.sentry.io/4507573335228416",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
-    profiles_sample_rate=1.0,
-)
-
 # Initialize the environment variables
 env = environ.Env(DJANGO_ENV=(str, "development"), DEBUG=(bool, False))
 
@@ -42,15 +29,47 @@ environ.Env.read_env(".env")
 DJANGO_ENV = env("DJANGO_ENV", default="development")
 DEBUG = DJANGO_ENV == "development"
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://d9dd3ff899810b6599de77809ab2644a@o4507573329199104.ingest.us.sentry.io/4507573335228416",
+    environment=DJANGO_ENV,
+    traces_sample_rate=1.0 if DEBUG else 0.2,
+    profiles_sample_rate=1.0 if DEBUG else 0.1,
+)
+
 # Set ALLOWED_HOSTS based on environment variable
-ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost").split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in env("ALLOWED_HOSTS", default="localhost").split(",")
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in env.list("CSRF_TRUSTED_ORIGINS", default=[])
+    if origin.strip()
+]
 
 # CORS configuration
-# CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=["http://localhost", "http://127.0.0.1"])
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"]
+)
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()]
 
-# Ensure CORS_ALLOWED_ORIGINS does not contain empty strings
-CORS_ALLOWED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin]
+if DJANGO_ENV != "development":
+    for host in ("dantrum.com", "www.dantrum.com", "dantrum.applikuapp.com"):
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
+    for origin in (
+        "https://dantrum.com",
+        "https://www.dantrum.com",
+        "https://dantrum.applikuapp.com",
+    ):
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,10 +100,14 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ],
+    "DEFAULT_RENDERER_CLASSES": (
+        ["rest_framework.renderers.JSONRenderer"]
+        if DJANGO_ENV != "development"
+        else [
+            "rest_framework.renderers.JSONRenderer",
+            "rest_framework.renderers.BrowsableAPIRenderer",
+        ]
+    ),
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],

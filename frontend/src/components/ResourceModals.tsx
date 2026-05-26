@@ -21,11 +21,12 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteResource } from "../api/resources";
+import { fetchUrlSummary } from "../api/summary";
 import { Resource } from "../helpers/types";
+import AppButton from "./ui/AppButton";
 
 interface ResourceModalsProps {
   resources: Resource[];
@@ -44,8 +45,8 @@ export const ResourceModals = ({
   onClose,
   currentResource,
   setCurrentResource,
+  setResources,
   formik,
-  fetchResources,
   validate,
 }: ResourceModalsProps) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,6 +58,15 @@ export const ResourceModals = ({
     onClose: onAlertClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const summaryDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (summaryDebounceRef.current) {
+        clearTimeout(summaryDebounceRef.current);
+      }
+    };
+  }, []);
 
   const renderAlert = (error: string) => {
     return (
@@ -66,36 +76,40 @@ export const ResourceModals = ({
     );
   };
 
-  const handleUrlBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const url = e.target.value;
     const errors = validate({ ...formik.values, url });
 
-    if (!errors.url) {
-      setLoading(true);
-
-      const response = await axios.post("/api/summary/", { url });
-      if (response) {
-        setLoading(false);
-        if (response.data) {
-          formik.setValues({
-            ...formik.values,
-            title: formik.values.title || response.data.title || "",
-            description:
-              formik.values.description || response.data.summary || "",
-            thumbnail_url:
-              formik.values.thumbnail_url || response.data.thumbnail || "",
-          });
-          setError(null);
-        }
-      } else {
-        setLoading(false);
-        setError(`Couldn't auto-fetch resource details: ${error}`);
-      }
+    if (errors.url) {
+      return;
     }
+
+    if (summaryDebounceRef.current) {
+      clearTimeout(summaryDebounceRef.current);
+    }
+
+    summaryDebounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      const summary = await fetchUrlSummary(url);
+      setLoading(false);
+      if (summary) {
+        formik.setValues({
+          ...formik.values,
+          title: formik.values.title || summary.title || "",
+          description: formik.values.description || summary.summary || "",
+          thumbnail_url:
+            formik.values.thumbnail_url || summary.thumbnail || "",
+        });
+        setError(null);
+      } else {
+        setError("Couldn't auto-fetch resource details");
+      }
+    }, 400);
   };
 
   const handleDelete = async () => {
-    const deletedResource = await deleteResource(currentResource!.id || 0);
+    const resourceId = currentResource!.id || 0;
+    const deletedResource = await deleteResource(resourceId);
     if (deletedResource) {
       toast({
         title: "Resource Deleted!",
@@ -104,7 +118,7 @@ export const ResourceModals = ({
         isClosable: true,
       });
       setCurrentResource(null);
-      fetchResources();
+      setResources((prev) => prev.filter((resource) => resource.id !== resourceId));
       onAlertClose();
     } else {
       toast({
@@ -122,7 +136,7 @@ export const ResourceModals = ({
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontFamily={"Comic Sans MS"}>
+          <ModalHeader>
             {currentResource
               ? `Edit Resource: ${currentResource.title}`
               : "Add New Resource"}
@@ -197,10 +211,8 @@ export const ResourceModals = ({
                 </Text>
               )}
               <Flex marginY={6} justifyContent="space-evenly">
-                <Button
-                  borderRadius="25px"
-                  colorScheme="gray"
-                  variant="outline"
+                <AppButton
+                  colorTone="outline"
                   onClick={() => {
                     !currentResource && formik.resetForm();
                     setError(null);
@@ -208,11 +220,10 @@ export const ResourceModals = ({
                   }}
                 >
                   Cancel
-                </Button>
+                </AppButton>
                 {currentResource && (
-                  <Button
-                    colorScheme="red"
-                    borderRadius="25px"
+                  <AppButton
+                    colorTone="cta"
                     onClick={() => {
                       onClose();
                       setError(null);
@@ -220,11 +231,11 @@ export const ResourceModals = ({
                     }}
                   >
                     <FaRegTrashAlt />
-                  </Button>
+                  </AppButton>
                 )}
-                <Button colorScheme="green" borderRadius="25px" type="submit">
+                <AppButton colorTone="success" type="submit">
                   {currentResource ? "Save Changes" : "Create Resource"}
-                </Button>
+                </AppButton>
               </Flex>
             </form>
           </ModalBody>
@@ -239,7 +250,6 @@ export const ResourceModals = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader
-              fontFamily={"Comic Sans MS"}
               fontSize="lg"
               fontWeight="bold"
             >
@@ -257,8 +267,6 @@ export const ResourceModals = ({
             <AlertDialogFooter>
               <Button
                 ref={cancelRef}
-                borderRadius="25px"
-                colorScheme="gray"
                 variant="outline"
                 onClick={() => {
                   setCurrentResource(null);
@@ -267,9 +275,8 @@ export const ResourceModals = ({
               >
                 Cancel
               </Button>
-              <Button
-                colorScheme="red"
-                borderRadius="25px"
+              <AppButton
+                colorTone="cta"
                 onClick={() => {
                   handleDelete();
                   setCurrentResource(null);
@@ -278,7 +285,7 @@ export const ResourceModals = ({
                 ml={3}
               >
                 Delete
-              </Button>
+              </AppButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>

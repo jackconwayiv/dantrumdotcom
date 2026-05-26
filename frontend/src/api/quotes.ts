@@ -1,5 +1,16 @@
 import axios from "axios";
-import { Quote } from "../helpers/types";
+import { DjangoPaginatedResponse, Quote } from "../helpers/types";
+
+export const fetchQuotes = async () => {
+  try {
+    const response = await axios.get<DjangoPaginatedResponse<Quote>>(
+      "/api/quotes/"
+    );
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+  }
+};
 
 export const saveQuote = async (quoteDetails: Quote) => {
   try {

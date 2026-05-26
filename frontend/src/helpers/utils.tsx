@@ -47,16 +47,11 @@ export const renderSharedBy = (user: User) => {
     >
       {
         <>
-          <Text
-            mr={1}
-            fontSize="10px"
-            fontFamily={"Comic Sans MS"}
-            alignItems="end"
-          >
+          <Text mr={1} fontSize="xs" color="gray.600">
             Shared by
           </Text>
           {renderAvatar(user)}{" "}
-          <Text fontSize="10px" fontFamily={"Comic Sans MS"} alignItems="end">
+          <Text fontSize="xs" color="oasis.text">
             {renderNickname(user)}
           </Text>
         </>
