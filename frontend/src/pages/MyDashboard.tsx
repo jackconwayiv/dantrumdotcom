@@ -2,11 +2,6 @@ import {
   Button,
   Flex,
   Heading,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Text,
   useDisclosure,
   useToast,
@@ -18,7 +13,6 @@ import { updateUser } from "../api/users";
 import ProfileModals from "../components/ProfileModals";
 import AppButton from "../components/ui/AppButton";
 import { User } from "../helpers/types";
-import FamilyTreeView from "./FamilyTreeView";
 import UserProfile from "./UserProfile";
 
 interface MyDashboardProps {
@@ -94,34 +88,18 @@ export default function MyDashboard({ user, setUser }: MyDashboardProps) {
           </Flex>
           <Text p={2}>✉️ {user.email}</Text>
         </Flex>
-        <Tabs variant="enclosed" colorScheme="brand">
-          <TabList>
-            <Tab>Public Profile</Tab>
-            <Tab>Family Tree</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel p={2}>
-              <Flex direction="column">
-                <Flex justifyContent="end">
-                  <AppButton
-                    colorTone="soft"
-                    leftIcon={<FaGear />}
-                    onClick={onOpen}
-                  >
-                    Edit Profile
-                  </AppButton>
-                </Flex>
-
-                <Flex direction="column">
-                  <UserProfile user={user} />
-                </Flex>
-              </Flex>
-            </TabPanel>
-            <TabPanel>
-              <FamilyTreeView user={user} />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        <Flex direction="column" p={2}>
+          <Flex justifyContent="end">
+            <AppButton
+              colorTone="soft"
+              leftIcon={<FaGear />}
+              onClick={onOpen}
+            >
+              Edit Profile
+            </AppButton>
+          </Flex>
+          <UserProfile user={user} />
+        </Flex>
 
         <ProfileModals isOpen={isOpen} onClose={onClose} formik={formik} />
       </Flex>

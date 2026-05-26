@@ -184,47 +184,29 @@ const HomeRecentCarousel = () => {
         </Box>
       </Box>
 
-      {totalSlides > 1 ? (
-        <>
-          <Text
-            position="absolute"
-            top="8px"
-            right="12px"
-            fontSize="xs"
-            fontWeight="bold"
-            bg="blackAlpha.600"
-            color="white"
-            px={2}
-            py={1}
-            borderRadius="md"
-          >
-            {currentIndex + 1} / {totalSlides}
-          </Text>
-          {totalSlides <= 12 ? (
-            <Flex
-              position="absolute"
-              bottom="10px"
-              width="100%"
-              justifyContent="center"
-            >
-              {items.map((_, index) => (
-                <Box
-                  key={index}
-                  width={currentIndex === index ? "12px" : "8px"}
-                  height={currentIndex === index ? "12px" : "8px"}
-                  borderRadius="50%"
-                  bg={currentIndex === index ? "brand.500" : "brand.200"}
-                  margin="0 4px"
-                  cursor="pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentIndex(index);
-                  }}
-                />
-              ))}
-            </Flex>
-          ) : null}
-        </>
+      {totalSlides > 1 && totalSlides <= 12 ? (
+        <Flex
+          position="absolute"
+          bottom="10px"
+          width="100%"
+          justifyContent="center"
+        >
+          {items.map((_, index) => (
+            <Box
+              key={index}
+              width={currentIndex === index ? "12px" : "8px"}
+              height={currentIndex === index ? "12px" : "8px"}
+              borderRadius="50%"
+              bg={currentIndex === index ? "brand.500" : "brand.200"}
+              margin="0 4px"
+              cursor="pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(index);
+              }}
+            />
+          ))}
+        </Flex>
       ) : null}
     </Box>
   );
