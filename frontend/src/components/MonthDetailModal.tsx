@@ -24,7 +24,7 @@ import {
 } from "../api/timelineEvents";
 import { TimelineCustomEvent, TimelineMonthEvent, User } from "../helpers/types";
 import dayjs from "dayjs";
-import { isOwner, renderNickname, renderSharedBy } from "../helpers/utils";
+import { isOwner, renderFirstLastName, renderSharedBy } from "../helpers/utils";
 import TimelineConfirmDialog from "./TimelineConfirmDialog";
 import TimelineEventForm from "./TimelineEventForm";
 import AppButton from "./ui/AppButton";
@@ -280,15 +280,10 @@ const MonthDetailModal = ({
                     <Box as="ul" pl={5} m={0} style={{ listStyleType: "disc" }}>
                       {birthdays.map((event) => {
                         const dayLabel = birthdayDayLabel(event);
+                        const name = renderFirstLastName(event.owner);
                         return (
                           <Box as="li" key={event.id} fontSize="sm" mb={1}>
-                            {renderNickname(event.owner)}
-                            {dayLabel != null && (
-                              <Text as="span" color="gray.600">
-                                {" "}
-                                — {dayLabel}
-                              </Text>
-                            )}
+                            {dayLabel != null ? `${dayLabel}: ${name}` : name}
                           </Box>
                         );
                       })}

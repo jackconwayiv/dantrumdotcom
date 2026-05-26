@@ -23,6 +23,11 @@ export const renderNickname = (user: User) => {
   return nameString;
 };
 
+export const renderFirstLastName = (user: User) => {
+  const name = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+  return name || user.username || user.email;
+};
+
 const renderAvatar = (user: User) => {
   return (
     <Avatar
