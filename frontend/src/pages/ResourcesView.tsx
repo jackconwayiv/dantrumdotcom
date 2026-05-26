@@ -44,22 +44,22 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
       const resourceValues = { ...values, id: values.id || 0 };
       handleSubmit(resourceValues);
     },
-    enableReinitialize: true,
   });
 
+  const { setValues, resetForm } = formik;
+
   useEffect(() => {
-    if (currentResource) {
-      formik.setValues({
-        id: currentResource.id ?? undefined,
-        title: currentResource.title,
-        description: currentResource.description,
-        url: currentResource.url,
-        thumbnail_url: currentResource.thumbnail_url,
-      });
-    } else {
-      formik.resetForm();
+    if (!currentResource) {
+      return;
     }
-  }, [currentResource, formik]);
+    setValues({
+      id: currentResource.id ?? undefined,
+      title: currentResource.title,
+      description: currentResource.description,
+      url: currentResource.url,
+      thumbnail_url: currentResource.thumbnail_url,
+    });
+  }, [currentResource, setValues]);
 
   const loadResources = async () => {
     try {
@@ -143,6 +143,7 @@ const ResourcesView: React.FC<ResourcesViewProps> = ({ user }) => {
           colorTone="success"
           onClick={() => {
             setCurrentResource(null);
+            resetForm();
             onOpen();
           }}
         >

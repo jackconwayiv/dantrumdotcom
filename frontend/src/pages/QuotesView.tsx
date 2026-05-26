@@ -88,20 +88,20 @@ export default function QuotesView({ user }: QuotesViewProps) {
       const quoteValues = { ...values, id: values.id || 0 }; //double-check this
       handleSubmit(quoteValues);
     },
-    enableReinitialize: true,
   });
 
+  const { setValues, resetForm } = formik;
+
   useEffect(() => {
-    if (currentQuote) {
-      formik.setValues({
-        id: currentQuote.id ?? undefined,
-        text: currentQuote.text,
-        date: currentQuote.date,
-      });
-    } else {
-      formik.resetForm();
+    if (!currentQuote) {
+      return;
     }
-  }, [currentQuote, formik]);
+    setValues({
+      id: currentQuote.id ?? undefined,
+      text: currentQuote.text,
+      date: currentQuote.date,
+    });
+  }, [currentQuote, setValues]);
 
   const renderAlert = (error: string) => {
     return (
@@ -226,6 +226,7 @@ export default function QuotesView({ user }: QuotesViewProps) {
         m={4}
         onClick={() => {
           setCurrentQuote(null);
+          resetForm();
           onOpen();
         }}
       >

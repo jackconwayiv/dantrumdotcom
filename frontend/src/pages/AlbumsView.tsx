@@ -110,23 +110,23 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
       const albumValues = { ...values, id: values.id || 0 }; //double-check this
       handleSubmit(albumValues);
     },
-    enableReinitialize: true,
   });
 
+  const { setValues, resetForm } = formik;
+
   useEffect(() => {
-    if (currentAlbum) {
-      formik.setValues({
-        id: currentAlbum.id ?? undefined,
-        title: currentAlbum.title,
-        description: currentAlbum.description,
-        link_url: currentAlbum.link_url,
-        thumbnail_url: currentAlbum.thumbnail_url,
-        date: currentAlbum.date,
-      });
-    } else {
-      formik.resetForm();
+    if (!currentAlbum) {
+      return;
     }
-  }, [currentAlbum, formik]);
+    setValues({
+      id: currentAlbum.id ?? undefined,
+      title: currentAlbum.title,
+      description: currentAlbum.description,
+      link_url: currentAlbum.link_url,
+      thumbnail_url: currentAlbum.thumbnail_url,
+      date: currentAlbum.date,
+    });
+  }, [currentAlbum, setValues]);
 
   const renderAlbum = (album: Album) => {
     return (
@@ -241,6 +241,7 @@ const AlbumsView = ({ user }: AlbumsViewProps) => {
           colorTone="success"
           onClick={() => {
             setCurrentAlbum(null);
+            resetForm();
             onOpen();
           }}
         >
