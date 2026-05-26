@@ -669,13 +669,16 @@ class TimelineViewTests(APITestCase):
         self.assertIn("birthday", types)
         self.assertEqual(response.data["events"][0]["sort_date"], "2024-03-05")
 
-    def test_birthday_month_highlighted_on_all_years(self):
+    def test_birthday_only_month_not_highlighted_on_summary(self):
+        """March has birthdays but no albums/events — grid should stay inactive."""
         self._create_album("Old", "2022-01-01")
         self._create_album("New", "2024-01-01")
         response = self.client.get(reverse("timeline-summary"), format="json")
         years = {item["year"]: item["months_with_events"] for item in response.data["years"]}
-        self.assertIn(3, years[2024])
-        self.assertIn(3, years[2022])
+        self.assertNotIn(3, years[2024])
+        self.assertNotIn(3, years[2022])
+        self.assertEqual(years[2024], [1])
+        self.assertEqual(years[2022], [1])
 
     def test_timeline_years_oldest_first(self):
         self._create_album("Old", "2022-01-01")
@@ -701,7 +704,7 @@ class TimelineViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["years"]), 7)
         # Fixed small number of queries regardless of how many years have data.
-        self.assertEqual(len(ctx.captured_queries), 3)
+        self.assertEqual(len(ctx.captured_queries), 2)
 
     def test_timeline_summary_query_count_same_for_few_or_many_years(self):
         """Adding more years must not add more summary queries."""

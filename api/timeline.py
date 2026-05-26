@@ -19,15 +19,6 @@ def visible_albums_queryset(*, with_owner=True):
     return qs
 
 
-def get_birthday_months():
-    return set(
-        User.objects.filter(is_active=True)
-        .exclude(date_of_birth__isnull=True)
-        .values_list("date_of_birth__month", flat=True)
-        .distinct()
-    )
-
-
 def _months_by_year(qs):
     """Single query: distinct (year, month) pairs for a date field on qs."""
     by_year = defaultdict(set)
@@ -44,17 +35,13 @@ def _months_by_year(qs):
 
 def build_timeline_summary():
     """Build year/month grid in O(1) DB round-trips (not one query per year)."""
-    birthday_months = get_birthday_months()
     album_months = _months_by_year(visible_albums_queryset(with_owner=False))
     event_months = _months_by_year(TimelineEvent.objects.all())
 
     all_years = sorted(set(album_months) | set(event_months))
     years = []
     for year in all_years:
-        months = set()
-        months |= album_months.get(year, set())
-        months |= event_months.get(year, set())
-        months |= birthday_months
+        months = album_months.get(year, set()) | event_months.get(year, set())
         years.append({"year": year, "months_with_events": sorted(months)})
     return {"years": years}
 
