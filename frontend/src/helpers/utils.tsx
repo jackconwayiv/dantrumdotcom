@@ -37,12 +37,15 @@ const renderAvatar = (user: User) => {
   );
 };
 
-export const renderSharedBy = (user: User) => {
+export const renderSharedBy = (
+  user: User,
+  options?: { align?: "between" | "end" }
+) => {
   return (
     <Flex
       direction="row"
       alignItems="center"
-      justifyContent="space-between"
+      justifyContent={options?.align === "end" ? "flex-end" : "space-between"}
       p={1}
     >
       {

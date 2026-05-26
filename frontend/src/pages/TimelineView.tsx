@@ -57,6 +57,7 @@ const TimelineView = ({ user }: TimelineViewProps) => {
 
   const loadMonth = useCallback(async (year: number, month: number) => {
     setMonthLoading(true);
+    setMonthEvents([]);
     const data = await fetchMonthEvents(year, month);
     if (data) {
       setMonthName(data.month_name);

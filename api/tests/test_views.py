@@ -260,10 +260,95 @@ class HomeRecentViewTests(APITestCase):
             created_at=timezone.now() - timedelta(days=31)
         )
 
+        for i in range(5):
+            Album.objects.create(
+                title=f"Recent filler {i}",
+                link_url=f"http://recent{i}.com",
+                thumbnail_url="http://example.com/a.jpg",
+                owner=self.user,
+            )
+
         response = self.client.get(reverse("home-recent"), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        album_items = [i for i in response.data["items"] if i["kind"] == "album"]
-        self.assertEqual(len(album_items), 0)
+        titles = [i["title"] for i in response.data["items"] if i["kind"] == "album"]
+        self.assertNotIn("Old", titles)
+        self.assertEqual(len(response.data["items"]), 5)
+
+    def test_home_recent_fills_to_minimum_from_recent_posts(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from api.models import Album
+
+        for i in range(2):
+            Album.objects.create(
+                title=f"Recent Album {i}",
+                link_url=f"http://recentalbum{i}.com",
+                thumbnail_url="http://example.com/a.jpg",
+                owner=self.user,
+            )
+
+        older_created_at = timezone.now() - timedelta(days=40)
+        for i in range(5):
+            album = Album.objects.create(
+                title=f"Older Album {i}",
+                link_url=f"http://olderalbum{i}.com",
+                thumbnail_url="http://example.com/a.jpg",
+                owner=self.user,
+            )
+            Album.objects.filter(pk=album.pk).update(created_at=older_created_at)
+
+        response = self.client.get(reverse("home-recent"), format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        items = response.data["items"]
+        self.assertEqual(len(items), 5)
+        kinds = [item["kind"] for item in items]
+        self.assertEqual(kinds.count("album"), 5)
+
+    def test_home_recent_album_wins_tiebreak_over_resource(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from api.models import Album, Resource
+
+        posted_at = timezone.now()
+        older_created_at = timezone.now() - timedelta(days=40)
+        album = Album.objects.create(
+            title="Tie Album",
+            link_url="http://tiealbum.com",
+            thumbnail_url="http://example.com/a.jpg",
+            owner=self.user,
+        )
+        resource = Resource.objects.create(
+            title="Tie Resource",
+            url="http://tieresource.com",
+            thumbnail_url="http://example.com/r.jpg",
+            owner=self.user,
+        )
+        Album.objects.filter(pk=album.pk).update(created_at=posted_at)
+        Resource.objects.filter(pk=resource.pk).update(created_at=posted_at)
+
+        for i in range(3):
+            filler = Album.objects.create(
+                title=f"Filler Album {i}",
+                link_url=f"http://filler{i}.com",
+                thumbnail_url="http://example.com/a.jpg",
+                owner=self.user,
+            )
+            Album.objects.filter(pk=filler.pk).update(created_at=older_created_at)
+
+        response = self.client.get(reverse("home-recent"), format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        items = response.data["items"]
+        self.assertEqual(len(items), 5)
+        album_positions = [
+            index
+            for index, item in enumerate(items)
+            if item["kind"] == "album" and item["title"] == "Tie Album"
+        ]
+        self.assertEqual(album_positions, [0])
 
     def test_home_recent_includes_upcoming_event(self):
         from datetime import timedelta

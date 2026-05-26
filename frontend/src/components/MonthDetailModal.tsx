@@ -23,7 +23,8 @@ import {
   updateTimelineEvent,
 } from "../api/timelineEvents";
 import { TimelineCustomEvent, TimelineMonthEvent, User } from "../helpers/types";
-import { isOwner, renderSharedBy } from "../helpers/utils";
+import dayjs from "dayjs";
+import { isOwner, renderNickname, renderSharedBy } from "../helpers/utils";
 import TimelineConfirmDialog from "./TimelineConfirmDialog";
 import TimelineEventForm from "./TimelineEventForm";
 import AppButton from "./ui/AppButton";
@@ -168,6 +169,19 @@ const MonthDetailModal = ({
     onHideClose();
   };
 
+  const birthdays = events.filter((event) => event.type === "birthday");
+  const monthEvents = events.filter((event) => event.type !== "birthday");
+
+  const birthdayDayLabel = (event: TimelineMonthEvent) => {
+    if (event.owner.date_of_birth) {
+      return dayjs(event.owner.date_of_birth).format("D");
+    }
+    if (event.sort_date) {
+      return dayjs(event.sort_date).format("D");
+    }
+    return null;
+  };
+
   const renderEventRow = (event: TimelineMonthEvent) => {
     return (
       <Flex
@@ -186,9 +200,7 @@ const MonthDetailModal = ({
                 {event.title}
               </Link>
             ) : (
-              <Text fontWeight="bold">
-                {event.type === "birthday" ? `🎂 ${event.title}` : event.title}
-              </Text>
+              <Text fontWeight="bold">{event.title}</Text>
             )}
             {event.date && (
               <Text fontSize="xs" color="gray.600">
@@ -237,7 +249,7 @@ const MonthDetailModal = ({
             )}
           </Flex>
         </Flex>
-        {event.owner && renderSharedBy(event.owner)}
+        {event.owner && renderSharedBy(event.owner, { align: "end" })}
       </Flex>
     );
   };
@@ -259,7 +271,32 @@ const MonthDetailModal = ({
             ) : events.length === 0 ? (
               <Text>No events this month.</Text>
             ) : (
-              events.map(renderEventRow)
+              <>
+                {birthdays.length > 0 && (
+                  <Box as="section" mb={4}>
+                    <Text fontWeight="semibold" fontSize="sm" mb={2}>
+                      {monthName} Birthdays:
+                    </Text>
+                    <Box as="ul" pl={5} m={0} style={{ listStyleType: "disc" }}>
+                      {birthdays.map((event) => {
+                        const dayLabel = birthdayDayLabel(event);
+                        return (
+                          <Box as="li" key={event.id} fontSize="sm" mb={1}>
+                            {renderNickname(event.owner)}
+                            {dayLabel != null && (
+                              <Text as="span" color="gray.600">
+                                {" "}
+                                — {dayLabel}
+                              </Text>
+                            )}
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </Box>
+                )}
+                {monthEvents.map(renderEventRow)}
+              </>
             )}
 
             {showAddForm && (
